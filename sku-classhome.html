@@ -2,13 +2,25 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Test Kirim WhatsApp via Fonnte</title>
+    <title>Form Kirim WhatsApp via Fonnte</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            max-width: 480px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
         }
         button {
+            margin-top: 15px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
@@ -21,25 +33,51 @@
 </head>
 <body>
 
-    <h2>Test Kirim WhatsApp via Fonnte</h2>
+    <h2>Kirim WhatsApp via Fonnte</h2>
 
-    <button id="btnTest">Test</button>
+    <!-- Input nomor WA -->
+    <label for="target">Nomor WhatsApp (tanpa 62):</label>
+    <input type="text" id="target" placeholder="contoh: 081212345678">
+
+    <!-- Input pesan -->
+    <label for="message">Pesan:</label>
+    <textarea id="message" rows="4" placeholder="Tulis pesan yang akan dikirim"></textarea>
+
+    <!-- Tombol kirim -->
+    <button id="btnKirim">Kirim</button>
 
     <div id="status"></div>
 
     <script>
-        const btnTest = document.getElementById('btnTest');
+        const btnKirim  = document.getElementById('btnKirim');
         const statusDiv = document.getElementById('status');
+        const targetInp = document.getElementById('target');
+        const msgInp    = document.getElementById('message');
 
-        btnTest.addEventListener('click', function () {
+        btnKirim.addEventListener('click', function () {
+            const target = targetInp.value.trim();
+            const message = msgInp.value.trim();
+
+            if (!target || !message) {
+                statusDiv.textContent = "Nomor dan pesan tidak boleh kosong.";
+                return;
+            }
+
             statusDiv.textContent = "Mengirim pesan...";
-            
-            // URL API Fonnte (GET)
-            const url = "https://api.fonnte.com/send?token=AiK7CYb8t8Musw5HMBG1&target=081212745643&message=Transaksi%20anda%20berhasil.%20Terima%20kasih!&delay=0&countryCode=62";
 
-            // Panggil API menggunakan fetch
+            // Encode pesan agar aman di URL
+            const encodedMessage = encodeURIComponent(message);
+
+            // Jika mau tetap pakai nomor fix 081212745643, ganti 'target' di bawah dengan nomor tersebut.
+            const url = "https://api.fonnte.com/send"
+                + "?token=AiK7CYb8t8Musw5HMBG1"
+                + "&target=" + encodeURIComponent(target)
+                + "&message=" + encodedMessage
+                + "&delay=0"
+                + "&countryCode=62";
+
             fetch(url)
-                .then(response => response.text()) // gunakan .json() jika API mengembalikan JSON
+                .then(response => response.text())
                 .then(data => {
                     console.log(data);
                     statusDiv.textContent = "Permintaan terkirim. Cek WhatsApp / log untuk hasilnya.";
