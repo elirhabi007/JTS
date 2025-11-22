@@ -1,208 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Form Pendaftaran CLass Home</title>
-  <style>
-    :root{
-      --bg:#f3f4f6;--card:#ffffff;--border:#e5e7eb;
-      --text:#0f172a;--muted:#6b7280;--accent:#0b6ef6;
-    }
-    html,body{
-      margin:0;padding:0;background:var(--bg);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      color:var(--text);
-    }
-    .wrap{
-      max-width:880px;margin:0 auto;padding:16px;
-    }
-    .card{
-      background:var(--card);border-radius:10px;
-      border:1px solid var(--border);
-      padding:16px;margin-top:12px;
-      box-shadow:0 2px 6px rgba(0,0,0,.03);
-    }
-    h1{font-size:20px;margin:0 0 4px;}
-    h2{font-size:16px;margin:8px 0;}
-    .subtitle{font-size:13px;color:var(--muted);}
-    label{display:block;margin-top:10px;font-size:14px;}
-    input,select,textarea{
-      width:100%;margin-top:4px;padding:8px;
-      border-radius:8px;border:1px solid var(--border);
-      font-size:14px;box-sizing:border-box;
-    }
-    textarea{resize:vertical;}
-    button{
-      margin-top:16px;padding:10px 18px;border-radius:999px;
-      border:none;font-size:14px;font-weight:600;
-      cursor:pointer;background:var(--accent);color:#fff;
-    }
-    button:disabled{opacity:.6;cursor:wait;}
-    .small{font-size:12px;color:var(--muted);margin-top:4px;}
-    .msg{margin-top:10px;font-size:14px;}
-    .msg.ok{color:#15803d;}
-    .msg.err{color:#b91c1c;}
-    .ketentuan-list{font-size:14px;color:var(--text);padding-left:18px;}
-    .ketentuan-list li{margin:4px 0;}
-    @media (prefers-color-scheme:dark){
-      :root{
-        --bg:#020617;--card:#02081b;--border:#1f2937;
-        --text:#e5e7eb;--muted:#9ca3af;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Test Kirim WhatsApp via Fonnte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Form Pendaftaran Layanan Internet CLass Home</h1>
-      <div class="subtitle">PT. Jaringan Teknologi Sejahtera</div>
-      <p class="small">
-        Silakan isi data di bawah ini. Data pendaftaran akan otomatis dikirim ke WhatsApp Admin CLass Home melalui sistem Fonnte.
-      </p>
-    </div>
 
-    <div class="card">
-      <h2>Data Calon Pelanggan</h2>
+    <h2>Test Kirim WhatsApp via Fonnte</h2>
 
-      <form id="formPendaftaran">
-        <label>Nama Lengkap
-          <input type="text" name="nama" required />
-        </label>
+    <button id="btnTest">Test</button>
 
-        <label>Nomor WhatsApp Calon Pelanggan
-          <input type="tel" name="wa_pelanggan" placeholder="08xxxxxxxxxx" required />
-        </label>
+    <div id="status"></div>
 
-        <label>Alamat Lengkap Pemasangan
-          <textarea name="alamat" rows="3" required></textarea>
-        </label>
+    <script>
+        const btnTest = document.getElementById('btnTest');
+        const statusDiv = document.getElementById('status');
 
-        <label>Paket Berlangganan
-          <select name="paket" required>
-            <option value="">-- Pilih Paket --</option>
-            <option value="Paket Dasar 10 Mbps">Paket Dasar 10 Mbps</option>
-            <option value="Paket Standard 20 Mbps">Paket Standard 20 Mbps</option>
-            <option value="Paket Premium 50 Mbps">Paket Premium 50 Mbps</option>
-            <!-- Tambahkan paket lain sesuai kebutuhan -->
-          </select>
-        </label>
+        btnTest.addEventListener('click', function () {
+            statusDiv.textContent = "Mengirim pesan...";
+            
+            // URL API Fonnte (GET)
+            const url = "https://api.fonnte.com/send?token=AiK7CYb8t8Musw5HMBG1&target=081212745643&message=Transaksi%20anda%20berhasil.%20Terima%20kasih!&delay=0&countryCode=62";
 
-        <label>Nomor KTP / NIK
-          <input type="text" name="nik" placeholder="Opsional, isi jika sudah siap" />
-        </label>
-
-        <label>NPWP (jika ada)
-          <input type="text" name="npwp" placeholder="Opsional" />
-        </label>
-
-        <label>Catatan Tambahan
-          <textarea name="catatan" rows="2" placeholder="Misalnya: patokan lokasi, permintaan jam pemasangan, dll."></textarea>
-        </label>
-
-        <div class="small">
-          Dengan mengirim formulir ini, Calon Pelanggan menyatakan telah membaca dan menyetujui Syarat dan Ketentuan Layanan CLass Home.
-        </div>
-
-        <button type="submit" id="btnKirim">Kirim Pendaftaran</button>
-        <div id="statusMsg" class="msg"></div>
-      </form>
-    </div>
-
-    <div class="card">
-      <h2>Ringkasan Ketentuan Singkat</h2>
-      <ul class="ketentuan-list">
-        <li>Calon Pelanggan dimohon melampirkan KTP atau NPWP yang masih berlaku saat proses administrasi.</li>
-        <li>Perangkat layanan dipinjamkan oleh CLass Home dan diharapkan dijaga dengan baik selama masa berlangganan.</li>
-        <li>Jika saat pemasangan membutuhkan material tambahan di luar standar instalasi, biaya material tambahan ditanggung Calon Pelanggan.</li>
-        <li>Penanganan kendala dilakukan pada jam kerja, pukul 08.00–16.00 WIB pada hari kerja.</li>
-        <li>Pelanggan mendapatkan fasilitas dan layanan sesuai paket berlangganan yang dipilih.</li>
-      </ul>
-      <p class="small">
-        Untuk informasi lengkap, silakan minta dokumen SKU CLass Home kepada petugas.
-      </p>
-    </div>
-  </div>
-
-  <script>
-    const form = document.getElementById('formPendaftaran');
-    const btn = document.getElementById('btnKirim');
-    const statusMsg = document.getElementById('statusMsg');
-
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      statusMsg.textContent = '';
-      statusMsg.className = 'msg';
-
-      const formData = new FormData(form);
-      const nama = formData.get('nama') || '';
-      const waPelanggan = formData.get('wa_pelanggan') || '';
-      const alamat = formData.get('alamat') || '';
-      const paket = formData.get('paket') || '';
-      const nik = formData.get('nik') || '-';
-      const npwp = formData.get('npwp') || '-';
-      const catatan = formData.get('catatan') || '-';
-
-      // Format pesan ke WhatsApp (Admin)
-      const text =
-        `PENDAFTARAN BARU CLass Home\n\n` +
-        `Nama : ${nama}\n` +
-        `WA Calon Pelanggan : ${waPelanggan}\n` +
-        `Alamat : ${alamat}\n` +
-        `Paket : ${paket}\n` +
-        `NIK : ${nik}\n` +
-        `NPWP : ${npwp}\n` +
-        `Catatan : ${catatan}`;
-
-      // Konfigurasi Fonnte
-      const FONNTE_URL = 'https://api.fonnte.com/send';
-      const TOKEN = 'AiK7CYb8t8Musw5HMBG1'; // token kamu
-
-      // Nomor admin (target) → bisa sama seperti contoh kamu
-      const TARGET_ADMIN = '081212745643';
-
-      // Siapkan payload sesuai Fonnte (POST + header Authorization)
-      const payload = {
-        target: TARGET_ADMIN,
-        message: text,
-        delay: 0,
-        countryCode: '62'
-      };
-
-      try {
-        btn.disabled = true;
-        btn.textContent = 'Mengirim...';
-
-        const res = await fetch(FONNTE_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': TOKEN
-          },
-          body: JSON.stringify(payload)
+            // Panggil API menggunakan fetch
+            fetch(url)
+                .then(response => response.text()) // gunakan .json() jika API mengembalikan JSON
+                .then(data => {
+                    console.log(data);
+                    statusDiv.textContent = "Permintaan terkirim. Cek WhatsApp / log untuk hasilnya.";
+                })
+                .catch(error => {
+                    console.error(error);
+                    statusDiv.textContent = "Gagal mengirim: " + error;
+                });
         });
+    </script>
 
-        const data = await res.json().catch(() => ({}));
-
-        // Kamu bisa sesuaikan pengecekan berdasarkan struktur respon Fonnte
-        if (!res.ok || (data && data.status && data.status !== 'success')) {
-          console.log('Respon Fonnte:', data);
-          throw new Error('Gagal mengirim ke Fonnte');
-        }
-
-        statusMsg.textContent = 'Pendaftaran berhasil dikirim. Admin CLass Home akan menghubungi Anda melalui WhatsApp.';
-        statusMsg.className = 'msg ok';
-        form.reset();
-      } catch (err) {
-        console.error(err);
-        statusMsg.textContent = 'Maaf, terjadi kendala saat mengirim pendaftaran. Silakan coba lagi atau hubungi Admin CLass Home melalui WhatsApp.';
-        statusMsg.className = 'msg err';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Kirim Pendaftaran';
-      }
-    });
-  </script>
 </body>
 </html>
