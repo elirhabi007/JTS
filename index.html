@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Pendaftaran Internet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #ffffff;
+      padding: 20px 24px 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    p.sub {
+      text-align: center;
+      color: #555;
+      font-size: 13px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px #2563eb33;
+    }
+    .btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 10px;
+      background: #16a34a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: #15803d;
+    }
+    .small {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .autocomplete-wrapper {
+      position: relative;
+    }
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-top: none;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 999;
+      border-radius: 0 0 6px 6px;
+    }
+    .autocomplete-item {
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .autocomplete-item:hover {
+      background: #e5e7eb;
+    }
+    .flex-row {
+      display: flex;
+      gap: 10px;
+    }
+    .flex-row > div {
+      flex: 1;
+    }
+    .msg {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .msg.success {
+      color: #15803d;
+    }
+    .msg.error {
+      color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Form Pendaftaran Layanan Internet</h1>
+    <p class="sub">Data akan dikirim ke WhatsApp admin melalui API Fonnte</p>
+
+    <form id="waForm">
+      <!-- NAMA -->
+      <label for="namaLengkap">Nama Lengkap</label>
+      <input type="text" id="namaLengkap" name="namaLengkap" placeholder="Nama sesuai KTP" required>
+
+      <!-- NOMOR WA CALON PELANGGAN -->
+      <label for="waCalon">Nomor WhatsApp Calon Pelanggan</label>
+      <input type="tel" id="waCalon" name="waCalon" placeholder="08xxxxxxxxxx" required>
+
+      <!-- PAKET BERLANGGANAN -->
+      <label for="paket">Paket Berlangganan</label>
+      <input type="text" id="paket" name="paket" placeholder="Contoh: Paket 20 Mbps" required>
+
+      <!-- ALAMAT: KOTA / KABUPATEN -->
+      <label for="kotaInput">Kota / Kabupaten</label>
+      <div class="autocomplete-wrapper">
+        <input type="text" id="kotaInput" name="kota" placeholder="Ketik nama kota/kabupaten" autocomplete="off" required>
+        <div id="kotaList" class="autocomplete-list" style="display:none;"></div>
+      </div>
+
+      <!-- ALAMAT: KECAMATAN + DESA/KELURAHAN DALAM 1 BARIS -->
+      <div class="flex-row">
+        <div>
+          <label for="kecInput">Kecamatan</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" id="kecInput" name="kecamatan" placeholder="Ketik nama kecamatan" autocomplete="off" required>
+            <div id="kecList" class="autocomplete-list" style="display:none;"></div>
+          </div>
+        </div>
+        <div>
+          <label for="desaInput">Desa / Kelurahan</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" id="desaInput" name="desa" placeholder="Ketik nama desa/kelurahan" autocomplete="off" required>
+            <div id="desaList" class="autocomplete-list" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOMBOL KIRIM -->
+      <button type="submit" class="btn">Kirim ke WhatsApp</button>
+      <div id="statusMsg" class="msg"></div>
+      <p class="small">
+        Dengan menekan tombol Kirim, data pendaftaran Anda akan dikirim ke admin melalui WhatsApp
+        menggunakan API Fonnte.
+      </p>
+    </form>
+  </div>
+
+  <!-- File data wilayah -->
+  <script src="wilayah-lampung.js"></script>
+
+  <script>
+    // ===== KONFIGURASI FONNTE =====
+    const WHATSAPP_TOKEN = "AiK7CYb8t8Musw5HMBG1";
+    const WHATSAPP_TARGET_DEFAULT = "081212745643"; // nomor admin
+
+    function encodeForURL(text) {
+      return encodeURIComponent(text);
+    }
+
+    // Hapus kata depan seperti "Kabupaten ", "Kota ", "Kecamatan ", "Kelurahan ", "Desa "
+    function bersihkanLabelWilayah(nama) {
+      if (!nama) return "";
+      return nama
+        .replace(/^Kabupaten\s+/i, "")
+        .replace(/^Kota\s+/i, "")
+        .replace(/^Kecamatan\s+/i, "")
+        .replace(/^Kelurahan\s+/i, "")
+        .replace(/^Desa\s+/i, "")
+        .trim();
+    }
+
+    // ===== AUTOCOMPLETE GENERIC =====
+    function setupAutocomplete(inputEl, listEl, getSuggestions, onSelected) {
+      inputEl.addEventListener("input", function () {
+        const value = this.value.trim().toLowerCase();
+        const suggestions = getSuggestions(value);
+
+        if (!value || suggestions.length === 0) {
+          listEl.style.display = "none";
+          listEl.innerHTML = "";
+          return;
+        }
+
+        listEl.innerHTML = "";
+        suggestions.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "autocomplete-item";
+          div.textContent = item;
+          div.addEventListener("click", () => {
+            inputEl.value = item;
+            listEl.style.display = "none";
+            listEl.innerHTML = "";
+            if (onSelected) onSelected(item);
+          });
+          listEl.appendChild(div);
+        });
+
+        listEl.style.display = "block";
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!listEl.contains(e.target) && e.target !== inputEl) {
+          listEl.style.display = "none";
+        }
+      });
+    }
+
+    // ===== DATA WILAYAH DARI FILE JS =====
+    const daftarKota   = (typeof daftarKotaIndonesia !== "undefined") ? daftarKotaIndonesia : [];
+    const kecamatanData = (typeof kecamatanLampung !== "undefined") ? kecamatanLampung : {};
+    const desaData      = (typeof desaLampung !== "undefined") ? desaLampung : {};
+
+    // ELEMENT INPUT
+    const kotaInput  = document.getElementById("kotaInput");
+    const kotaList   = document.getElementById("kotaList");
+    const kecInput   = document.getElementById("kecInput");
+    const kecList    = document.getElementById("kecList");
+    const desaInput  = document.getElementById("desaInput");
+    const desaList   = document.getElementById("desaList");
+    const statusMsg  = document.getElementById("statusMsg");
+
+    // ===== AUTOCOMPLETE KOTA =====
+    setupAutocomplete(
+      kotaInput,
+      kotaList,
+      (value) => {
+        if (!value) return [];
+        return daftarKota.filter(k => k.toLowerCase().includes(value));
+      },
+      (selectedKota) => {
+        kecInput.value = "";
+        desaInput.value = "";
+      }
+    );
+
+    // ===== AUTOCOMPLETE KECAMATAN =====
+    setupAutocomplete(
+      kecInput,
+      kecList,
+      (value) => {
+        const selectedKota = kotaInput.value.trim();
+        if (!selectedKota || !value) return [];
+        const daftarKec = kecamatanData[selectedKota] || [];
+        return daftarKec.filter(kec => kec.toLowerCase().includes(value));
+      },
+      (selectedKec) => {
+        desaInput.value = "";
+      }
+    );
+
+    // ===== AUTOCOMPLETE DESA/KELURAHAN =====
+    setupAutocomplete(
+      desaInput,
+      desaList,
+      (value) => {
+        const selectedKota = kotaInput.value.trim();
+        const selectedKec  = kecInput.value.trim();
+        if (!selectedKota || !selectedKec || !value) return [];
+
+        const desaKota = desaData[selectedKota] || {};
+        const daftarDesa = desaKota[selectedKec] || [];
+        return daftarDesa.filter(d => d.toLowerCase().includes(value.toLowerCase()));
+      },
+      null
+    );
+
+    // ===== HANDLE SUBMIT FORM =====
+    document.getElementById("waForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      statusMsg.textContent = "";
+      statusMsg.className = "msg";
+
+      const namaLengkap = document.getElementById("namaLengkap").value.trim();
+      const waCalon     = document.getElementById("waCalon").value.trim();
+      const paket       = document.getElementById("paket").value.trim();
+
+      const kotaRaw      = kotaInput.value.trim();
+      const kecamatanRaw = kecInput.value.trim();
+      const desaRaw      = desaInput.value.trim();
+
+      if (!namaLengkap || !waCalon || !paket || !kotaRaw || !kecamatanRaw || !desaRaw) {
+        statusMsg.textContent = "Harap lengkapi semua data.";
+        statusMsg.classList.add("error");
+        return;
+      }
+
+      const kotaBersih      = bersihkanLabelWilayah(kotaRaw);
+      const kecamatanBersih = bersihkanLabelWilayah(kecamatanRaw);
+      const desaBersih      = bersihkanLabelWilayah(desaRaw);
+
+      const target = WHATSAPP_TARGET_DEFAULT;
+
+      const pesan = 
+        "Pendaftaran Pelanggan Baru%0A" +
+        "-------------------------%0A" +
+        "Nama: " + encodeForURL(namaLengkap) + "%0A" +
+        "WA Calon: " + encodeForURL(waCalon) + "%0A" +
+        "Paket: " + encodeForURL(paket) + "%0A" +
+        "Kota/Kabupaten: " + encodeForURL(kotaBersih) + "%0A" +
+        "Kecamatan: " + encodeForURL(kecamatanBersih) + "%0A" +
+        "Desa/Kelurahan: " + encodeForURL(desaBersih);
+
+      const url = "https://api.fonnte.com/send" +
+        "?token=" + encodeURIComponent(WHATSAPP_TOKEN) +
+        "&target=" + encodeURIComponent(target) +
+        "&message=" + pesan +
+        "&delay=0&countryCode=62";
+
+      window.open(url, "_blank");
+
+      statusMsg.textContent = "Mengalihkan ke WhatsApp (via Fonnte)...";
+      statusMsg.classList.add("success");
+      this.reset();
+    });
+  </script>
+</body>
+</html>
