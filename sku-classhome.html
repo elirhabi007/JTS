@@ -11,7 +11,6 @@
       margin: 0;
       padding: 16px;
     }
-
     .card {
       max-width: 600px;
       margin: 0 auto;
@@ -20,25 +19,19 @@
       padding: 24px 20px 28px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
-
     h1 {
       font-size: 22px;
       text-align: center;
       margin: 0 0 4px;
       font-weight: 700;
     }
-
     .subtitle {
       text-align: center;
       font-size: 13px;
       color: #6b7280;
       margin-bottom: 20px;
     }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
+    .form-group { margin-bottom: 14px; }
     label {
       display: block;
       font-size: 13px;
@@ -46,10 +39,7 @@
       margin-bottom: 4px;
       color: #111827;
     }
-
-    input[type="text"],
-    select,
-    input[type="file"] {
+    input[type="text"], select, input[type="file"] {
       width: 100%;
       padding: 10px 12px;
       border-radius: 10px;
@@ -57,20 +47,9 @@
       font-size: 14px;
       box-sizing: border-box;
     }
-
-    input[type="text"]::placeholder {
-      color: #9ca3af;
-    }
-
-    .row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .row .form-group {
-      flex: 1;
-    }
-
+    input[type="text"]::placeholder { color: #9ca3af; }
+    .row { display: flex; gap: 8px; }
+    .row .form-group { flex: 1; }
     .btn-submit {
       width: 100%;
       margin-top: 10px;
@@ -83,18 +62,8 @@
       color: #ffffff;
       cursor: pointer;
     }
-
-    .btn-submit:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-
-    .hint {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-
+    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+    .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
     .status-box {
       margin-top: 10px;
       font-size: 13px;
@@ -104,26 +73,22 @@
       display: none;
       white-space: pre-line;
     }
-
     .status-success {
       background: #d1fae5;
       border-color: #6ee7b7;
       color: #065f46;
     }
-
     .status-error {
       background: #fee2e2;
       border-color: #fecaca;
       color: #991b1b;
     }
-
     .terms-title {
       margin-top: 18px;
       font-size: 13px;
       font-weight: 700;
       color: #111827;
     }
-
     .terms-list {
       margin: 6px 0 0;
       padding-left: 18px;
@@ -131,10 +96,7 @@
       color: #4b5563;
       line-height: 1.5;
     }
-
-    .terms-list li {
-      margin-bottom: 4px;
-    }
+    .terms-list li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -217,8 +179,8 @@
 </div>
 
 <script>
-  // URL Web App Apps Script kamu
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxduz534zY04-lJX9bQotvtihYuNVTzCuI_rIR8memahB61bolgDByoJzqXMAW3E-Idiw/exec";
+  // URL Web App-mu
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz-QoVS7RGQ2eSla4dxoXQEW0VuHFT-Q26zLYU_ZAnSTD2sBwyVVTU6e5IZjQVLxl6DHQ/exec";
 
   const form = document.getElementById("formPelanggan");
   const btnKirim = document.getElementById("btnKirim");
@@ -269,24 +231,20 @@
         fotoDataUrl: dataURL
       };
 
-      // Kirim ke Apps Script sebagai x-www-form-urlencoded
       fetch(WEB_APP_URL, {
         method: "POST",
-        body: toFormBody(payload)   // TIDAK set header Content-Type manual
+        body: toFormBody(payload) // biarkan browser set Content-Type
       })
       .then(resp => resp.text())
       .then(text => {
         let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error("Respon bukan JSON valid: " + text);
-        }
+        try { data = JSON.parse(text); }
+        catch (e) { throw new Error("Respon bukan JSON valid: " + text); }
 
         if (data.result === "success") {
           let msg =
             "Pendaftaran berhasil dikirim dan dicatat di Google Spreadsheet.\n\n" +
-            "Ringkasan Data:\n" +
+            "Ringkasan Data (detail file ada di Spreadsheet):\n" +
             `NIK: ${payload.nik}\n` +
             `Nama: ${payload.nama}\n` +
             `Paket: ${payload.paket}\n`;
