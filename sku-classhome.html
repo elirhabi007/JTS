@@ -5,6 +5,7 @@
   <title>Form Pendaftaran Layanan Internet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f3f4f6;
@@ -13,6 +14,7 @@
     }
     .card {
       max-width: 600px;
+      width: 100%;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 24px;
@@ -45,11 +47,13 @@
       border-radius: 10px;
       border: 1px solid #d1d5db;
       font-size: 14px;
-      box-sizing: border-box;
     }
     input[type="text"]::placeholder { color: #9ca3af; }
-    .row { display: flex; gap: 8px; }
-    .row .form-group { flex: 1; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .row .form-group { flex: 1 1 100%; }
+    @media (min-width: 480px) {
+      .row .form-group { flex: 1; }
+    }
     .btn-submit {
       width: 100%;
       margin-top: 10px;
@@ -63,7 +67,6 @@
       cursor: pointer;
     }
     .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
-    .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
     .status-box {
       margin-top: 10px;
       font-size: 13px;
@@ -83,20 +86,6 @@
       border-color: #fecaca;
       color: #991b1b;
     }
-    .terms-title {
-      margin-top: 18px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #111827;
-    }
-    .terms-list {
-      margin: 6px 0 0;
-      padding-left: 18px;
-      font-size: 12px;
-      color: #4b5563;
-      line-height: 1.5;
-    }
-    .terms-list li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -111,7 +100,6 @@
     <div class="form-group">
       <label for="nik">NIK</label>
       <input type="text" id="nik" name="nik" maxlength="16" placeholder="Masukkan NIK 16 digit" required />
-      <div class="hint">Isi sesuai KTP (16 digit angka).</div>
     </div>
 
     <div class="form-group">
@@ -138,24 +126,23 @@
 
     <div class="form-group">
       <label for="kota">Kota / Kabupaten</label>
-      <input type="text" id="kota" name="kota" placeholder="Ketik nama kota/kabupaten" required />
+      <input type="text" id="kota" name="kota" required />
     </div>
 
     <div class="row">
       <div class="form-group">
         <label for="kecamatan">Kecamatan</label>
-        <input type="text" id="kecamatan" name="kecamatan" placeholder="Ketik nama kecamatan" required />
+        <input type="text" id="kecamatan" name="kecamatan" required />
       </div>
       <div class="form-group">
         <label for="desa">Desa / Kelurahan</label>
-        <input type="text" id="desa" name="desa" placeholder="Ketik nama desa/kelurahan" required />
+        <input type="text" id="desa" name="desa" required />
       </div>
     </div>
-    
+
     <div class="form-group">
       <label for="foto">Upload Foto KTP</label>
       <input type="file" id="foto" name="foto" accept="image/*" capture="camera" required />
-      <div class="hint">Upload foto KTP. Pilih file atau jepret langsung dengan kamera.</div>
     </div>
 
     <button type="submit" class="btn-submit" id="btnKirim">
@@ -163,43 +150,31 @@
     </button>
 
     <div id="statusBox" class="status-box"></div>
-
-    <div class="terms-title">
-      Catatan untuk Calon Pelanggan:
-    </div>
-    <ul class="terms-list">
-      <li>Calon Pelanggan dimohon melampirkan KTP atau NPWP yang masih berlaku saat proses administrasi.</li>
-      <li>Perangkat layanan dipinjamkan oleh Class Home dan diharapkan dijaga dengan baik selama masa berlangganan.</li>
-      <li>Jika saat pemasangan membutuhkan material tambahan di luar standar instalasi, biaya material tambahan ditanggung Calon Pelanggan.</li>
-      <li>Penanganan kendala dilakukan pada jam kerja, pukul 08.00–16.00 WIB pada hari kerja.</li>
-      <li>Pelanggan mendapatkan fasilitas dan layanan sesuai paket berlangganan yang dipilih.</li>
-    </ul>
-
   </form>
 </div>
 
 <script>
-  // URL Web App-mu
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz-QoVS7RGQ2eSla4dxoXQEW0VuHFT-Q26zLYU_ZAnSTD2sBwyVVTU6e5IZjQVLxl6DHQ/exec";
+  // GANTI dengan URL Web App-mu sendiri
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyC4b1QG1yWrDfhWgO4xo8HDVFUgpvhPlZmR60LVDKsj8UP5kAvpSg-HMUFNDgUw7Q/exec";
 
   const form = document.getElementById("formPelanggan");
   const btnKirim = document.getElementById("btnKirim");
   const statusBox = document.getElementById("statusBox");
 
-  function showStatus(message, isError) {
+  function showStatus(msg, isError) {
     statusBox.style.display = "block";
     statusBox.className = "status-box " + (isError ? "status-error" : "status-success");
-    statusBox.textContent = message;
+    statusBox.textContent = msg;
   }
 
   function toFormBody(obj) {
-    const params = [];
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        params.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
+    const enc = [];
+    for (const k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        enc.push(encodeURIComponent(k) + "=" + encodeURIComponent(obj[k]));
       }
     }
-    return params.join("&");
+    return enc.join("&");
   }
 
   form.addEventListener("submit", function (e) {
@@ -218,7 +193,7 @@
 
     const reader = new FileReader();
     reader.onload = function (ev) {
-      const dataURL = ev.target.result; // data:image/...;base64,...
+      const dataURL = ev.target.result; // data:image/...;base64,....
 
       const payload = {
         nik: document.getElementById("nik").value.trim(),
@@ -233,33 +208,29 @@
 
       fetch(WEB_APP_URL, {
         method: "POST",
-        body: toFormBody(payload) // biarkan browser set Content-Type
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+        body: toFormBody(payload)
       })
-      .then(resp => resp.text())
-      .then(text => {
-        let data;
-        try { data = JSON.parse(text); }
-        catch (e) { throw new Error("Respon bukan JSON valid: " + text); }
+      .then(r => r.text())
+      .then(t => {
+        let res;
+        try { res = JSON.parse(t); }
+        catch (e) { throw new Error("Respon bukan JSON valid: " + t); }
 
-        if (data.result === "success") {
+        if (res.result === "success") {
           let msg =
-            "Pendaftaran berhasil dikirim dan dicatat di Google Spreadsheet.\n\n" +
-            "Ringkasan Data (detail file ada di Spreadsheet):\n" +
+            "Pendaftaran berhasil dikirim.\n\n" +
             `NIK: ${payload.nik}\n` +
             `Nama: ${payload.nama}\n` +
             `Paket: ${payload.paket}\n`;
-
-          if (data.fileUrl) {
-            msg += `Link Foto: ${data.fileUrl}\n`;
-          }
+          if (res.fileUrl) msg += `Link Foto: ${res.fileUrl}\n`;
 
           showStatus(msg, false);
           form.reset();
         } else {
-          showStatus(
-            "Gagal mencatat data.\n" + (data.message || "Periksa log Apps Script."),
-            true
-          );
+          showStatus("Gagal mencatat data:\n" + (res.message || "Periksa log Apps Script."), true);
         }
       })
       .catch(err => {
