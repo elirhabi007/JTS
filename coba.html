@@ -47,7 +47,6 @@
     .iframe-container {
       position: relative;
       width: 100%;
-      min-height: 85vh; /* tinggi minimal hampir 1 layar penuh */
       background: #ffffff;
       border-radius: 24px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -57,7 +56,8 @@
     iframe {
       border: 0;
       width: 100%;
-      height: 100%;
+      /* tinggi besar supaya form nggak kepotong */
+      height: 1700px;
       display: block;
     }
 
@@ -68,7 +68,10 @@
       .iframe-container {
         border-radius: 0;
         box-shadow: none;
-        min-height: 100vh;
+      }
+      iframe {
+        /* di hp juga tetap full panjang, user tinggal scroll */
+        height: 1900px;
       }
     }
   </style>
