@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Form Pendaftaran Layanan Internet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .frame-wrapper {
+      width: 100%;
+      max-width: 640px;
+      padding: 16px;
+    }
+
+    .frame-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .frame-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      min-height: 85vh; /* tinggi minimal hampir 1 layar penuh */
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    iframe {
+      border: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @media (max-width: 480px) {
+      .frame-wrapper {
+        padding: 8px;
+      }
+      .iframe-container {
+        border-radius: 0;
+        box-shadow: none;
+        min-height: 100vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <div class="frame-wrapper">
+    <div class="frame-title">Form Pendaftaran Layanan Internet</div>
+    <div class="frame-subtitle">
+      Data diproses langsung oleh sistem Google Apps Script (Drive & Spreadsheet).
+    </div>
+
+    <div class="iframe-container">
+      <iframe
+        src="https://script.google.com/macros/s/AKfycbwrrHvD_FUgjCJzBipU7DQw7KnCZUrBE2Oh32T4TzragEOU0LpLPQ3nwOzYPsQhC-RZ/exec"
+        loading="lazy"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
