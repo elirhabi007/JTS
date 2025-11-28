@@ -1,77 +1,30 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Embed Auto Height</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f3f4f6;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    .page-wrapper {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
-
-    .frame-wrapper {
-      width: 100%;
-      max-width: 640px;
-      padding: 16px;
-    }
-
-    .iframe-container {
-      position: relative;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-
-    iframe {
-      border: 0;
-      width: 100%;
-      height: 900px; /* DITINGGIKAN */
-      display: block;
-    }
-
-    @media (max-width: 480px) {
-      .frame-wrapper {
-        padding: 8px;
-      }
-      .iframe-container {
-        border-radius: 0;
-        box-shadow: none;
-      }
-      iframe {
-        height: 1000px; /* lebih tinggi di HP */
-      }
-    }
+    html,body{height:100%;margin:0;}
+    .frame-wrapper{max-width:900px;margin:0 auto;padding:0;}
+    iframe{width:100%;border:0;display:block;}
   </style>
 </head>
 <body>
-
-<div class="page-wrapper">
   <div class="frame-wrapper">
-    <div class="iframe-container">
-      <iframe
-        src="https://script.google.com/macros/s/AKfycbwMRH7vDfT3Y_Ftoqb8r6vAAbeb4rm7RWTjCj22DG_Q7U0n50fNNJDqy5FxMG4tsWQP/exec"
-        loading="lazy"
-        allowfullscreen>
-      </iframe>
-    </div>
+    <iframe id="myFrame" src="https://script.google.com/macros/s/AKfycbwMRH7vDfT3Y_Ftoqb8r6vAAbeb4rm7RWTjCj22DG_Q7U0n50fNNJDqy5FxMG4tsWQP/exec"
+      loading="lazy" allowfullscreen></iframe>
   </div>
-</div>
 
+  <script>
+    const f = document.getElementById('myFrame');
+    function fit() {
+      // setinggi viewport; ubah multiplier bila ingin lebih tinggi
+      f.style.height = window.innerHeight + 'px';
+    }
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    fit();
+  </script>
 </body>
 </html>
