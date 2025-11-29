@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APLIKASI TEKNISI</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #e0f2fe;
+      --primary-soft: #dbeafe;
+      --border: #e5e7eb;
+      --bg: #f3f4f6;
+      --bg-card: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius: 12px;
+      --status-online: #bbf7d0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+    body { background: var(--bg); min-height: 100vh; display: flex; justify-content: center; padding: 16px 10px; color: var(--text-main); }
+
+    .app { width: 100%; max-width: 430px; }
+
+    .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+
+    /* HEADER BAR */
+    .header { display: flex; align-items: center; justify-content: space-between; background: var(--primary-light); padding: 14px 16px; border-bottom: 1px solid var(--primary-soft); border-radius: var(--radius) var(--radius) 0 0; }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+
+    .logo { width: 44px; height: 44px; border-radius: 999px; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+
+    .brand-text { display: flex; flex-direction: column; }
+
+    .brand-text h1 { font-size: 18px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+
+    .brand-text span { font-size: 12px; color: var(--text-muted); }
+
+    .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--status-online); color: #166534; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+
+    .status-dot { width: 7px; height: 7px; border-radius: 999px; background: #22c55e; }
+
+    /* MENU LIST */
+    .menu-list { display: flex; flex-direction: column; }
+
+    .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: background 0.1s ease; }
+
+    .menu-item:last-child { border-bottom: none; }
+
+    .menu-item:hover { background: #f9fafb; }
+
+    .menu-left { display: flex; align-items: center; gap: 12px; }
+
+    .menu-icon { width: 32px; height: 32px; border-radius: 8px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--primary); }
+
+    .menu-text { display: flex; flex-direction: column; }
+
+    .menu-text-title { font-size: 14px; font-weight: 500; }
+
+    .menu-text-sub { font-size: 11px; color: var(--text-muted); }
+
+    .menu-right { font-size: 16px; color: var(--border); }
+
+    .footer { padding: 8px 16px; font-size: 10px; color: var(--text-muted); text-align: center; }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="brand">
+          <div class="logo">AT</div>
+          <div class="brand-text">
+            <h1>APLIKASI TEKNISI</h1>
+            <span>Panel utama teknisi lapangan</span>
+          </div>
+        </div>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Online
+        </div>
+      </div>
+
+      <!-- MENU LIST -->
+      <div class="menu-list">
+        <div class="menu-item" onclick="window.location.href='https://elirhabi007.github.io/JTS/daftar.html'">
+          <div class="menu-left">
+            <div class="menu-icon">📝</div>
+            <div class="menu-text">
+              <div class="menu-text-title">Pendaftaran Pelanggan</div>
+              <div class="menu-text-sub">Input data pelanggan baru</div>
+            </div>
+          </div>
+          <div class="menu-right">›</div>
+        </div>
+
+        <div class="menu-item" onclick="window.location.href='https://elirhabi007.github.io/PON/index.html'">
+          <div class="menu-left">
+            <div class="menu-icon">📡</div>
+            <div class="menu-text">
+              <div class="menu-text-title">PON Kalkulator</div>
+              <div class="menu-text-sub">Hitung redaman & splitter</div>
+            </div>
+          </div>
+          <div class="menu-right">›</div>
+        </div>
+
+        <div class="menu-item" onclick="goTo('pengambilan-barang')">
+          <div class="menu-left">
+            <div class="menu-icon">📦</div>
+            <div class="menu-text">
+              <div class="menu-text-title">Pengambilan & Pembayaran Barang</div>
+              <div class="menu-text-sub">Catat material & pembayaran</div>
+            </div>
+          </div>
+          <div class="menu-right">›</div>
+        </div>
+
+        <div class="menu-item" onclick="goTo('slip-gaji')">
+          <div class="menu-left">
+            <div class="menu-icon">💰</div>
+            <div class="menu-text">
+              <div class="menu-text-title">Slip Gaji</div>
+              <div class="menu-text-sub">Lihat rekap kerja & gaji</div>
+            </div>
+          </div>
+          <div class="menu-right">›</div>
+        </div>
+
+        <div class="menu-item" onclick="goTo('absensi')">
+          <div class="menu-left">
+            <div class="menu-icon">⏱️</div>
+            <div class="menu-text">
+              <div class="menu-text-title">Absensi</div>
+              <div class="menu-text-sub">Catat masuk & pulang</div>
+            </div>
+          </div>
+          <div class="menu-right">›</div>
+        </div>
+      </div>
+
+      <div class="footer">Versi 1.0 • Profesional & Sejuk</div>
+    </div>
+  </div>
+
+  <script>
+    function goTo(menu) {
+      let label = "";
+      switch(menu){
+        case "pengambilan-barang": label="Pengambilan & Pembayaran Barang"; break;
+        case "slip-gaji": label="Slip Gaji"; break;
+        case "absensi": label="Absensi"; break;
+      }
+      alert("Buka menu: " + label);
+    }
+  </script>
+</body>
+</html>
