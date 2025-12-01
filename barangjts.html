@@ -1,180 +1,44 @@
-<!doctype html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Input Data Hutang</title>
-  <style>
-    body{
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 16px;
-      background:#f3f4f6;
-      color:#111827;
+// ========== KONFIGURASI ==========
+const SHEET_NAME = "DataHutang"; // ganti jika nama sheet beda
+const DRIVE_FOLDER_ID = "1gjfsx4IFRlad-zyD5xY4lSaOcl36DMlt"; // folder untuk simpan foto
+// =================================
+
+// Tampilkan form HTML
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('formHutang')
+    .setTitle('Input Data Hutang')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+// Terima data + file dari form
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      throw new Error("Sheet '" + SHEET_NAME + "' tidak ditemukan");
     }
-    h1{
-      font-size:1.4rem;
-      margin-bottom:8px;
+
+    var folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+
+    // Ambil data text dari form (multipart/form-data)
+    var barang = "";
+    var harga = "";
+
+    if (e.parameters) {
+      barang = (e.parameters["Barang"] || [""])[0];
+      harga = (e.parameters["Harga Barang"] || [""])[0];
     }
-    .card{
-      background:white;
-      border-radius:8px;
-      padding:12px;
-      border:1px solid #e5e7eb;
-      box-shadow:0 1px 2px rgba(0,0,0,0.04);
+
+    // Ambil file foto (field name: 'photo')
+    if (!e.files || !e.files["photo"]) {
+      throw new Error("File foto (field 'photo') tidak ditemukan");
     }
-    label{
-      display:block;
-      margin-top:10px;
-      font-size:0.9rem;
-      color:#374151;
-    }
-    input{
-      width:100%;
-      padding:6px 8px;
-      margin-top:4px;
-      border-radius:6px;
-      border:1px solid #d1d5db;
-      font-size:0.9rem;
-      box-sizing:border-box;
-    }
-    input:focus{
-      outline:none;
-      border-color:#2563eb;
-      box-shadow:0 0 0 1px rgba(37,99,235,0.3);
-    }
-    button{
-      margin-top:14px;
-      padding:8px 14px;
-      border-radius:6px;
-      border:none;
-      font-size:0.95rem;
-      cursor:pointer;
-      background:#2563eb;
-      color:white;
-    }
-    button:disabled{
-      opacity:0.6;
-      cursor:not-allowed;
-    }
-    .small{font-size:0.8rem;color:#6b7280;margin-top:4px}
-    .status{
-      margin-top:10px;
-      font-size:0.9rem;
-    }
-    .status.ok{color:#16a34a;}
-    .status.err{color:#b91c1c;}
-  </style>
-</head>
-<body>
-  <h1>Input Data Hutang</h1>
-  <p class="small">
-    Form ini akan mengisi sheet dengan kolom: <code>timestamp</code>, <code>Barang</code>, <code>Photo</code>, <code>Harga Barang</code>.<br>
-    <strong>timestamp</strong> diisi otomatis oleh Google Apps Script.<br>
-    Foto diambil dari kamera dan diunggah ke Google Drive.
-  </p>
 
-  <div class="card">
-    <form id="hutangForm">
-      <!-- Barang -->
-      <label for="barang">Barang</label>
-      <input type="text" id="barang" name="Barang" placeholder="Contoh: Beras 5kg" required />
+    var photoBlob = e.files["photo"]; // sudah berupa Blob
 
-      <!-- Harga Barang -->
-      <label for="harga">Harga Barang</label>
-      <input type="number" id="harga" name="Harga Barang" placeholder="Contoh: 125000" required />
+    // Simpan ke Drive
+    var createdFile = folder.createFile(photoBlob);
+    createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-      <!-- Photo (kamera / file) -->
-      <label for="photo">Photo (ambil dari kamera / galeri)</label>
-      <input
-        type="file"
-        id="photo"
-        name="photo"
-        accept="image/*"
-        capture="environment"
-        required
-      />
-      <p class="small">
-        Di HP: akan membuka kamera (atau pilih foto). Di laptop: bisa pilih file gambar.
-      </p>
-
-      <button type="submit" id="submitBtn">Simpan</button>
-      <div id="statusMsg" class="status"></div>
-    </form>
-  </div>
-
-<script>
-// ====== KONFIGURASI: GANTI DENGAN URL WEB APP GOOGLE SCRIPT KAMU ======
-const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
-// =====================================================================
-
-const form = document.getElementById("hutangForm");
-const statusMsg = document.getElementById("statusMsg");
-const submitBtn = document.getElementById("submitBtn");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  statusMsg.textContent = "";
-  statusMsg.className = "status";
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Menyimpan...";
-
-  const barang = document.getElementById("barang").value.trim();
-  const harga = document.getElementById("harga").value;
-  const photoInput = document.getElementById("photo");
-  const file = photoInput.files[0];
-
-  if (!file) {
-    statusMsg.textContent = "Foto wajib diisi.";
-    statusMsg.classList.add("err");
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Simpan";
-    return;
-  }
-
-  const formData = new FormData();
-  // field text
-  formData.append("Barang", barang);
-  formData.append("Harga Barang", harga);
-  // field file (nama 'photo' harus sama dengan yang dibaca di Apps Script)
-  formData.append("photo", file);
-
-  try{
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      body: formData
-    });
-
-    // coba baca response JSON (kalau Apps Script mengirim)
-    let msg = "Data berhasil dikirim (cek sheet & Google Drive).";
-    if (res.ok) {
-      try {
-        const data = await res.json();
-        if (data && data.status === "ok") {
-          msg = "Data berhasil disimpan.";
-        } else if (data && data.message) {
-          msg = "Respon: " + data.message;
-        }
-      } catch(e) {
-        // kalau bukan JSON, abaikan
-      }
-      statusMsg.textContent = msg;
-      statusMsg.classList.add("ok");
-      form.reset();
-    } else {
-      statusMsg.textContent = "Gagal mengirim data. Kode HTTP: " + res.status;
-      statusMsg.classList.add("err");
-    }
-  }catch(err){
-    console.error(err);
-    statusMsg.textContent = "Gagal mengirim data: " + err.message;
-    statusMsg.classList.add("err");
-  }finally{
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Simpan";
-  }
-});
-</script>
-</body>
-</html>
+    var photoUrl = createdFile.g
