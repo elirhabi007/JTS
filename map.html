@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Deteksi Latitude & Longitude dari URL</title>
+  <style>
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding: 20px; max-width: 800px; margin: auto; }
+    input[type="text"]{ width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }
+    pre{ background:#f7f7f7; padding:10px; border-radius:6px; }
+    .btn { 
+      padding:8px 12px; 
+      border:none; 
+      background:#2563eb; 
+      color:white; 
+      border-radius:6px; 
+      cursor:pointer; 
+      transition: all 0.2s ease-in-out; /* Menambahkan transisi untuk efek yang lebih halus */
+    }
+    .btn:active{ transform: translateY(1px); }
+  </style>
+</head>
+<body>
+  <h1>Ambil Latitude & Longitude dari URL</h1>
+  <p>Script akan mencoba mendeteksi koordinat dari <em>current URL</em> atau URL yang kamu tempel.</p>
+
+  <label>Tempel URL di sini (opsional):</label>
+  <input id="urlInput" type="text" placeholder="https://www.google.com/maps/..." />
+
+  <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+    <button id="parseBtn" class="btn">Parse URL</button>
+    <button id="useCurrentBtn" class="btn">Gunakan Current URL</button>
+    <button id="copyBtn" class="btn">Salin Koordinat</button>
+    <button id="copyLat" class="btn" style="background:#059669;">Copy Latitude</button>
+    <button id="copyLon" class="btn" style="background:#059669;">Copy Longitude</button>
+  </div>
+
+  <div id="result">
+    <h3>Hasil:</h3>
+    <pre id="out">Menunggu input...</pre>
+  </div>
+
+  <script>
+    const patterns = [
+      { name: 'google-@-pattern', re: /@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)(?:[,\/]|$)/i },
+      { name: 'google-q', re: /[?&]q=(-?\d+(?:\.\d+)?)[,+\s](-?\d+(?:\.\d+)?)/i },
+      { name: 'lat-lon-params', re: /[?&](?:lat|latitude)=(-?\d+(?:\.\d+)?)[^&]*&(?:lon|lng|longitude)=(-?\d+(?:\.\d+)?)/i },
+      { name: 'll-param', re: /[?&]ll=(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/i },
+      { name: 'google-3d-4d', re: /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/i },
+      { name: 'osm-hash-map', re: /#map=\d+\/(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)/i },
+      { name: 'bing-cp', re: /[?&]cp=(-?\d+(?:\.\d+)?)~(-?\d+(?:\.\d+)?)/i },
+      { name: 'lat-lon-simple', re: /[?&](?:lon|lng|longitude)=(-?\d+(?:\.\d+)?)[^&]*&(?:lat|latitude)=(-?\d+(?:\.\d+)?)/i },
+      { name: 'two-decimals-anywhere', re: /(-?\d{1,3}\.\d+)[ ,\/]+(-?\d{1,3}\.\d+)/ }
+    ];
+
+    function parseCoordinatesFromURL(url) {
+      if (!url) return null;
+      for (const p of patterns) {
+        const m = url.match(p.re);
+        if (m) {
+          let lat = parseFloat(m[1]);
+          let lon = parseFloat(m[2]);
+
+          const latOk = lat >= -90 && lat <= 90;
+          const lonOk = lon >= -180 && lon <= 180;
+          if (!latOk && lonOk && lat >= -180 && lat <= 180 && lon >= -90 && lon <= 90) {
+            // Tukar urutan jika Lintang/Bujur terbalik tapi masih valid
+            [lat, lon] = [lon, lat];
+          }
+          if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return { lat, lon, source: p.name };
+        }
+      }
+      return null;
+    }
+
+    function showResult(obj) {
+      const out = document.getElementById('out');
+      if (!obj) return out.textContent = 'Koordinat tidak ditemukan di URL.';
+      out.textContent = `Sukses mendeteksi koordinat!\nSumber pola: ${obj.source}\nLatitude: ${obj.lat}\nLongitude: ${obj.lon}\n\nLink preview Google Maps:\nhttps://www.google.com/maps/@${obj.lat},${obj.lon},15z`;
+      window._lastCoords = obj;
+    }
+    
+    // Fungsi baru untuk memberikan umpan balik visual saat menyalin
+    function feedbackAndRestore(buttonId, successText) {
+      const btn = document.getElementById(buttonId);
+      const originalText = btn.textContent;
+      // Simpan latar belakang asli, terutama untuk tombol lat/lon yang berbeda
+      const originalBackground = btn.style.backgroundColor; 
+      
+      // Ubah teks, warna, dan berikan efek skala
+      btn.textContent = successText;
+      btn.style.backgroundColor = '#10B981'; // Hijau muda (success color)
+      btn.style.transform = 'scale(1.05)'; 
+
+      // Kembalikan ke keadaan semula setelah 1.5 detik
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.backgroundColor = originalBackground;
+        btn.style.transform = 'scale(1.0)';
+      }, 1500);
+    }
+
+    // --- EVENT LISTENERS ---
+
+    document.getElementById('parseBtn').addEventListener('click', () => {
+      const url = document.getElementById('urlInput').value.trim() || window.location.href;
+      showResult(parseCoordinatesFromURL(url));
+    });
+
+    document.getElementById('useCurrentBtn').addEventListener('click', () => {
+      document.getElementById('urlInput').value = window.location.href;
+      showResult(parseCoordinatesFromURL(window.location.href));
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      if (!window._lastCoords) return alert('Belum ada koordinat.');
+      await navigator.clipboard.writeText(`${window._lastCoords.lat},${window._lastCoords.lon}`);
+      
+      feedbackAndRestore('copyBtn', 'Koordinat Berhasil Disalin!');
+    });
+
+    document.getElementById('copyLat').addEventListener('click', async () => {
+      if (!window._lastCoords) return alert('Belum ada koordinat.');
+      await navigator.clipboard.writeText(window._lastCoords.lat);
+      
+      feedbackAndRestore('copyLat', 'Latitude Berhasil Disalin!');
+    });
+
+    document.getElementById('copyLon').addEventListener('click', async () => {
+      if (!window._lastCoords) return alert('Belum ada koordinat.');
+      await navigator.clipboard.writeText(window._lastCoords.lon);
+      
+      feedbackAndRestore('copyLon', 'Longitude Berhasil Disalin!');
+    });
+
+    window.addEventListener('load', () => {
+      const parsed = parseCoordinatesFromURL(window.location.href);
+      if (parsed) showResult(parsed);
+    });
+  </script>
+</body>
+</html>
