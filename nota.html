@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Catatan Hutang & Cicilan</title>
+  <style>
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      background:#f3f4f6;
+      color:#111827;
+    }
+    h1{font-size:1.6rem;margin-bottom:4px}
+    h2{font-size:1.1rem;margin:0 0 6px}
+    .small{font-size:0.9rem;color:#4b5563}
+    .muted{color:#6b7280}
+    table{width:100%;border-collapse:collapse;margin-top:8px;font-size:0.9rem;background:white}
+    th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left}
+    th{background:#e5e7eb}
+
+    .filter-bar{
+      margin-top:10px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:6px;
+    }
+    .filter-bar label{
+      font-size:0.9rem;
+      color:#4b5563;
+    }
+    .filter-bar select{
+      padding:4px 8px;
+      border-radius:6px;
+      border:1px solid #d1d5db;
+      background:white;
+      font-size:0.9rem;
+      margin-top:2px;
+    }
+
+    .wrap{
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    .left-col{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .right-col{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .card{
+      background:white;
+      border-radius:8px;
+      padding:12px;
+      border:1px solid #e5e7eb;
+      box-shadow:0 1px 2px rgba(0,0,0,0.04);
+    }
+    .stat-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+      margin-top:6px;
+    }
+    .stat-item{
+      padding:8px 10px;
+      border-radius:8px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+    }
+    .stat-label{
+      font-size:0.8rem;
+      color:#6b7280;
+      margin-bottom:2px;
+    }
+    .stat-value{
+      font-size:1.1rem;
+      font-weight:600;
+    }
+    .stat-sisa{
+      color:#b91c1c;
+    }
+
+    .progress-wrap{
+      margin-top:10px;
+    }
+    .progress-bar{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background:#e5e7eb;
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:#22c55e;
+      transition:width .3s;
+    }
+    .progress-text{
+      font-size:0.8rem;
+      color:#4b5563;
+      margin-top:4px;
+    }
+
+    .photo-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:24px;
+      height:24px;
+      border-radius:999px;
+      border:1px solid #d1d5db;
+      background:#f9fafb;
+      text-decoration:none;
+      font-size:14px;
+      cursor:pointer;
+    }
+    .photo-link:hover{
+      background:#e5e7eb;
+    }
+
+    @media(max-width:900px){
+      .wrap{
+        grid-template-columns:1fr;
+      }
+      .right-col{
+        order:1;
+      }
+      .left-col{
+        order:2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Catatan Hutang & Cicilan</h1>
+  <p class="small">
+    Total &amp; sisa hutang bisa difilter per bulan dan tahun (berdasarkan <code>timestamp</code>).
+  </p>
+
+  <div class="filter-bar">
+    <div>
+      <label for="bulanSelect">Bulan:</label>
+      <select id="bulanSelect">
+        <option value="all">Semua Bulan</option>
+        <option value="1">Januari</option>
+        <option value="2">Februari</option>
+        <option value="3">Maret</option>
+        <option value="4">April</option>
+        <option value="5">Mei</option>
+        <option value="6">Juni</option>
+        <option value="7">Juli</option>
+        <option value="8">Agustus</option>
+        <option value="9">September</option>
+        <option value="10">Oktober</option>
+        <option value="11">November</option>
+        <option value="12">Desember</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="tahunSelect">Tahun:</label>
+      <select id="tahunSelect">
+        <option value="all">Semua Tahun</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+      </select>
+    </div>
+
+    <span id="filterInfo" class="small muted"></span>
+  </div>
+
+  <div id="status" class="small" style="margin-top:6px;">Status: menyiapkan fetch...</div>
+
+  <div class="wrap">
+    <div class="left-col">
+      <div class="card">
+        <h2>Riwayat Barang Diambil (DataHutang)</h2>
+        <p class="small muted">Setiap baris adalah satu barang yang diambil.</p>
+        <div id="hutangWrap">Menunggu data...</div>
+      </div>
+
+      <div class="card">
+        <h2>Riwayat Cicilan (CicilanHutang)</h2>
+        <p class="small muted">Setiap baris adalah satu transaksi pembayaran cicilan.</p>
+        <div id="cicilanWrap">Menunggu data...</div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="card">
+        <h2>Ringkasan Hutang</h2>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-label">Total Nilai Barang (s.d. bulan & tahun terpilih)</div>
+            <div id="totalHutang" class="stat-value">-</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Cicilan Dibayar (s.d. bulan & tahun terpilih)</div>
+            <div id="totalCicilan" class="stat-value">-</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Sisa Hutang</div>
+            <div id="totalSisa" class="stat-value stat-sisa">-</div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="stat-label">Progress Pelunasan</div>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div id="progressText" class="progress-text">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const CSV_URL_HUTANG  =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTz5Zo8oT3nuDLRZJhh0tqzTRfYWvCQCPjkOnAO5vBb4DTOosHMWzQyMLy3aKZW4XLASn2R4AiTC6Bj/pub?gid=0&single=true&output=csv";
+const CSV_URL_CICILAN =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTz5Zo8oT3nuDLRZJhh0tqzTRfYWvCQCPjkOnAO5vBb4DTOosHMWzQyMLy3aKZW4XLASn2R4AiTC6Bj/pub?gid=1090039187&single=true&output=csv";
+
+let allHutangObjs = [];
+let allCicilanObjs = [];
+
+async function fetchCsv(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error("Gagal fetch: " + res.status);
+  const text = await res.text();
+  return text.trim().split(/\r?\n/).map(row => row.split(",").map(v => v.replace(/^"|"$/g,"")));
+}
+
+function csvToObjects(data){
+  const [header,...rows] = data;
+  return rows.filter(r => !r.every(c=>c==="")).map(row=>{
+    const o={};
+    header.forEach((h,i)=>o[h.trim()]=row[i]??"");
+    return o;
+  });
+}
+
+function escapeHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function formatRupiah(n){ return isNaN(n)?"-":n.toLocaleString('id-ID'); }
+function parseHarga(x){ return parseInt(String(x||"").replace(/[^0-9]/g,""),10)||0; }
+function formatTimestampDateOnly(raw){ return raw?String(raw).split(" ")[0]:""; }
+function getMonthFromTimestamp(raw){ if(!raw)return null; const p=String(raw).split(" ")[0].split("/"); const m=parseInt(p[1],10); return isNaN(m)?null:m; }
+function getYearFromTimestamp(raw){ if(!raw)return null; const p=String(raw).split(" ")[0].split("/"); const y=parseInt(p[2],10); return isNaN(y)?null:y; }
+
+function renderCell(value,col){
+  if(col.key==="timestamp") return escapeHtml(formatTimestampDateOnly(value));
+  if(col.type==="harga") return formatRupiah(parseHarga(value));
+  if(col.key==="Photo"){ const url=(value||"").trim(); return url?`<a href="${escapeHtml(url)}" class="photo-link" target="_blank" title="Lihat foto">🔗</a>`:"-"; }
+  return escapeHtml(value??"");
+}
+
+function buildTableHTMLFromObjects(objs,columns){
+  if(!objs||objs.length===0) return "<div class='small muted'>Tidak ada data.</div>";
+  let html="<table><thead><tr>";
+  columns.forEach(c=>html+="<th>"+escapeHtml(c.label)+"</th>");
+  html+="</tr></thead><tbody>";
+  objs.forEach(o=>{
+    html+="<tr>";
+    columns.forEach(c=>html+="<td>"+renderCell(o[c.key]??"",c)+"</td>");
+    html+="</tr>";
+  });
+  html+="</tbody></table>";
+  return html;
+}
+
+function applyFilterAndRender(){
+  const bulanVal = document.getElementById("bulanSelect").value;
+  const tahunVal = document.getElementById("tahunSelect").value;
+  const filterInfo = document.getElementById("filterInfo");
+
+  const hutangWrap  = document.getElementById("hutangWrap");
+  const cicilanWrap = document.getElementById("cicilanWrap");
+  const totalHutangEl  = document.getElementById("totalHutang");
+  const totalCicilanEl = document.getElementById("totalCicilan");
+  const totalSisaEl    = document.getElementById("totalSisa");
+  const progressFill   = document.getElementById("progressFill");
+  const progressText   = document.getElementById("progressText");
+
+  const bulanFilter = bulanVal==="all"?null:parseInt(bulanVal,10);
+  const tahunFilter = tahunVal==="all"?null:parseInt(tahunVal,10);
+
+  function filterFunc(r){
+    const m=getMonthFromTimestamp(r["timestamp"]);
+    const y=getYearFromTimestamp(r["timestamp"]);
+    return (!bulanFilter||m===bulanFilter)&&(!tahunFilter||y===tahunFilter);
+  }
+
+  const hutangForTable = allHutangObjs.filter(filterFunc);
+  const cicilanForTable = allCicilanObjs.filter(filterFunc);
+
+  hutangWrap.innerHTML = buildTableHTMLFromObjects(hutangForTable,[
+    {key:"timestamp",label:"Tanggal"},
+    {key:"Barang",label:"Barang"},
+    {key:"Photo",label:"Photo"},
+    {key:"Harga Barang",label:"Harga Barang",type:"harga"}
+  ]);
+
+  cicilanWrap.innerHTML = buildTableHTMLFromObjects(cicilanForTable,[
+    {key:"timestamp",label:"Tanggal"},
+    {key:"Total pembayaran",label:"Total pembayaran",type:"harga"},
+    {key:"Photo",label:"Photo"}
+  ]);
+
+  const hutangForSum = allHutangObjs.filter(r=>{
+    const m=getMonthFromTimestamp(r["timestamp"]);
+    const y=getYearFromTimestamp(r["timestamp"]);
+    return (!bulanFilter||m<=bulanFilter)&&(!tahunFilter||y<=tahunFilter);
+  });
+  const cicilanForSum = allCicilanObjs.filter(r=>{
+    const m=getMonthFromTimestamp(r["timestamp"]);
+    const y=getYearFromTimestamp(r["timestamp"]);
+    return (!bulanFilter||m<=bulanFilter)&&(!tahunFilter||y<=tahunFilter);
+  });
+
+  const totalHutang = hutangForSum.reduce((s,r)=>s+parseHarga(r["Harga Barang"]),0);
+  const totalCicilan = cicilanForSum.reduce((s,r)=>s+parseHarga(r["Total pembayaran"]),0);
+  const totalSisa = Math.max(0,totalHutang-totalCicilan);
+
+  totalHutangEl.textContent = "Rp "+formatRupiah(totalHutang);
+  totalCicilanEl.textContent = "Rp "+formatRupiah(totalCicilan);
+  totalSisaEl.textContent = "Rp "+formatRupiah(totalSisa);
+
+  const progress = totalHutang>0?Math.min(100,(totalCicilan/totalHutang)*100):0;
+  progressFill.style.width = progress.toFixed(0)+"%";
+  progressText.textContent = totalHutang>0?progress.toFixed(1)+"% hutang sudah dibayar":"Belum ada data hutang";
+
+  filterInfo.textContent = (bulanFilter||tahunFilter)?`Menampilkan data bulan ${bulanFilter||"–"} dan tahun ${tahunFilter||"–"} (perhitungan akumulasi sampai periode ini).`:"";
+}
+
+(async function main(){
+  const statusEl = document.getElementById("status");
+  try{
+    statusEl.textContent = "Status: mengambil data dari kedua sheet...";
+    const [csvHutang,csvCicilan] = await Promise.all([fetchCsv(CSV_URL_HUTANG),fetchCsv(CSV_URL_CICILAN)]);
+    allHutangObjs = csvToObjects(csvHutang);
+    allCicilanObjs = csvToObjects(csvCicilan);
+    applyFilterAndRender();
+    document.getElementById("bulanSelect").addEventListener("change",applyFilterAndRender);
+    document.getElementById("tahunSelect").addEventListener("change",applyFilterAndRender);
+    statusEl.textContent = "Status: data berhasil diambil. Silakan pilih bulan & tahun jika perlu.";
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = "Status: error - "+err.message;
+    document.getElementById("hutangWrap").textContent  = "Gagal mengambil data.";
+    document.getElementById("cicilanWrap").textContent = "Gagal mengambil data.";
+  }
+})();
+</script>
+</body>
+</html>
