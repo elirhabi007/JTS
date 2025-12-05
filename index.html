@@ -18,36 +18,164 @@
       --status-online: #bbf7d0;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { background: var(--bg); min-height: 100vh; display: flex; justify-content: center; padding: 16px 10px; color: var(--text-main); }
-    .app { width: 100%; max-width: 430px; }
-    .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
-    /* HEADER BAR */    
-    .header { display: flex; align-items: center; justify-content: space-between; background: var(--primary-light); padding: 14px 16px; border-bottom: 1px solid var(--primary-soft); border-radius: var(--radius) var(--radius) 0 0; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .logo { width: 44px; height: 44px; border-radius: 999px; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
-    .brand-text { display: flex; flex-direction: column; }
-    .brand-text h1 { font-size: 18px; font-weight: 700; color: var(--primary); line-height: 1.2; }
-    .brand-text span { font-size: 12px; color: var(--text-muted); }
-    .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--status-online); color: #166534; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-    .status-dot { width: 7px; height: 7px; border-radius: 999px; background: #22c55e; }
-    /* MENU LIST */    
-    .menu-list { display: flex; flex-direction: column; }
-    .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: background 0.1s ease; }
-    .menu-item:last-child { border-bottom: none; }
-    .menu-item:hover { background: #f9fafb; }
-    .menu-left { display: flex; align-items: center; gap: 12px; }
-    .menu-icon { width: 32px; height: 32px; border-radius: 8px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--primary); }
-    .menu-text { display: flex; flex-direction: column; }
-    .menu-text-title { font-size: 14px; font-weight: 500; }
-    .menu-text-sub { font-size: 11px; color: var(--text-muted); }
-    .menu-right { font-size: 16px; color: var(--border); }
-    .footer { padding: 8px 16px; font-size: 10px; color: var(--text-muted); text-align: center; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px 10px;
+      color: var(--text-main);
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--primary-light);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--primary-soft);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .brand-text span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--status-online);
+      color: #166534;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background: #f9fafb;
+    }
+
+    .menu-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .menu-text-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .menu-text-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .menu-right {
+      font-size: 16px;
+      color: var(--border);
+    }
+
+    .footer {
+      padding: 8px 16px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ===== IFRAME MODE ===== */
+    .iframe-view {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: 0;
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="card">
+
+    <!-- MENU UTAMA -->
+    <div class="card" id="menuView">
+
       <div class="header">
         <div class="brand">
           <div class="logo">AT</div>
@@ -63,34 +191,24 @@
       </div>
 
       <div class="menu-list">
-        <div class="menu-item" onclick="window.location.href='https://elirhabi007.github.io/JTS/daftar.html'">
+
+        <div class="menu-item" onclick="goTo('pendaftaran')">
           <div class="menu-left">
             <div class="menu-icon">📝</div>
-            <div class="menu-text">
+            <div>
               <div class="menu-text-title">Pendaftaran Pelanggan</div>
-              <div class="menu-text-sub">Input data pelanggan baru</div>
+              <div class="menu-text-sub">Form daftar pelanggan baru</div>
             </div>
           </div>
           <div class="menu-right">›</div>
         </div>
 
-        <div class="menu-item" onclick="window.location.href='https://elirhabi007.github.io/PON/index.html'">
+        <div class="menu-item" onclick="goTo('pon-kalkulator')">
           <div class="menu-left">
             <div class="menu-icon">📡</div>
-            <div class="menu-text">
+            <div>
               <div class="menu-text-title">PON Kalkulator</div>
               <div class="menu-text-sub">Hitung redaman & splitter</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
-        </div>
-
-        <div class="menu-item" onclick="window.open('https://elirhabi007.github.io/JTS/map.html', '_blank')">
-          <div class="menu-left">
-            <div class="menu-icon">🗺️</div>
-            <div class="menu-text">
-              <div class="menu-text-title">Google Map</div>
-              <div class="menu-text-sub">Akses peta & navigasi</div>
             </div>
           </div>
           <div class="menu-right">›</div>
@@ -99,51 +217,67 @@
         <div class="menu-item" onclick="goTo('pengambilan-barang')">
           <div class="menu-left">
             <div class="menu-icon">📦</div>
-            <div class="menu-text">
+            <div>
               <div class="menu-text-title">Pengambilan & Pembayaran Barang</div>
-              <div class="menu-text-sub">Catat material & pembayaran</div>
+              <div class="menu-text-sub">Form material & transaksi</div>
             </div>
           </div>
           <div class="menu-right">›</div>
         </div>
 
-        <div class="menu-item" onclick="goTo('slip-gaji')">
+        <div class="menu-item" onclick="alert('Slip Gaji belum dihubungkan')">
           <div class="menu-left">
             <div class="menu-icon">💰</div>
-            <div class="menu-text">
+            <div>
               <div class="menu-text-title">Slip Gaji</div>
-              <div class="menu-text-sub">Lihat rekap kerja & gaji</div>
+              <div class="menu-text-sub">Rekap kerja & gaji</div>
             </div>
           </div>
           <div class="menu-right">›</div>
         </div>
 
-        <div class="menu-item" onclick="goTo('absensi')">
+        <div class="menu-item" onclick="alert('Absensi belum dihubungkan')">
           <div class="menu-left">
             <div class="menu-icon">⏱️</div>
-            <div class="menu-text">
+            <div>
               <div class="menu-text-title">Absensi</div>
-              <div class="menu-text-sub">Catat masuk & pulang</div>
+              <div class="menu-text-sub">Masuk & pulang kerja</div>
             </div>
           </div>
           <div class="menu-right">›</div>
         </div>
+
       </div>
+
       <div class="footer">Versi 1.0 • Profesional & Sejuk</div>
     </div>
+
+    <!-- IFRAME MODE -->
+    <div class="iframe-view" id="iframeView">
+      <iframe id="myFrame"></iframe>
+    </div>
+
   </div>
+
   <script>
+    function bukaIframe(link) {
+      document.getElementById("menuView").style.display = "none";
+      document.getElementById("iframeView").style.display = "flex";
+      document.getElementById("myFrame").src = link;
+    }
+
     function goTo(menu) {
-      let label = "";
-      switch(menu){
-        case "pengambilan-barang": label="Pengambilan & Pembayaran Barang"; break;
-        case "slip-gaji": label="Slip Gaji"; break;
-        case "absensi": label="Absensi"; break;
-        // Tambahan untuk menu yang baru ditambahkan (meskipun menggunakan window.open langsung)
-        case "google-map": label="Google Map"; break; 
+      if (menu === 'pendaftaran') {
+        bukaIframe('https://script.google.com/macros/s/AKfycbyZshXex_lBijAevScsyywKkkSA2cmdnouw0U1tynn25MmJf_iP-91nIO7_f_BrpR5X/exec');
+      } 
+      else if (menu === 'pon-kalkulator') {
+        window.location.href = 'https://elirhabi007.github.io/PON/index.html';
+      } 
+      else if (menu === 'pengambilan-barang') {
+        bukaIframe('https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec');
       }
-      alert("Buka menu: " + label);
     }
   </script>
+
 </body>
 </html>
