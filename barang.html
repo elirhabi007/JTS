@@ -1,44 +1,33 @@
-// ========== KONFIGURASI ==========
-const SHEET_NAME = "DataHutang"; // ganti jika nama sheet beda
-const DRIVE_FOLDER_ID = "1gjfsx4IFRlad-zyD5xY4lSaOcl36DMlt"; // folder untuk simpan foto
-// =================================
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Form Pendaftaran</title>
+  <style>
+    html,body{height:100%;margin:0;}
+    .frame-wrapper{max-width:900px;margin:0 auto;padding:0;}
+    iframe{width:100%;border:0;display:block;}
+  </style>
+</head>
+<body>
+  <div class="frame-wrapper">
+    <iframe id="myFrame" src="https://script.google.com/macros/s/AKfycbwcNHC79DA6Kpy_Tw5SWrF2QVJ_5BOLAPMJMDFiqvmtSFDWqMFxTmkqhtGTK9sQ39Covw/exec"
+      loading="lazy" allowfullscreen></iframe>
+  </div>
 
-// Tampilkan form HTML
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('formHutang')
-    .setTitle('Input Data Hutang')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-// Terima data + file dari form
-function doPost(e) {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet) {
-      throw new Error("Sheet '" + SHEET_NAME + "' tidak ditemukan");
+  <script>
+    const f = document.getElementById('myFrame');
+    function fit() {
+      // setinggi viewport; ubah multiplier bila ingin lebih tinggi
+      f.style.height = window.innerHeight + 'px';
     }
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    fit();
+  </script>
+</body>
+</html>
 
-    var folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
 
-    // Ambil data text dari form (multipart/form-data)
-    var barang = "";
-    var harga = "";
 
-    if (e.parameters) {
-      barang = (e.parameters["Barang"] || [""])[0];
-      harga = (e.parameters["Harga Barang"] || [""])[0];
-    }
-
-    // Ambil file foto (field name: 'photo')
-    if (!e.files || !e.files["photo"]) {
-      throw new Error("File foto (field 'photo') tidak ditemukan");
-    }
-
-    var photoBlob = e.files["photo"]; // sudah berupa Blob
-
-    // Simpan ke Drive
-    var createdFile = folder.createFile(photoBlob);
-    createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-    var photoUrl = createdFile.g
