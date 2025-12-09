@@ -1,255 +1,218 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Form Pendaftaran Layanan Internet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kirim Pesan WhatsApp</title>
+
   <style>
-    * { box-sizing: border-box; }
+    /* TAMBAHAN PENTING: Agar padding tidak membuat elemen melebar keluar */
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      padding: 16px;
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 0; /* Reset margin body */
     }
-    .card {
-      max-width: 600px;
+
+    .form-container {
       width: 100%;
-      margin: 0 auto;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 24px 20px 28px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
-    h1 {
-      font-size: 22px;
-      text-align: center;
-      margin: 0 0 4px;
-      font-weight: 700;
-    }
-    .subtitle {
-      text-align: center;
-      font-size: 13px;
-      color: #6b7280;
-      margin-bottom: 20px;
-    }
-    .form-group { margin-bottom: 14px; }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 4px;
-      color: #111827;
-    }
-    input[type="text"], select, input[type="file"] {
-      width: 100%;
-      padding: 10px 12px;
+      max-width: 380px;
+      background: #fff;
+      padding: 20px;
       border-radius: 10px;
-      border: 1px solid #d1d5db;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 0;
+      margin-bottom: 18px;
+      color: #333;
+    }
+
+    label {
       font-size: 14px;
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-weight: bold; /* Sedikit ditebalkan agar lebih jelas */
     }
-    input[type="text"]::placeholder { color: #9ca3af; }
-    .row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .row .form-group { flex: 1 1 100%; }
-    @media (min-width: 480px) {
-      .row .form-group { flex: 1; }
+
+    .radio-group {
+      margin-bottom: 14px;
     }
-    .btn-submit {
+
+    .radio-option {
+      margin-bottom: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .radio-option input {
+        margin-right: 8px; /* Jarak antara bulatan radio dan teks */
+    }
+
+    /* Menggabungkan style input dan textarea agar seragam */
+    textarea,
+    input[type="date"],
+    input[type="time"] {
       width: 100%;
-      margin-top: 10px;
+      padding: 10px; /* Sedikit diperbesar agar lega */
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      /* box-sizing sudah dihandle oleh tanda bintang (*) di atas */
+    }
+
+    textarea {
+      height: 90px;
+      resize: vertical;
+      font-family: Arial, sans-serif; /* Agar font textarea sama dengan input lain */
+      margin-bottom: 10px; /* Jarak ke tombol */
+    }
+    
+    /* Memberikan jarak bawah pada input date dan time */
+    input[type="date"],
+    input[type="time"] {
+      margin-bottom: 14px;
+    }
+
+    button {
+      width: 100%;
       padding: 12px;
       font-size: 15px;
-      font-weight: 600;
-      border-radius: 999px;
+      background: #0066ff;
+      color: white;
       border: none;
-      background: #16a34a;
-      color: #ffffff;
+      border-radius: 7px;
       cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
     }
-    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
-    .status-box {
-      margin-top: 10px;
-      font-size: 13px;
-      border-radius: 12px;
-      padding: 10px 12px;
-      border: 1px solid transparent;
-      display: none;
-      white-space: pre-line;
+
+    button:hover {
+      background: #004ecc;
     }
-    .status-success {
-      background: #d1fae5;
-      border-color: #6ee7b7;
-      color: #065f46;
-    }
-    .status-error {
-      background: #fee2e2;
-      border-color: #fecaca;
-      color: #991b1b;
+    
+    /* Fokus effect agar terlihat interaktif saat diklik */
+    textarea:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus {
+        border-color: #0066ff;
+        box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
     }
   </style>
 </head>
-<body>
 
-<div class="card">
-  <h1>Form Pendaftaran Layanan Internet</h1>
-  <div class="subtitle">
-    Data akan dikirim ke petugas resmi PT. Jaringan Teknologi Sejahtera
+<body>
+  <div class="form-container">
+    <h2>Kirim Pesan WhatsApp</h2>
+
+    <label>Pilih Tujuan Pengiriman</label>
+    <div class="radio-group">
+      <div class="radio-option">
+        <input type="radio" name="tujuan" id="grup" value="grup" checked> 
+        <label for="grup" style="margin:0; font-weight:normal; cursor:pointer;">Kirim ke Grup WhatsApp</label>
+      </div>
+      <div class="radio-option">
+        <input type="radio" name="tujuan" id="pribadi" value="pribadi"> 
+        <label for="pribadi" style="margin:0; font-weight:normal; cursor:pointer;">Kirim ke Nomor Pribadi</label>
+      </div>
+    </div>
+
+    <label for="tanggal">Tanggal Pengiriman</label>
+    <input type="date" id="tanggal">
+
+    <label for="jam">Jam Pengiriman</label>
+    <input type="time" id="jam">
+
+    <label for="pesan">Isi Pesan WhatsApp</label>
+    <textarea id="pesan" placeholder="Tulis pesan yang akan dikirim..." required></textarea>
+
+    <button onclick="kirimData()">Kirim</button>
   </div>
 
-  <form id="formPelanggan">
-    <div class="form-group">
-      <label for="nik">NIK</label>
-      <input type="text" id="nik" name="nik" maxlength="16" placeholder="Masukkan NIK 16 digit" required />
-    </div>
 
-    <div class="form-group">
-      <label for="nama">Nama Lengkap</label>
-      <input type="text" id="nama" name="nama" placeholder="Nama sesuai KTP" required />
-    </div>
+  <script>
+    const SCRIPT_URL = "PASTE_URL_WEB_APP_KAMU";
 
-    <div class="form-group">
-      <label for="wa">Nomor WhatsApp Calon Pelanggan</label>
-      <input type="text" id="wa" name="wa" placeholder="08xxxxxxxxxx" required />
-    </div>
+    function kirimData() {
+      const tujuanEl = document.querySelector('input[name="tujuan"]:checked');
+      if(!tujuanEl) { alert("Pilih tujuan dulu"); return; }
+      
+      const tujuan = tujuanEl.value;
+      const pesan  = document.getElementById("pesan").value.trim();
+      const tanggal = document.getElementById("tanggal").value;
+      const jam = document.getElementById("jam").value;
 
-    <div class="form-group">
-      <label for="paket">Paket Berlangganan</label>
-      <select id="paket" name="paket" required>
-        <option value="">Pilih paket…</option>
-        <option value="Basic">Basic</option>
-        <option value="Clasic">Clasic</option>
-        <option value="Bronze">Bronze</option>
-        <option value="Silver">Silver</option>
-        <option value="Gold">Gold</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="kota">Kota / Kabupaten</label>
-      <input type="text" id="kota" name="kota" required />
-    </div>
-
-    <div class="row">
-      <div class="form-group">
-        <label for="kecamatan">Kecamatan</label>
-        <input type="text" id="kecamatan" name="kecamatan" required />
-      </div>
-      <div class="form-group">
-        <label for="desa">Desa / Kelurahan</label>
-        <input type="text" id="desa" name="desa" required />
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="foto">Upload Foto KTP</label>
-      <input type="file" id="foto" name="foto" accept="image/*" capture="camera" required />
-    </div>
-
-    <button type="submit" class="btn-submit" id="btnKirim">
-      Daftar Sekarang
-    </button>
-
-    <div id="statusBox" class="status-box"></div>
-  </form>
-</div>
-
-<script>
-  // GANTI dengan URL Web App-mu sendiri
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyMXQdLF_Gm7ukcgOcxWnJrw5m-zbs793b_akg4RAX1Iv3jD5blKPIdeGUIHC-P5QhI7A/exec";
-
-  const form = document.getElementById("formPelanggan");
-  const btnKirim = document.getElementById("btnKirim");
-  const statusBox = document.getElementById("statusBox");
-
-  function showStatus(msg, isError) {
-    statusBox.style.display = "block";
-    statusBox.className = "status-box " + (isError ? "status-error" : "status-success");
-    statusBox.textContent = msg;
-  }
-
-  function toFormBody(obj) {
-    const enc = [];
-    for (const k in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, k)) {
-        enc.push(encodeURIComponent(k) + "=" + encodeURIComponent(obj[k]));
+      if (!tanggal) {
+        alert("Tanggal wajib diisi!");
+        return;
       }
-    }
-    return enc.join("&");
-  }
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
+      if (!jam) {
+        alert("Jam wajib diisi!");
+        return;
+      }
 
-    const fileInput = document.getElementById("foto");
-    if (!fileInput.files.length) {
-      showStatus("Harap unggah foto KTP.", true);
-      return;
-    }
+      if (!pesan) {
+        alert("Pesan tidak boleh kosong!");
+        return;
+      }
 
-    const file = fileInput.files[0];
+      let nomorWA = tujuan === "grup"
+        ? "120363401341090123@g.us"
+        : "081212745643";
 
-    btnKirim.disabled = true;
-    showStatus("Membaca foto dan mengirim data...", false);
-
-    const reader = new FileReader();
-    reader.onload = function (ev) {
-      const dataURL = ev.target.result; // data:image/...;base64,....
-
-      const payload = {
-        nik: document.getElementById("nik").value.trim(),
-        nama: document.getElementById("nama").value.trim(),
-        wa: document.getElementById("wa").value.trim(),
-        paket: document.getElementById("paket").value,
-        kota: document.getElementById("kota").value.trim(),
-        kecamatan: document.getElementById("kecamatan").value.trim(),
-        desa: document.getElementById("desa").value.trim(),
-        fotoDataUrl: dataURL
+      const data = {
+        tujuan: tujuan,
+        nomor: nomorWA,
+        tanggal: tanggal,
+        jam: jam,
+        pesan: pesan
       };
 
-      fetch(WEB_APP_URL, {
+      // Tambahkan loading state pada tombol
+      const btn = document.querySelector("button");
+      const textAwal = btn.innerText;
+      btn.innerText = "Mengirim...";
+      btn.disabled = true;
+
+      fetch(SCRIPT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        },
-        body: toFormBody(payload)
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "text/plain;charset=utf-8" } // Terkadang text/plain lebih aman CORS di GAS
       })
-      .then(r => r.text())
-      .then(t => {
-        let res;
-        try { res = JSON.parse(t); }
-        catch (e) { throw new Error("Respon bukan JSON valid: " + t); }
-
-        if (res.result === "success") {
-          let msg =
-            "Pendaftaran berhasil dikirim.\n\n" +
-            `NIK: ${payload.nik}\n` +
-            `Nama: ${payload.nama}\n` +
-            `Paket: ${payload.paket}\n`;
-          if (res.fileUrl) msg += `Link Foto: ${res.fileUrl}\n`;
-
-          showStatus(msg, false);
-          form.reset();
+      .then(res => res.text())
+      .then(res => {
+        if (res.includes("OK") || res.includes("Success")) { // Sesuaikan dengan return GAS
+          alert("Data berhasil dikirim!");
+          document.getElementById("pesan").value = "";
+          document.getElementById("tanggal").value = "";
+          document.getElementById("jam").value = "";
         } else {
-          showStatus("Gagal mencatat data:\n" + (res.message || "Periksa log Apps Script."), true);
+          alert("Gagal mengirim/Respon tidak dikenal. Coba lagi.");
         }
       })
       .catch(err => {
-        showStatus("Terjadi kesalahan jaringan:\n" + err.message, true);
+          alert("Error: " + err);
       })
       .finally(() => {
-        btnKirim.disabled = false;
+          btn.innerText = textAwal;
+          btn.disabled = false;
       });
-    };
-
-    reader.onerror = function () {
-      showStatus("Gagal membaca file foto.", true);
-      btnKirim.disabled = false;
-    };
-
-    reader.readAsDataURL(file);
-  });
-</script>
+    }
+  </script>
 
 </body>
 </html>
-
