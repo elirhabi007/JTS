@@ -6,10 +6,7 @@
   <title>Kirim Pesan WhatsApp</title>
 
   <style>
-    /* TAMBAHAN PENTING: Agar padding tidak membuat elemen melebar keluar */
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -17,8 +14,7 @@
       padding: 20px;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      margin: 0; /* Reset margin body */
+      margin: 0;
     }
 
     .form-container {
@@ -33,7 +29,6 @@
     .form-container h2 {
       text-align: center;
       font-size: 20px;
-      margin-top: 0;
       margin-bottom: 18px;
       color: #333;
     }
@@ -43,11 +38,7 @@
       display: block;
       margin-bottom: 6px;
       color: #444;
-      font-weight: bold; /* Sedikit ditebalkan agar lebih jelas */
-    }
-
-    .radio-group {
-      margin-bottom: 14px;
+      font-weight: bold;
     }
 
     .radio-option {
@@ -56,35 +47,21 @@
       display: flex;
       align-items: center;
     }
-    
-    .radio-option input {
-        margin-right: 8px; /* Jarak antara bulatan radio dan teks */
-    }
 
-    /* Menggabungkan style input dan textarea agar seragam */
-    textarea,
-    input[type="date"],
-    input[type="time"] {
+    .radio-option input { margin-right: 8px; }
+
+    input[type="date"], input[type="time"], textarea {
       width: 100%;
-      padding: 10px; /* Sedikit diperbesar agar lega */
+      padding: 10px;
       font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      outline: none;
-      /* box-sizing sudah dihandle oleh tanda bintang (*) di atas */
+      margin-bottom: 14px;
     }
 
     textarea {
       height: 90px;
       resize: vertical;
-      font-family: Arial, sans-serif; /* Agar font textarea sama dengan input lain */
-      margin-bottom: 10px; /* Jarak ke tombol */
-    }
-    
-    /* Memberikan jarak bawah pada input date dan time */
-    input[type="date"],
-    input[type="time"] {
-      margin-bottom: 14px;
     }
 
     button {
@@ -92,24 +69,11 @@
       padding: 12px;
       font-size: 15px;
       background: #0066ff;
-      color: white;
+      color: #fff;
       border: none;
       border-radius: 7px;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #004ecc;
-    }
-    
-    /* Fokus effect agar terlihat interaktif saat diklik */
-    textarea:focus,
-    input[type="date"]:focus,
-    input[type="time"]:focus {
-        border-color: #0066ff;
-        box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
     }
   </style>
 </head>
@@ -121,12 +85,12 @@
     <label>Pilih Tujuan Pengiriman</label>
     <div class="radio-group">
       <div class="radio-option">
-        <input type="radio" name="tujuan" id="grup" value="grup" checked> 
-        <label for="grup" style="margin:0; font-weight:normal; cursor:pointer;">Kirim ke Grup WhatsApp</label>
+        <input type="radio" name="tujuan" id="grup" value="grup" checked>
+        <label for="grup" style="margin:0; font-weight:normal;">Kirim ke Grup WhatsApp</label>
       </div>
       <div class="radio-option">
-        <input type="radio" name="tujuan" id="pribadi" value="pribadi"> 
-        <label for="pribadi" style="margin:0; font-weight:normal; cursor:pointer;">Kirim ke Nomor Pribadi</label>
+        <input type="radio" name="tujuan" id="pribadi" value="pribadi">
+        <label for="pribadi" style="margin:0; font-weight:normal;">Kirim ke Nomor Pribadi</label>
       </div>
     </div>
 
@@ -137,82 +101,59 @@
     <input type="time" id="jam">
 
     <label for="pesan">Isi Pesan WhatsApp</label>
-    <textarea id="pesan" placeholder="Tulis pesan yang akan dikirim..." required></textarea>
+    <textarea id="pesan" placeholder="Tulis pesan..."></textarea>
 
     <button onclick="kirimData()">Kirim</button>
   </div>
 
+<script>
+const SCRIPT_URL = "PASTE_URL_WEB_APP_KAMU";
 
-  <script>
-    const SCRIPT_URL = "PASTE_URL_WEB_APP_KAMU";
+document.getElementById("grup").addEventListener("change", () => {
+  document.getElementById("jam").value = "06:00";
+  document.getElementById("jam").disabled = true;
+});
 
-    function kirimData() {
-      const tujuanEl = document.querySelector('input[name="tujuan"]:checked');
-      if(!tujuanEl) { alert("Pilih tujuan dulu"); return; }
-      
-      const tujuan = tujuanEl.value;
-      const pesan  = document.getElementById("pesan").value.trim();
-      const tanggal = document.getElementById("tanggal").value;
-      const jam = document.getElementById("jam").value;
+document.getElementById("pribadi").addEventListener("change", () => {
+  document.getElementById("jam").value = "";
+  document.getElementById("jam").disabled = false;
+});
 
-      if (!tanggal) {
-        alert("Tanggal wajib diisi!");
-        return;
-      }
+function kirimData() {
+  const tujuan = document.querySelector('input[name="tujuan"]:checked').value;
+  const pesan = document.getElementById("pesan").value.trim();
+  const tanggal = document.getElementById("tanggal").value;
+  const jam = document.getElementById("jam").value;
 
-      if (!jam) {
-        alert("Jam wajib diisi!");
-        return;
-      }
+  if (!tanggal) return alert("Tanggal wajib diisi!");
+  if (!jam) return alert("Jam wajib diisi!");
+  if (!pesan) return alert("Pesan tidak boleh kosong!");
 
-      if (!pesan) {
-        alert("Pesan tidak boleh kosong!");
-        return;
-      }
+  let nomorWA = tujuan === "grup"
+    ? "120363401341090123@g.us"
+    : "081212745643";
 
-      let nomorWA = tujuan === "grup"
-        ? "120363401341090123@g.us"
-        : "081212745643";
+  const data = { tujuan, nomor: nomorWA, tanggal, jam, pesan };
 
-      const data = {
-        tujuan: tujuan,
-        nomor: nomorWA,
-        tanggal: tanggal,
-        jam: jam,
-        pesan: pesan
-      };
-
-      // Tambahkan loading state pada tombol
-      const btn = document.querySelector("button");
-      const textAwal = btn.innerText;
-      btn.innerText = "Mengirim...";
-      btn.disabled = true;
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "text/plain;charset=utf-8" } // Terkadang text/plain lebih aman CORS di GAS
-      })
-      .then(res => res.text())
-      .then(res => {
-        if (res.includes("OK") || res.includes("Success")) { // Sesuaikan dengan return GAS
-          alert("Data berhasil dikirim!");
-          document.getElementById("pesan").value = "";
-          document.getElementById("tanggal").value = "";
-          document.getElementById("jam").value = "";
-        } else {
-          alert("Gagal mengirim/Respon tidak dikenal. Coba lagi.");
-        }
-      })
-      .catch(err => {
-          alert("Error: " + err);
-      })
-      .finally(() => {
-          btn.innerText = textAwal;
-          btn.disabled = false;
-      });
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(res => res.text())
+  .then(res => {
+    if (res.includes("OK")) {
+      alert("Data berhasil dikirim!");
+      document.getElementById("pesan").value = "";
+      document.getElementById("tanggal").value = "";
+      document.getElementById("jam").value = "";
+    } else {
+      alert("Gagal: " + res);
     }
-  </script>
+  })
+  .catch(err => alert("Error: " + err));
+}
+</script>
 
 </body>
 </html>
