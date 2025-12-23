@@ -38,31 +38,37 @@
 
         select {
             width: 100%; padding: 12px; border: 2px solid #eee;
-            border-radius: 12px; margin-bottom: 15px; outline: none; font-size: 15px;
+            border-radius: 12px; margin-bottom: 15px; outline: none; font-size: 14px;
+            background-color: #fff;
         }
 
-        /* FITUR MIRROR: Membalikkan tampilan kamera agar seperti cermin */
         .camera-box {
             width: 100%; height: 250px; background: #000;
             border-radius: 15px; overflow: hidden; position: relative; margin-bottom: 15px;
         }
 
-        video, #photo-preview {
+        video {
             width: 100%; height: 100%; object-fit: cover;
-            transform: scaleX(-1); /* MEMBALIK KAMERA HORIZONTAL */
+            transform: scaleX(-1); 
+        }
+
+        #photo-preview {
+            width: 100%; height: 100%; object-fit: cover;
+            display: none;
         }
 
         .btn-capture {
             position: absolute; bottom: 15px; left: 50%;
             transform: translateX(-50%); background: white;
-            border: none; padding: 8px 18px; border-radius: 20px;
+            border: none; padding: 10px 20px; border-radius: 30px;
             font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 10;
+            z-index: 10; font-size: 12px;
         }
 
         .info-panel {
-            background: #f8f9fa; padding: 12px; border-radius: 10px;
-            font-size: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary);
+            background: #fff9db; padding: 12px; border-radius: 10px;
+            font-size: 12px; margin-bottom: 15px; border: 1px solid #ffeeba;
+            color: #856404;
         }
 
         .btn-submit {
@@ -72,8 +78,11 @@
             display: flex; justify-content: center; align-items: center;
         }
 
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+
         #success-page { display: none; text-align: center; padding: 40px 20px; animation: fadeIn 0.5s; }
         .success-icon { font-size: 80px; color: var(--success); margin-bottom: 20px; }
+        
         .spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite linear; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -83,50 +92,59 @@
 <body>
 
 <div class="card">
+    <!-- FORM ABSENSI -->
     <div id="attendance-form">
         <div class="header">
-            <i class="fas fa-camera-retro fa-2x" style="color: #00d4ff;"></i>
+            <i class="fas fa-map-marker-alt fa-2x" style="color: #00d4ff;"></i>
             <h1>ARIEF KOMPUTER</h1>
-            <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Presensi Digital (Mode Cermin)</p>
+            <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Presensi Lokasi Sekitar</p>
         </div>
 
         <div class="form-body">
-            <label><i class="fas fa-school"></i> Pilih Asal Sekolah</label>
+            <label><i class="fas fa-school"></i> Pilih Sekolah</label>
             <select id="sekolah">
                 <option value="">-- Pilih Sekolah --</option>
                 <option value="SMK Muhammadiyah 1 Rumbia">SMK Muhammadiyah 1 Rumbia</option>
             </select>
 
-            <label><i class="fas fa-user-graduate"></i> Nama Siswa</label>
+            <label><i class="fas fa-user"></i> Nama Siswa</label>
             <select id="nama" disabled>
                 <option value="">-- Pilih Sekolah Dulu --</option>
             </select>
 
             <div class="camera-box">
                 <video id="video" autoplay playsinline></video>
-                <img id="photo-preview" src="" style="display:none;">
+                <img id="photo-preview" src="">
                 <button type="button" class="btn-capture" id="capture-btn">
                     <i class="fas fa-camera"></i> AMBIL FOTO
                 </button>
             </div>
 
-            <div class="info-panel">
-                <div><i class="fas fa-mobile-alt"></i> <b>HP:</b> <span id="device-text">Mendeteksi...</span></div>
-                <div style="margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> <b>GPS:</b> <span id="loc-text">Mencari Lokasi...</span></div>
+            <!-- FITUR BARU: PILIH TOKO SEKITAR -->
+            <label><i class="fas fa-store"></i> Posisi Toko Sekitar Anda</label>
+            <select id="lokasi-toko" disabled>
+                <option value="">Mencari toko di sekitar...</option>
+            </select>
+
+            <div class="info-panel" id="gps-status">
+                <i class="fas fa-sync fa-spin"></i> Menunggu sinyal GPS...
             </div>
 
             <button class="btn-submit" id="submit-btn">
-                <span id="btn-label">KIRIM ABSENSI SEKARANG</span>
+                <span id="btn-label">KIRIM ABSENSI</span>
                 <div class="spinner" id="loader"></div>
             </button>
         </div>
     </div>
 
+    <!-- HALAMAN SUKSES -->
     <div id="success-page">
         <i class="fas fa-check-circle success-icon"></i>
-        <h2 style="color: var(--dark);">Absensi Berhasil!</h2>
-        <p style="color: #666; margin-top: 10px;">Data telah terkirim ke sistem Arief Komputer.</p>
-        <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; color: #888;">Kembali</button>
+        <h2 style="color: var(--dark);">Absensi Terkirim!</h2>
+        <p style="color: #666; margin-top: 10px;">Laporan kehadiran Anda telah masuk ke sistem.</p>
+        <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+            <i class="fas fa-redo"></i> Absen Kembali
+        </button>
     </div>
 </div>
 
@@ -143,22 +161,23 @@
 
     const schoolSelect = document.getElementById('sekolah');
     const nameSelect = document.getElementById('nama');
+    const storeSelect = document.getElementById('lokasi-toko');
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const photoPreview = document.getElementById('photo-preview');
     const captureBtn = document.getElementById('capture-btn');
     const submitBtn = document.getElementById('submit-btn');
-    const locText = document.getElementById('loc-text');
-    const deviceText = document.getElementById('device-text');
+    const gpsStatus = document.getElementById('gps-status');
     const loader = document.getElementById('loader');
     const btnLabel = document.getElementById('btn-label');
     const formContainer = document.getElementById('attendance-form');
     const successPage = document.getElementById('success-page');
 
-    let userLocation = "Tidak terdeteksi";
+    let userLocationURL = "";
     let photoBlob = null;
     let cameraStream = null;
 
+    // 1. Cascading Dropdown
     schoolSelect.addEventListener('change', function() {
         const sekolah = this.value;
         nameSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
@@ -175,36 +194,85 @@
         }
     });
 
-    function getDeviceInfo() {
-        const ua = navigator.userAgent;
-        if (/android/i.test(ua)) {
-            const match = ua.match(/Android\s([0-9\.]+);\s([^;]+)/);
-            return match ? match[2] : "Android Device";
-        }
-        return /iPhone|iPad|iPod/i.test(ua) ? "iPhone" : "PC/Laptop";
-    }
-    deviceText.innerText = getDeviceInfo();
-
+    // 2. Mirror Camera Setup
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => { cameraStream = stream; video.srcObject = stream; })
-        .catch(() => { locText.innerText = "Izin Kamera Diblokir!"; });
+        .catch(() => { gpsStatus.innerHTML = "<i class='fas fa-times-circle'></i> Kamera diblokir!"; });
 
+    // 3. Deteksi GPS & Toko Sekitar (OpenStreetMap Overpass API)
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((p) => {
-            userLocation = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-            locText.innerText = "Lokasi Terdeteksi";
-            locText.style.color = "green";
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            userLocationURL = `https://www.google.com/maps?q=${lat},${lon}`;
+            
+            gpsStatus.innerHTML = "<i class='fas fa-check-circle'></i> GPS Terkunci. Mencari toko...";
+            gpsStatus.style.color = "#155724";
+            gpsStatus.style.backgroundColor = "#d4edda";
+            gpsStatus.style.borderColor = "#c3e6cb";
+
+            getNearbyStores(lat, lon);
+        }, () => {
+            gpsStatus.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Gagal akses GPS!";
         });
     }
 
+    async function getNearbyStores(lat, lon) {
+        // Radius pencarian 500 meter
+        const query = `[out:json];node(around:500,${lat},${lon})[shop];out;`;
+        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            storeSelect.innerHTML = '<option value="">-- Pilih Toko/Lokasi --</option>';
+            
+            if (data.elements && data.elements.length > 0) {
+                data.elements.forEach(el => {
+                    const storeName = el.tags.name || "Toko Tanpa Nama";
+                    const opt = document.createElement('option');
+                    opt.value = storeName;
+                    opt.textContent = storeName;
+                    storeSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = "Lokasi Pemukiman/Umum";
+                opt.textContent = "Tidak ada toko spesifik terdeteksi";
+                storeSelect.appendChild(opt);
+            }
+            
+            // Tambahkan opsi manual di paling bawah
+            const optOther = document.createElement('option');
+            optOther.value = "Area Arief Komputer / Lokasi Lainnya";
+            optOther.textContent = "+ Gunakan Lokasi Saat Ini";
+            storeSelect.appendChild(optOther);
+            
+            storeSelect.disabled = false;
+        } catch (error) {
+            storeSelect.innerHTML = '<option value="Lokasi Umum">Gagal memuat toko sekitar</option>';
+            storeSelect.disabled = false;
+        }
+    }
+
+    // 4. Capture Logic (Mirror Fixed)
     captureBtn.addEventListener('click', () => {
+        if (captureBtn.innerText.includes("ULANG")) {
+            photoPreview.style.display = 'none';
+            video.style.display = 'block';
+            captureBtn.innerHTML = '<i class="fas fa-camera"></i> AMBIL FOTO';
+            photoBlob = null;
+            return;
+        }
+
         const context = canvas.getContext('2d');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        // --- LOGIKA UNTUK MENYIMPAN HASIL MIRROR KE GAMBAR ---
+        context.setTransform(1, 0, 0, 1, 0, 0);
         context.translate(canvas.width, 0);
-        context.scale(-1, 1); // Membalikkan hasil tangkapan di canvas
+        context.scale(-1, 1);
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
         canvas.toBlob((blob) => {
@@ -212,20 +280,19 @@
             photoPreview.src = URL.createObjectURL(blob);
             photoPreview.style.display = 'block';
             video.style.display = 'none';
-            captureBtn.innerHTML = '<i class="fas fa-sync"></i> ULANG';
+            captureBtn.innerHTML = '<i class="fas fa-sync"></i> ULANG FOTO';
         }, 'image/jpeg', 0.8);
-
-        if(captureBtn.innerText.includes("ULANG")) {
-            photoPreview.style.display = 'none';
-            video.style.display = 'block';
-            captureBtn.innerHTML = '<i class="fas fa-camera"></i> AMBIL FOTO';
-            photoBlob = null;
-        }
     });
 
+    // 5. Submit Logic
     submitBtn.addEventListener('click', async () => {
         const val = nameSelect.value;
-        if (!val || !photoBlob) return alert("Pilih Nama & Ambil Foto!");
+        const school = schoolSelect.value;
+        const store = storeSelect.value;
+
+        if (!school || !val || !photoBlob || !store) {
+            return alert("Lengkapi Form, Foto, dan Pilih Toko Sekitar!");
+        }
 
         const [namaSiswa, noTujuan] = val.split('|');
         btnLabel.style.display = 'none';
@@ -234,7 +301,14 @@
 
         const formData = new FormData();
         formData.append('target', noTujuan);
-        formData.append('message', `*ABSENSI MASUK*\n🏫 Sekolah: ${schoolSelect.value}\n👤 Nama: ${namaSiswa}\n📱 HP: ${deviceText.innerText}\n📍 Lokasi: ${userLocation}\n⏰ Waktu: ${new Date().toLocaleString('id-ID')}`);
+        formData.append('message', 
+            `*ABSENSI MASUK PKL*\n` +
+            `🏫 Sekolah: ${school}\n` +
+            `👤 Nama: ${namaSiswa}\n` +
+            `📍 Lokasi Sekitar: ${store}\n` +
+            `🔗 Maps: ${userLocationURL}\n` +
+            `⏰ Waktu: ${new Date().toLocaleString('id-ID')}`
+        );
         formData.append('file', photoBlob, 'absen.jpg');
 
         try {
@@ -245,20 +319,25 @@
             });
             const result = await response.json();
             if (result.status) {
-                if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+                if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
                 formContainer.style.display = 'none';
                 successPage.style.display = 'block';
             } else {
                 alert("Gagal: " + result.reason);
-                btnLabel.style.display = 'block';
-                loader.style.display = 'none';
-                submitBtn.disabled = false;
+                resetButton();
             }
         } catch (e) {
             alert("Terjadi kesalahan jaringan!");
+            resetButton();
         }
     });
+
+    function resetButton() {
+        btnLabel.style.display = 'block';
+        loader.style.display = 'none';
+        submitBtn.disabled = false;
+    }
 </script>
 
 </body>
-</html>
+    </html>
