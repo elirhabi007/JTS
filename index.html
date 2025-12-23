@@ -214,7 +214,7 @@
           <div class="menu-right">›</div>
         </div>
 
-        <!-- MENU BARU: JOB DESK -->
+        <!-- MENU JOB DESK -->
         <div class="menu-item" onclick="goTo('job-desk')">
           <div class="menu-left">
             <div class="menu-icon">📋</div>
@@ -248,7 +248,8 @@
           <div class="menu-right">›</div>
         </div>
 
-        <div class="menu-item" onclick="alert('Absensi belum dihubungkan')">
+        <!-- MENU ABSENSI (SUDAH TAUTKAN) -->
+        <div class="menu-item" onclick="goTo('absensi')">
           <div class="menu-left">
             <div class="menu-icon">⏱️</div>
             <div>
@@ -286,11 +287,14 @@
         window.location.href = 'https://elirhabi007.github.io/PON/index.html';
       }
       else if (menu === 'job-desk') {
-        // Logika untuk menu Job Desk
         window.location.href = 'https://elirhabi007.github.io/JTS/jobdesk.html';
       } 
       else if (menu === 'pengambilan-barang') {
         bukaIframe('https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec');
+      }
+      else if (menu === 'absensi') {
+        // Tautan ke halaman absensi
+        window.location.href = 'https://elirhabi007.github.io/JTS/absen';
       }
     }
   </script>
