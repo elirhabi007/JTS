@@ -1,303 +1,333 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APLIKASI TEKNISI</title>
+  <title>JTS Pro - Technician Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-light: #e0f2fe;
-      --primary-soft: #dbeafe;
-      --border: #e5e7eb;
-      --bg: #f3f4f6;
-      --bg-card: #ffffff;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --radius: 12px;
-      --status-online: #bbf7d0;
+      --bg-dark: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --accent-blue: #38bdf8;
+      --accent-purple: #818cf8;
+      --text-white: #f8fafc;
+      --text-dim: #94a3b8;
+      --glass-border: rgba(255, 255, 255, 0.1);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
-      background: var(--bg);
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent),
+        radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.1), transparent);
+      color: var(--text-white);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 16px 10px;
-      color: var(--text-main);
+      padding: 20px;
     }
 
-    .app {
+    .app-container {
       width: 100%;
-      max-width: 430px;
+      max-width: 450px;
     }
 
-    .card {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .header {
+    /* TOP BAR */
+    .top-bar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      background: var(--primary-light);
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--primary-soft);
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 0 5px;
     }
 
-    .brand {
+    .brand-logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-indicator {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      background: var(--primary);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .brand-text h1 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .brand-text span {
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
       font-size: 12px;
-      color: var(--text-muted);
+      font-weight: 600;
     }
 
-    .status-pill {
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--status-online);
-      color: #166534;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
+    .dot {
+      width: 8px;
+      height: 8px;
       background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #22c55e;
     }
 
-    .menu-item {
+    /* GREETING */
+    .greeting {
+      margin-bottom: 25px;
+    }
+
+    .greeting h1 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .greeting p {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    /* GRID MENU */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .menu-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 20px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-    }
-
-    .menu-item:hover {
-      background: #f9fafb;
-    }
-
-    .menu-left {
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .menu-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: #f3f4f6;
+    .menu-card:hover {
+      transform: translateY(-5px);
+      background: rgba(51, 65, 85, 0.8);
+      border-color: var(--accent-blue);
+    }
+
+    .menu-card:active {
+      transform: scale(0.95);
+    }
+
+    .icon-wrapper {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      color: var(--primary);
+      font-size: 24px;
     }
 
-    .menu-text-title {
-      font-size: 14px;
-      font-weight: 500;
+    .menu-info h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
-    .menu-text-sub {
+    .menu-info p {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-dim);
+      line-height: 1.4;
     }
 
-    .menu-right {
-      font-size: 16px;
-      color: var(--border);
+    /* SPAN 2 COLUMNS FOR SPECIAL MENU */
+    .span-2 {
+      grid-column: span 2;
+      flex-direction: row;
+      align-items: center;
     }
 
-    .footer {
-      padding: 8px 16px;
-      font-size: 10px;
-      color: var(--text-muted);
+    .span-2 .icon-wrapper {
+      min-width: 50px;
+    }
+
+    /* FOOTER */
+    .app-footer {
       text-align: center;
+      margin-top: 40px;
+      padding-bottom: 20px;
     }
 
-    /* ===== IFRAME MODE ===== */
-    .iframe-view {
+    .app-footer p {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* IFRAME OVERLAY */
+    #iframeOverlay {
       display: none;
-      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-dark);
+      z-index: 9999;
       flex-direction: column;
+    }
+
+    .iframe-nav {
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .back-btn {
+      background: var(--accent-blue);
+      color: var(--bg-dark);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
     }
 
     iframe {
       width: 100%;
-      height: 100vh;
-      border: 0;
+      flex: 1;
+      border: none;
     }
   </style>
 </head>
 <body>
-  <div class="app">
 
-    <!-- MENU UTAMA -->
-    <div class="card" id="menuView">
+  <div class="app-container">
+    <div class="top-bar">
+      <div class="brand-logo">JTS CORE</div>
+      <div class="status-indicator">
+        <div class="dot"></div>
+        SYSTEM ACTIVE
+      </div>
+    </div>
 
-      <div class="header">
-        <div class="brand">
-          <div class="logo">AT</div>
-          <div class="brand-text">
-            <h1>APLIKASI TEKNISI</h1>
-            <span>Panel utama teknisi lapangan</span>
-          </div>
-        </div>
-        <div class="status-pill">
-          <span class="status-dot"></span>
-          Online
+    <div class="greeting">
+      <h1>Halo, Partner</h1>
+      <p>Pilih tugas operasional Anda hari ini.</p>
+    </div>
+
+    <div class="menu-grid">
+      <!-- Pendaftaran -->
+      <div class="menu-card" onclick="action('pendaftaran')">
+        <div class="icon-wrapper">📝</div>
+        <div class="menu-info">
+          <h3>Registrasi</h3>
+          <p>Pasang Baru</p>
         </div>
       </div>
 
-      <div class="menu-list">
-
-        <div class="menu-item" onclick="goTo('pendaftaran')">
-          <div class="menu-left">
-            <div class="menu-icon">📝</div>
-            <div>
-              <div class="menu-text-title">Pendaftaran Pelanggan</div>
-              <div class="menu-text-sub">Form daftar pelanggan baru</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
+      <!-- PON -->
+      <div class="menu-card" onclick="action('pon')">
+        <div class="icon-wrapper">📡</div>
+        <div class="menu-info">
+          <h3>Kalkulator</h3>
+          <p>Cek Redaman</p>
         </div>
-
-        <div class="menu-item" onclick="goTo('pon-kalkulator')">
-          <div class="menu-left">
-            <div class="menu-icon">📡</div>
-            <div>
-              <div class="menu-text-title">PON Kalkulator</div>
-              <div class="menu-text-sub">Hitung redaman & splitter</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
-        </div>
-
-        <!-- MENU JOB DESK -->
-        <div class="menu-item" onclick="goTo('job-desk')">
-          <div class="menu-left">
-            <div class="menu-icon">📋</div>
-            <div>
-              <div class="menu-text-title">Job Desk</div>
-              <div class="menu-text-sub">List pekerjaan & tugas harian</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
-        </div>
-
-        <div class="menu-item" onclick="goTo('pengambilan-barang')">
-          <div class="menu-left">
-            <div class="menu-icon">📦</div>
-            <div>
-              <div class="menu-text-title">Pengambilan & Pembayaran Barang</div>
-              <div class="menu-text-sub">Form material & transaksi</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
-        </div>
-
-        <div class="menu-item" onclick="alert('Slip Gaji belum dihubungkan')">
-          <div class="menu-left">
-            <div class="menu-icon">💰</div>
-            <div>
-              <div class="menu-text-title">Slip Gaji</div>
-              <div class="menu-text-sub">Rekap kerja & gaji</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
-        </div>
-
-        <!-- MENU ABSENSI (SUDAH TAUTKAN) -->
-        <div class="menu-item" onclick="goTo('absensi')">
-          <div class="menu-left">
-            <div class="menu-icon">⏱️</div>
-            <div>
-              <div class="menu-text-title">Absensi</div>
-              <div class="menu-text-sub">Masuk & pulang kerja</div>
-            </div>
-          </div>
-          <div class="menu-right">›</div>
-        </div>
-
       </div>
 
-      <div class="footer">Versi 1.1 • Profesional & Sejuk</div>
+      <!-- Job Desk (Full Width) -->
+      <div class="menu-card span-2" onclick="action('job')">
+        <div class="icon-wrapper">📋</div>
+        <div class="menu-info">
+          <h3>Tugas Lapangan (Job Desk)</h3>
+          <p>Monitoring daftar pekerjaan teknisi harian</p>
+        </div>
+      </div>
+
+      <!-- Logistik -->
+      <div class="menu-card" onclick="action('logistik')">
+        <div class="icon-wrapper">📦</div>
+        <div class="menu-info">
+          <h3>Logistik</h3>
+          <p>Ambil Material</p>
+        </div>
+      </div>
+
+      <!-- Absensi -->
+      <div class="menu-card" onclick="action('absen')">
+        <div class="icon-wrapper">⏱️</div>
+        <div class="menu-info">
+          <h3>Presensi</h3>
+          <p>Absen Masuk</p>
+        </div>
+      </div>
+
+      <!-- Gaji (Full Width) -->
+      <div class="menu-card span-2" onclick="alert('Modul Slip Gaji Sedang Maintenance')">
+        <div class="icon-wrapper">💰</div>
+        <div class="menu-info">
+          <h3>Informasi Gaji & Bonus</h3>
+          <p>Lihat rekapitulasi pendapatan bulanan Anda</p>
+        </div>
+      </div>
     </div>
 
-    <!-- IFRAME MODE -->
-    <div class="iframe-view" id="iframeView">
-      <iframe id="myFrame"></iframe>
+    <div class="app-footer">
+      <p>Engineering Dashboard v2.5</p>
     </div>
+  </div>
 
+  <!-- IFRAME OVERLAY -->
+  <div id="iframeOverlay">
+    <div class="iframe-nav">
+      <button class="back-btn" onclick="closeIframe()">← KEMBALI</button>
+    </div>
+    <iframe id="mainFrame"></iframe>
   </div>
 
   <script>
-    function bukaIframe(link) {
-      document.getElementById("menuView").style.display = "none";
-      document.getElementById("iframeView").style.display = "flex";
-      document.getElementById("myFrame").src = link;
+    function openIframe(url) {
+      document.getElementById('iframeOverlay').style.display = 'flex';
+      document.getElementById('mainFrame').src = url;
     }
 
-    function goTo(menu) {
-      if (menu === 'pendaftaran') {
-        bukaIframe('https://script.google.com/macros/s/AKfycbyZshXex_lBijAevScsyywKkkSA2cmdnouw0U1tynn25MmJf_iP-91nIO7_f_BrpR5X/exec');
-      } 
-      else if (menu === 'pon-kalkulator') {
-        window.location.href = 'https://elirhabi007.github.io/PON/index.html';
-      }
-      else if (menu === 'job-desk') {
-        window.location.href = 'https://elirhabi007.github.io/JTS/jobdesk.html';
-      } 
-      else if (menu === 'pengambilan-barang') {
-        bukaIframe('https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec');
-      }
-      else if (menu === 'absensi') {
-        // Tautan ke halaman absensi
-        window.location.href = 'https://elirhabi007.github.io/JTS/absen';
+    function closeIframe() {
+      document.getElementById('iframeOverlay').style.display = 'none';
+      document.getElementById('mainFrame').src = '';
+    }
+
+    function action(type) {
+      switch(type) {
+        case 'pendaftaran':
+          openIframe('https://script.google.com/macros/s/AKfycbyZshXex_lBijAevScsyywKkkSA2cmdnouw0U1tynn25MmJf_iP-91nIO7_f_BrpR5X/exec');
+          break;
+        case 'pon':
+          window.location.href = 'https://elirhabi007.github.io/PON/index.html';
+          break;
+        case 'job':
+          window.location.href = 'https://elirhabi007.github.io/JTS/jobdesk.html';
+          break;
+        case 'logistik':
+          openIframe('https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec');
+          break;
+        case 'absen':
+          window.location.href = 'https://elirhabi007.github.io/JTS/absen';
+          break;
       }
     }
   </script>
-
 </body>
 </html>
