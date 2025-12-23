@@ -20,119 +20,61 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px;
         }
 
         .card {
-            background: white;
-            width: 100%;
-            max-width: 450px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border-top: 6px solid var(--primary);
+            background: white; width: 100%; max-width: 450px;
+            border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden; border-top: 6px solid var(--primary);
         }
 
-        .header {
-            background: var(--dark);
-            padding: 25px;
-            text-align: center;
-            color: white;
-        }
-
+        .header { background: var(--dark); padding: 25px; text-align: center; color: white; }
         .header h1 { font-size: 20px; margin-top: 10px; }
-
         .form-body { padding: 25px; }
 
         label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--dark); font-size: 14px; }
 
         select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            outline: none;
-            font-size: 15px;
-            background-color: #fff;
+            width: 100%; padding: 12px; border: 2px solid #eee;
+            border-radius: 12px; margin-bottom: 15px; outline: none; font-size: 15px;
         }
 
-        select:disabled { background-color: #f1f1f1; cursor: not-allowed; }
-
+        /* FITUR MIRROR: Membalikkan tampilan kamera agar seperti cermin */
         .camera-box {
-            width: 100%;
-            height: 250px;
-            background: #000;
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 15px;
+            width: 100%; height: 250px; background: #000;
+            border-radius: 15px; overflow: hidden; position: relative; margin-bottom: 15px;
         }
 
-        video, #photo-preview { width: 100%; height: 100%; object-fit: cover; }
+        video, #photo-preview {
+            width: 100%; height: 100%; object-fit: cover;
+            transform: scaleX(-1); /* MEMBALIK KAMERA HORIZONTAL */
+        }
 
         .btn-capture {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: absolute; bottom: 15px; left: 50%;
+            transform: translateX(-50%); background: white;
+            border: none; padding: 8px 18px; border-radius: 20px;
+            font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 10;
         }
 
         .info-panel {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
+            background: #f8f9fa; padding: 12px; border-radius: 10px;
+            font-size: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary);
         }
 
         .btn-submit {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%; background: var(--primary); color: white;
+            border: none; padding: 16px; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        .btn-submit:disabled { background: #ccc; }
-
-        #success-page {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
-            animation: fadeIn 0.5s ease-out;
-        }
-
+        #success-page { display: none; text-align: center; padding: 40px 20px; animation: fadeIn 0.5s; }
         .success-icon { font-size: 80px; color: var(--success); margin-bottom: 20px; }
-
-        .spinner {
-            display: none;
-            width: 22px;
-            height: 22px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s infinite linear;
-        }
+        .spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite linear; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -141,30 +83,25 @@
 <body>
 
 <div class="card">
-    <!-- Halaman Utama Form -->
     <div id="attendance-form">
         <div class="header">
-            <i class="fas fa-user-check fa-2x" style="color: #00d4ff;"></i>
+            <i class="fas fa-camera-retro fa-2x" style="color: #00d4ff;"></i>
             <h1>ARIEF KOMPUTER</h1>
-            <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Presensi Digital Anak PKL</p>
+            <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Presensi Digital (Mode Cermin)</p>
         </div>
 
         <div class="form-body">
-            <!-- Pilih Sekolah -->
             <label><i class="fas fa-school"></i> Pilih Asal Sekolah</label>
             <select id="sekolah">
                 <option value="">-- Pilih Sekolah --</option>
                 <option value="SMK Muhammadiyah 1 Rumbia">SMK Muhammadiyah 1 Rumbia</option>
             </select>
 
-            <!-- Pilih Nama Siswa -->
             <label><i class="fas fa-user-graduate"></i> Nama Siswa</label>
             <select id="nama" disabled>
                 <option value="">-- Pilih Sekolah Dulu --</option>
             </select>
 
-            <!-- Kamera -->
-            <label><i class="fas fa-camera"></i> Foto Selfie (Wajib)</label>
             <div class="camera-box">
                 <video id="video" autoplay playsinline></video>
                 <img id="photo-preview" src="" style="display:none;">
@@ -173,7 +110,6 @@
                 </button>
             </div>
 
-            <!-- Panel Info -->
             <div class="info-panel">
                 <div><i class="fas fa-mobile-alt"></i> <b>HP:</b> <span id="device-text">Mendeteksi...</span></div>
                 <div style="margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> <b>GPS:</b> <span id="loc-text">Mencari Lokasi...</span></div>
@@ -186,25 +122,17 @@
         </div>
     </div>
 
-    <!-- Tampilan Sukses (Tampil setelah berhasil) -->
     <div id="success-page">
         <i class="fas fa-check-circle success-icon"></i>
         <h2 style="color: var(--dark);">Absensi Berhasil!</h2>
-        <p style="color: #666; margin-top: 10px; line-height: 1.6;">
-            Terima kasih, data kehadiran Anda <br> 
-            telah terkirim ke sistem <b>Arief Komputer</b>. <br>
-            Selamat belajar dan bekerja!
-        </p>
-        <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; color: #888;">
-            <i class="fas fa-sync"></i> Kembali ke Form
-        </button>
+        <p style="color: #666; margin-top: 10px;">Data telah terkirim ke sistem Arief Komputer.</p>
+        <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; color: #888;">Kembali</button>
     </div>
 </div>
 
 <canvas id="canvas" style="display:none;"></canvas>
 
 <script>
-    // --- DATABASE SISWA ---
     const dataSiswa = {
         "SMK Muhammadiyah 1 Rumbia": [
             { nama: "Mila Ayu Wandira", telp: "087822788629" },
@@ -227,15 +155,13 @@
     const formContainer = document.getElementById('attendance-form');
     const successPage = document.getElementById('success-page');
 
-    let userLocation = "Tidak diizinkan";
+    let userLocation = "Tidak terdeteksi";
     let photoBlob = null;
     let cameraStream = null;
 
-    // Logika Cascading Dropdown (Pilih sekolah -> Muncul Nama)
     schoolSelect.addEventListener('change', function() {
         const sekolah = this.value;
         nameSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
-        
         if (sekolah && dataSiswa[sekolah]) {
             nameSelect.disabled = false;
             dataSiswa[sekolah].forEach(siswa => {
@@ -249,7 +175,6 @@
         }
     });
 
-    // Deteksi HP
     function getDeviceInfo() {
         const ua = navigator.userAgent;
         if (/android/i.test(ua)) {
@@ -258,35 +183,36 @@
         }
         return /iPhone|iPad|iPod/i.test(ua) ? "iPhone" : "PC/Laptop";
     }
-    const modelHP = getDeviceInfo();
-    deviceText.innerText = modelHP;
+    deviceText.innerText = getDeviceInfo();
 
-    // Kamera
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => { cameraStream = stream; video.srcObject = stream; })
         .catch(() => { locText.innerText = "Izin Kamera Diblokir!"; });
 
-    // Lokasi GPS
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((p) => {
             userLocation = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-            locText.innerText = "Lokasi Terdeteksi (Siap)";
+            locText.innerText = "Lokasi Terdeteksi";
             locText.style.color = "green";
         });
     }
 
-    // Ambil Foto
     captureBtn.addEventListener('click', () => {
         const context = canvas.getContext('2d');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0);
+
+        // --- LOGIKA UNTUK MENYIMPAN HASIL MIRROR KE GAMBAR ---
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1); // Membalikkan hasil tangkapan di canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
         canvas.toBlob((blob) => {
             photoBlob = blob;
             photoPreview.src = URL.createObjectURL(blob);
             photoPreview.style.display = 'block';
             video.style.display = 'none';
-            captureBtn.innerHTML = '<i class="fas fa-sync"></i> FOTO ULANG';
+            captureBtn.innerHTML = '<i class="fas fa-sync"></i> ULANG';
         }, 'image/jpeg', 0.8);
 
         if(captureBtn.innerText.includes("ULANG")) {
@@ -297,61 +223,41 @@
         }
     });
 
-    // Kirim Data via Fonnte
     submitBtn.addEventListener('click', async () => {
         const val = nameSelect.value;
-        const sekolah = schoolSelect.value;
-        if (!sekolah || !val || !photoBlob) return alert("Pilih Nama & Ambil Foto Dulu!");
+        if (!val || !photoBlob) return alert("Pilih Nama & Ambil Foto!");
 
         const [namaSiswa, noTujuan] = val.split('|');
-        const token = "AiK7CYb8t8Musw5HMBG1";
-
         btnLabel.style.display = 'none';
         loader.style.display = 'block';
         submitBtn.disabled = true;
 
         const formData = new FormData();
         formData.append('target', noTujuan);
-        formData.append('message', 
-            `*ABSENSI MASUK PKL*\n\n` +
-            `🏫 Sekolah: ${sekolah}\n` +
-            `👤 Nama: ${namaSiswa}\n` +
-            `📱 HP: ${modelHP}\n` +
-            `📍 Lokasi: ${userLocation}\n` +
-            `⏰ Waktu: ${new Date().toLocaleString('id-ID')}\n\n` +
-            `_Sistem Absensi Arief Komputer_`
-        );
+        formData.append('message', `*ABSENSI MASUK*\n🏫 Sekolah: ${schoolSelect.value}\n👤 Nama: ${namaSiswa}\n📱 HP: ${deviceText.innerText}\n📍 Lokasi: ${userLocation}\n⏰ Waktu: ${new Date().toLocaleString('id-ID')}`);
         formData.append('file', photoBlob, 'absen.jpg');
 
         try {
             const response = await fetch('https://api.fonnte.com/send', {
                 method: 'POST',
-                headers: { 'Authorization': token },
+                headers: { 'Authorization': 'AiK7CYb8t8Musw5HMBG1' },
                 body: formData
             });
             const result = await response.json();
             if (result.status) {
-                // Matikan Kamera agar hemat baterai
                 if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
-                
-                // Pindah Tampilan ke Sukses
                 formContainer.style.display = 'none';
                 successPage.style.display = 'block';
             } else {
                 alert("Gagal: " + result.reason);
-                resetButton();
+                btnLabel.style.display = 'block';
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
             }
         } catch (e) {
             alert("Terjadi kesalahan jaringan!");
-            resetButton();
         }
     });
-
-    function resetButton() {
-        btnLabel.style.display = 'block';
-        loader.style.display = 'none';
-        submitBtn.disabled = false;
-    }
 </script>
 
 </body>
