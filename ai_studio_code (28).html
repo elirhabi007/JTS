@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Absensi | Arief Komputer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0056b3;
+            --dark: #002d5b;
+            --success: #25d366;
+            --bg: #f4f7f9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border-top: 6px solid var(--primary);
+        }
+
+        .header {
+            background: var(--dark);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 { font-size: 20px; margin-top: 10px; }
+
+        .form-body { padding: 25px; }
+
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--dark); font-size: 14px; }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            outline: none;
+            font-size: 15px;
+            background-color: #fff;
+        }
+
+        select:disabled { background-color: #f1f1f1; cursor: not-allowed; }
+
+        .camera-box {
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        video, #photo-preview { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-capture {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .info-panel {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-submit:disabled { background: #ccc; }
+
+        #success-page {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .success-icon { font-size: 80px; color: var(--success); margin-bottom: 20px; }
+
+        .spinner {
+            display: none;
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- Halaman Utama Form -->
+    <div id="attendance-form">
+        <div class="header">
+            <i class="fas fa-user-check fa-2x" style="color: #00d4ff;"></i>
+            <h1>ARIEF KOMPUTER</h1>
+            <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Presensi Digital Anak PKL</p>
+        </div>
+
+        <div class="form-body">
+            <!-- Pilih Sekolah -->
+            <label><i class="fas fa-school"></i> Pilih Asal Sekolah</label>
+            <select id="sekolah">
+                <option value="">-- Pilih Sekolah --</option>
+                <option value="SMK Muhammadiyah 1 Rumbia">SMK Muhammadiyah 1 Rumbia</option>
+            </select>
+
+            <!-- Pilih Nama Siswa -->
+            <label><i class="fas fa-user-graduate"></i> Nama Siswa</label>
+            <select id="nama" disabled>
+                <option value="">-- Pilih Sekolah Dulu --</option>
+            </select>
+
+            <!-- Kamera -->
+            <label><i class="fas fa-camera"></i> Foto Selfie (Wajib)</label>
+            <div class="camera-box">
+                <video id="video" autoplay playsinline></video>
+                <img id="photo-preview" src="" style="display:none;">
+                <button type="button" class="btn-capture" id="capture-btn">
+                    <i class="fas fa-camera"></i> AMBIL FOTO
+                </button>
+            </div>
+
+            <!-- Panel Info -->
+            <div class="info-panel">
+                <div><i class="fas fa-mobile-alt"></i> <b>HP:</b> <span id="device-text">Mendeteksi...</span></div>
+                <div style="margin-top: 5px;"><i class="fas fa-map-marker-alt"></i> <b>GPS:</b> <span id="loc-text">Mencari Lokasi...</span></div>
+            </div>
+
+            <button class="btn-submit" id="submit-btn">
+                <span id="btn-label">KIRIM ABSENSI SEKARANG</span>
+                <div class="spinner" id="loader"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tampilan Sukses (Tampil setelah berhasil) -->
+    <div id="success-page">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h2 style="color: var(--dark);">Absensi Berhasil!</h2>
+        <p style="color: #666; margin-top: 10px; line-height: 1.6;">
+            Terima kasih, data kehadiran Anda <br> 
+            telah terkirim ke sistem <b>Arief Komputer</b>. <br>
+            Selamat belajar dan bekerja!
+        </p>
+        <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 8px 15px; border-radius: 20px; cursor: pointer; color: #888;">
+            <i class="fas fa-sync"></i> Kembali ke Form
+        </button>
+    </div>
+</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<script>
+    // --- DATABASE SISWA ---
+    const dataSiswa = {
+        "SMK Muhammadiyah 1 Rumbia": [
+            { nama: "Mila Ayu Wandira", telp: "087822788629" },
+            { nama: "Nailla Fara Dinata", telp: "087797924745" },
+            { nama: "Nadia Ramadhani", telp: "082216327510" }
+        ]
+    };
+
+    const schoolSelect = document.getElementById('sekolah');
+    const nameSelect = document.getElementById('nama');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photoPreview = document.getElementById('photo-preview');
+    const captureBtn = document.getElementById('capture-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const locText = document.getElementById('loc-text');
+    const deviceText = document.getElementById('device-text');
+    const loader = document.getElementById('loader');
+    const btnLabel = document.getElementById('btn-label');
+    const formContainer = document.getElementById('attendance-form');
+    const successPage = document.getElementById('success-page');
+
+    let userLocation = "Tidak diizinkan";
+    let photoBlob = null;
+    let cameraStream = null;
+
+    // Logika Cascading Dropdown (Pilih sekolah -> Muncul Nama)
+    schoolSelect.addEventListener('change', function() {
+        const sekolah = this.value;
+        nameSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+        
+        if (sekolah && dataSiswa[sekolah]) {
+            nameSelect.disabled = false;
+            dataSiswa[sekolah].forEach(siswa => {
+                const opt = document.createElement('option');
+                opt.value = `${siswa.nama}|${siswa.telp}`;
+                opt.textContent = siswa.nama;
+                nameSelect.appendChild(opt);
+            });
+        } else {
+            nameSelect.disabled = true;
+        }
+    });
+
+    // Deteksi HP
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) {
+            const match = ua.match(/Android\s([0-9\.]+);\s([^;]+)/);
+            return match ? match[2] : "Android Device";
+        }
+        return /iPhone|iPad|iPod/i.test(ua) ? "iPhone" : "PC/Laptop";
+    }
+    const modelHP = getDeviceInfo();
+    deviceText.innerText = modelHP;
+
+    // Kamera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(stream => { cameraStream = stream; video.srcObject = stream; })
+        .catch(() => { locText.innerText = "Izin Kamera Diblokir!"; });
+
+    // Lokasi GPS
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((p) => {
+            userLocation = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+            locText.innerText = "Lokasi Terdeteksi (Siap)";
+            locText.style.color = "green";
+        });
+    }
+
+    // Ambil Foto
+    captureBtn.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        canvas.toBlob((blob) => {
+            photoBlob = blob;
+            photoPreview.src = URL.createObjectURL(blob);
+            photoPreview.style.display = 'block';
+            video.style.display = 'none';
+            captureBtn.innerHTML = '<i class="fas fa-sync"></i> FOTO ULANG';
+        }, 'image/jpeg', 0.8);
+
+        if(captureBtn.innerText.includes("ULANG")) {
+            photoPreview.style.display = 'none';
+            video.style.display = 'block';
+            captureBtn.innerHTML = '<i class="fas fa-camera"></i> AMBIL FOTO';
+            photoBlob = null;
+        }
+    });
+
+    // Kirim Data via Fonnte
+    submitBtn.addEventListener('click', async () => {
+        const val = nameSelect.value;
+        const sekolah = schoolSelect.value;
+        if (!sekolah || !val || !photoBlob) return alert("Pilih Nama & Ambil Foto Dulu!");
+
+        const [namaSiswa, noTujuan] = val.split('|');
+        const token = "AiK7CYb8t8Musw5HMBG1";
+
+        btnLabel.style.display = 'none';
+        loader.style.display = 'block';
+        submitBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('target', noTujuan);
+        formData.append('message', 
+            `*ABSENSI MASUK PKL*\n\n` +
+            `🏫 Sekolah: ${sekolah}\n` +
+            `👤 Nama: ${namaSiswa}\n` +
+            `📱 HP: ${modelHP}\n` +
+            `📍 Lokasi: ${userLocation}\n` +
+            `⏰ Waktu: ${new Date().toLocaleString('id-ID')}\n\n` +
+            `_Sistem Absensi Arief Komputer_`
+        );
+        formData.append('file', photoBlob, 'absen.jpg');
+
+        try {
+            const response = await fetch('https://api.fonnte.com/send', {
+                method: 'POST',
+                headers: { 'Authorization': token },
+                body: formData
+            });
+            const result = await response.json();
+            if (result.status) {
+                // Matikan Kamera agar hemat baterai
+                if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+                
+                // Pindah Tampilan ke Sukses
+                formContainer.style.display = 'none';
+                successPage.style.display = 'block';
+            } else {
+                alert("Gagal: " + result.reason);
+                resetButton();
+            }
+        } catch (e) {
+            alert("Terjadi kesalahan jaringan!");
+            resetButton();
+        }
+    });
+
+    function resetButton() {
+        btnLabel.style.display = 'block';
+        loader.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+</script>
+
+</body>
+</html>
