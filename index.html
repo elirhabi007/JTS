@@ -275,6 +275,15 @@
         </div>
       </div>
 
+      <!-- MAP (Full Width) - MENU BARU -->
+      <div class="menu-card span-2" onclick="action('map')">
+        <div class="icon-wrapper">📍</div>
+        <div class="menu-info">
+          <h3>Map & Lokasi</h3>
+          <p>Lihat pemetaan area dan koordinat lapangan</p>
+        </div>
+      </div>
+
       <!-- Gaji (Full Width) -->
       <div class="menu-card span-2" onclick="alert('Modul Slip Gaji Sedang Maintenance')">
         <div class="icon-wrapper">💰</div>
@@ -325,6 +334,9 @@
           break;
         case 'absen':
           window.location.href = 'https://elirhabi007.github.io/JTS/absen';
+          break;
+        case 'map':
+          window.location.href = 'https://elirhabi007.github.io/JTS/map';
           break;
       }
     }
