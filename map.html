@@ -6,42 +6,34 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Deteksi Koordinat (URL & GPS)</title>
   <style>
-    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding: 20px; max-width: 800px; margin: auto; }
-    input[type="text"]{ width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }
-    pre{ background:#f7f7f7; padding:10px; border-radius:6px; white-space: pre-wrap; word-wrap: break-word; }
-    .btn { 
-      padding:8px 12px; 
-      border:none; 
-      background:#2563eb; 
-      color:white; 
-      border-radius:6px; 
-      cursor:pointer; 
-      transition: all 0.2s ease-in-out;
-    }
-    .btn:active{ transform: translateY(1px); }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding: 20px; max-width: 800px; margin: auto; line-height: 1.5; }
+    input[type="text"]{ width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
+    #out { background: #f7f7f7; padding: 15px; border-radius: 6px; border: 1px solid #e5e7eb; min-height: 50px; white-space: pre-wrap; word-wrap: break-word; }
+    .btn { padding: 10px 16px; border: none; background: #2563eb; color: white; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s ease-in-out; }
+    .btn:active { transform: translateY(1px); }
     .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    .maps-link { display: inline-block; margin-top: 10px; padding: 8px 12px; background: #dbeafe; color: #1e40af; text-decoration: none; border-radius: 4px; font-weight: bold; border: 1px solid #bfdbfe; }
+    .maps-link:hover { background: #bfdbfe; }
   </style>
 </head>
 <body>
   <h1>Ambil Latitude & Longitude</h1>
-  <p>Deteksi dari URL atau ambil langsung dari <strong>GPS Perangkat</strong>.</p>
+  <p>Deteksi koordinat dari URL atau ambil langsung dari <strong>GPS Perangkat</strong>.</p>
 
-  <label>Tempel URL di sini (untuk parse manual):</label>
+  <label>Tempel URL di sini (opsional):</label>
   <input id="urlInput" type="text" placeholder="https://www.google.com/maps/..." />
 
   <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
     <button id="parseBtn" class="btn">Parse URL</button>
-    <!-- Tombol yang diubah fungsinya -->
     <button id="getGpsBtn" class="btn" style="background:#7c3aed;">Dapatkan Lokasi GPS</button>
-    
-    <button id="copyBtn" class="btn">Salin Koordinat</button>
-    <button id="copyLat" class="btn" style="background:#059669;">Copy Lat</button>
-    <button id="copyLon" class="btn" style="background:#059669;">Copy Lon</button>
+    <button id="copyBtn" class="btn">Salin Lat,Lon</button>
+    <button id="copyLat" class="btn" style="background:#059669;">Lat</button>
+    <button id="copyLon" class="btn" style="background:#059669;">Lon</button>
   </div>
 
   <div id="result">
     <h3>Hasil:</h3>
-    <pre id="out">Menunggu input atau perintah...</pre>
+    <div id="out">Menunggu input atau perintah...</div>
   </div>
 
   <script>
@@ -72,8 +64,22 @@
 
     function showResult(obj) {
       const out = document.getElementById('out');
-      if (!obj) return out.textContent = 'Koordinat tidak ditemukan.';
-      out.textContent = `Sukses mendeteksi koordinat!\nSumber: ${obj.source}\nLatitude: ${obj.lat}\nLongitude: ${obj.lon}\n\nLink preview Google Maps:\nhttps://www.google.com/maps/@${obj.lat},${obj.lon},15z`;
+      if (!obj) {
+        out.textContent = 'Koordinat tidak ditemukan.';
+        return;
+      }
+      
+      // Menggunakan format SEARCH agar muncul PIN MERAH
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${obj.lat},${obj.lon}`;
+      
+      out.innerHTML = `<strong>Sukses mendeteksi koordinat!</strong>
+Sumber: ${obj.source}
+Latitude: <code>${obj.lat}</code>
+Longitude: <code>${obj.lon}</code>
+
+<a href="${mapsUrl}" target="_blank" class="maps-link">📍 Buka di Google Maps (Muncul Pin)</a>
+<br><small style="color:gray;">${mapsUrl}</small>`;
+      
       window._lastCoords = obj;
     }
     
@@ -81,11 +87,9 @@
       const btn = document.getElementById(buttonId);
       const originalText = btn.textContent;
       const originalBg = btn.style.backgroundColor; 
-      
       btn.textContent = successText;
       btn.style.backgroundColor = '#10B981';
       btn.style.transform = 'scale(1.05)'; 
-
       setTimeout(() => {
         btn.textContent = originalText;
         btn.style.backgroundColor = originalBg;
@@ -93,53 +97,28 @@
       }, 1500);
     }
 
-    // --- EVENT LISTENERS ---
-
     document.getElementById('parseBtn').addEventListener('click', () => {
       const url = document.getElementById('urlInput').value.trim();
+      if(!url) return alert("Masukkan URL terlebih dahulu.");
       showResult(parseCoordinatesFromURL(url));
     });
 
-    // FUNGSI BARU: Ambil GPS Perangkat
     document.getElementById('getGpsBtn').addEventListener('click', () => {
       const btn = document.getElementById('getGpsBtn');
       const out = document.getElementById('out');
-      
-      if (!navigator.geolocation) {
-        alert("Browser Anda tidak mendukung fitur GPS.");
-        return;
-      }
-
-      out.textContent = "Sedang meminta izin dan mengambil lokasi GPS...";
+      if (!navigator.geolocation) { alert("Browser tidak mendukung GPS."); return; }
+      out.textContent = "Meminta izin GPS...";
       btn.disabled = true;
-
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const coords = {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-            source: 'Device-GPS (Akurat hingga ' + Math.round(position.coords.accuracy) + ' meter)'
-          };
+          const coords = { lat: position.coords.latitude, lon: position.coords.longitude, source: 'GPS Perangkat' };
           showResult(coords);
           document.getElementById('urlInput').value = `${coords.lat}, ${coords.lon}`;
           btn.disabled = false;
-          feedbackAndRestore('getGpsBtn', 'Lokasi Ditemukan!');
+          feedbackAndRestore('getGpsBtn', 'Lokasi Didapat!');
         },
-        (error) => {
-          let errorMsg = "Gagal mengambil lokasi.";
-          if (error.code === 1) errorMsg = "Izin GPS ditolak oleh pengguna.";
-          else if (error.code === 2) errorMsg = "Posisi tidak tersedia (periksa sinyal GPS).";
-          else if (error.code === 3) errorMsg = "Waktu permintaan habis (timeout).";
-          
-          out.textContent = "Error: " + errorMsg;
-          btn.disabled = false;
-          alert(errorMsg);
-        },
-        { 
-          enableHighAccuracy: true, // Mengaktifkan GPS (bukan hanya IP)
-          timeout: 10000, 
-          maximumAge: 0 
-        }
+        (error) => { out.textContent = "Error: " + error.message; btn.disabled = false; },
+        { enableHighAccuracy: true, timeout: 10000 }
       );
     });
 
@@ -152,13 +131,13 @@
     document.getElementById('copyLat').addEventListener('click', async () => {
       if (!window._lastCoords) return alert('Belum ada koordinat.');
       await navigator.clipboard.writeText(window._lastCoords.lat);
-      feedbackAndRestore('copyLat', 'Lat Disalin!');
+      feedbackAndRestore('copyLat', 'Disalin!');
     });
 
     document.getElementById('copyLon').addEventListener('click', async () => {
       if (!window._lastCoords) return alert('Belum ada koordinat.');
       await navigator.clipboard.writeText(window._lastCoords.lon);
-      feedbackAndRestore('copyLon', 'Lon Disalin!');
+      feedbackAndRestore('copyLon', 'Disalin!');
     });
   </script>
 </body>
