@@ -4,206 +4,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JTS Pro - Technician Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>JTS CORE - Minimalist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons for Professional Look -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --accent-blue: #38bdf8;
-      --accent-purple: #818cf8;
-      --text-white: #f8fafc;
-      --text-dim: #94a3b8;
-      --glass-border: rgba(255, 255, 255, 0.1);
+      --bg-color: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.4);
+      --accent-color: #38bdf8;
+      --border-color: rgba(255, 255, 255, 0.06);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background: var(--bg-dark);
+      background-color: var(--bg-color);
       background-image: 
-        radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent),
-        radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.1), transparent);
-      color: var(--text-white);
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.02) 0px, transparent 50%);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 20px;
+      padding: 24px 16px;
     }
 
     .app-container {
       width: 100%;
-      max-width: 450px;
+      max-width: 400px;
     }
 
-    /* TOP BAR */
-    .top-bar {
+    /* HEADER SECTION */
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
-      padding: 0 5px;
+      margin-bottom: 40px;
     }
 
-    .brand-logo {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .brand h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .status-indicator {
+    .status-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--glass-border);
-      font-size: 12px;
-      font-weight: 600;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.1);
+      padding: 4px 12px;
+      border-radius: 100px;
+      border: 1px solid rgba(34, 197, 94, 0.2);
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
+    .status-dot {
+      width: 6px;
+      height: 6px;
       background: #22c55e;
       border-radius: 50%;
-      box-shadow: 0 0 10px #22c55e;
+    }
+
+    .status-text {
+      font-size: 10px;
+      font-weight: 600;
+      color: #4ade80;
+      text-transform: uppercase;
     }
 
     /* GREETING */
-    .greeting {
-      margin-bottom: 25px;
+    .welcome-section {
+      margin-bottom: 32px;
     }
 
-    .greeting h1 {
+    .welcome-section h1 {
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
-    .greeting p {
-      color: var(--text-dim);
+    .welcome-section p {
+      color: var(--text-muted);
       font-size: 14px;
-      margin-top: 4px;
     }
 
-    /* GRID MENU */
+    /* MENU GRID */
     .menu-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
     }
 
-    .menu-card {
+    .card {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
+      transition: all 0.2s ease;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      color: inherit;
     }
 
-    .menu-card:hover {
-      transform: translateY(-5px);
-      background: rgba(51, 65, 85, 0.8);
-      border-color: var(--accent-blue);
+    .card:hover {
+      background: rgba(30, 41, 59, 0.7);
+      border-color: rgba(56, 189, 248, 0.3);
+      transform: translateY(-2px);
     }
 
-    .menu-card:active {
-      transform: scale(0.95);
+    .card:active {
+      transform: scale(0.98);
     }
 
-    .icon-wrapper {
-      width: 50px;
-      height: 50px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-color);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
     }
 
-    .menu-info h3 {
+    .card-info h3 {
       font-size: 15px;
       font-weight: 600;
       margin-bottom: 4px;
     }
 
-    .menu-info p {
+    .card-info p {
       font-size: 11px;
-      color: var(--text-dim);
+      color: var(--text-muted);
       line-height: 1.4;
     }
 
-    /* SPAN 2 COLUMNS FOR SPECIAL MENU */
-    .span-2 {
-      grid-column: span 2;
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .span-2 .icon-wrapper {
-      min-width: 50px;
-    }
-
     /* FOOTER */
-    .app-footer {
+    .footer {
       text-align: center;
-      margin-top: 40px;
-      padding-bottom: 20px;
+      margin-top: 48px;
+      opacity: 0.5;
     }
 
-    .app-footer p {
-      font-size: 12px;
-      color: var(--text-dim);
+    .footer p {
+      font-size: 10px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      letter-spacing: 2px;
     }
 
-    /* IFRAME OVERLAY */
-    #iframeOverlay {
+    /* OVERLAY */
+    #overlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg-dark);
-      z-index: 9999;
+      inset: 0;
+      background: var(--bg-color);
+      z-index: 1000;
       flex-direction: column;
     }
 
-    .iframe-nav {
-      padding: 15px;
+    .overlay-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
-      background: rgba(15, 23, 42, 0.9);
-      border-bottom: 1px solid var(--glass-border);
     }
 
-    .back-btn {
-      background: var(--accent-blue);
-      color: var(--bg-dark);
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: 700;
+    .btn-close {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
-      font-size: 14px;
     }
 
     iframe {
@@ -216,129 +203,123 @@
 <body>
 
   <div class="app-container">
-    <div class="top-bar">
-      <div class="brand-logo">JTS CORE</div>
-      <div class="status-indicator">
-        <div class="dot"></div>
-        SYSTEM ACTIVE
+    <header class="header">
+      <div class="brand">
+        <h2>JTS Core</h2>
       </div>
-    </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span class="status-text">Online</span>
+      </div>
+    </header>
 
-    <div class="greeting">
-      <h1>Halo, Partner</h1>
-      <p>Pilih tugas operasional Anda hari ini.</p>
-    </div>
+    <section class="welcome-section">
+      <h1>Halo, Rekan</h1>
+      <p>Pilih layanan operasional hari ini.</p>
+    </section>
 
-    <div class="menu-grid">
-      <!-- Pendaftaran -->
-      <div class="menu-card" onclick="action('pendaftaran')">
-        <div class="icon-wrapper">📝</div>
-        <div class="menu-info">
+    <main class="menu-grid">
+      <!-- Registrasi -->
+      <div class="card" onclick="handleAction('pendaftaran')">
+        <div class="icon-box"><i data-lucide="file-text"></i></div>
+        <div class="card-info">
           <h3>Registrasi</h3>
           <p>Pasang Baru</p>
         </div>
       </div>
 
-      <!-- PON -->
-      <div class="menu-card" onclick="action('pon')">
-        <div class="icon-wrapper">📡</div>
-        <div class="menu-info">
+      <!-- Kalkulator -->
+      <div class="card" onclick="handleAction('pon')">
+        <div class="icon-box"><i data-lucide="calculator"></i></div>
+        <div class="card-info">
           <h3>Kalkulator</h3>
           <p>Cek Redaman</p>
         </div>
       </div>
 
-      <!-- Job Desk (Full Width) -->
-      <div class="menu-card span-2" onclick="action('job')">
-        <div class="icon-wrapper">📋</div>
-        <div class="menu-info">
-          <h3>Tugas Lapangan (Job Desk)</h3>
-          <p>Monitoring daftar pekerjaan teknisi harian</p>
+      <!-- Job Desk -->
+      <div class="card" onclick="handleAction('job')">
+        <div class="icon-box"><i data-lucide="clipboard-list"></i></div>
+        <div class="card-info">
+          <h3>Job Desk</h3>
+          <p>Tugas Lapangan</p>
         </div>
       </div>
 
       <!-- Logistik -->
-      <div class="menu-card" onclick="action('logistik')">
-        <div class="icon-wrapper">📦</div>
-        <div class="menu-info">
+      <div class="card" onclick="handleAction('logistik')">
+        <div class="icon-box"><i data-lucide="box"></i></div>
+        <div class="card-info">
           <h3>Logistik</h3>
           <p>Ambil Material</p>
         </div>
       </div>
 
       <!-- Absensi -->
-      <div class="menu-card" onclick="action('absen')">
-        <div class="icon-wrapper">⏱️</div>
-        <div class="menu-info">
+      <div class="card" onclick="handleAction('absen')">
+        <div class="icon-box"><i data-lucide="user-check"></i></div>
+        <div class="card-info">
           <h3>Presensi</h3>
           <p>Absen Masuk</p>
         </div>
       </div>
 
-      <!-- MAP (Full Width) - MENU BARU -->
-      <div class="menu-card span-2" onclick="action('map')">
-        <div class="icon-wrapper">📍</div>
-        <div class="menu-info">
-          <h3>Map & Lokasi</h3>
-          <p>Lihat pemetaan area dan koordinat lapangan</p>
+      <!-- Instalasi -->
+      <div class="card" onclick="handleAction('instalasi')">
+        <div class="icon-box"><i data-lucide="wifi"></i></div>
+        <div class="card-info">
+          <h3>Instalasi</h3>
+          <p>SOP & Config</p>
         </div>
       </div>
 
-      <!-- Gaji (Full Width) -->
-      <div class="menu-card span-2" onclick="alert('Modul Slip Gaji Sedang Maintenance')">
-        <div class="icon-wrapper">💰</div>
-        <div class="menu-info">
-          <h3>Informasi Gaji & Bonus</h3>
-          <p>Lihat rekapitulasi pendapatan bulanan Anda</p>
+      <!-- Gaji -->
+      <div class="card" onclick="alert('Dalam Maintenance')">
+        <div class="icon-box"><i data-lucide="credit-card"></i></div>
+        <div class="card-info">
+          <h3>Gaji</h3>
+          <p>Cek Bonus</p>
         </div>
       </div>
-    </div>
+    </main>
 
-    <div class="app-footer">
-      <p>Engineering Dashboard v2.5</p>
-    </div>
+    <footer class="footer">
+      <p>System Version 2.5.0 • JTS CORE</p>
+    </footer>
   </div>
 
-  <!-- IFRAME OVERLAY -->
-  <div id="iframeOverlay">
-    <div class="iframe-nav">
-      <button class="back-btn" onclick="closeIframe()">← KEMBALI</button>
+  <div id="overlay">
+    <div class="overlay-header">
+      <button class="btn-close" onclick="closeOverlay()">Tutup Panel</button>
     </div>
-    <iframe id="mainFrame"></iframe>
+    <iframe id="frame"></iframe>
   </div>
 
   <script>
-    function openIframe(url) {
-      document.getElementById('iframeOverlay').style.display = 'flex';
-      document.getElementById('mainFrame').src = url;
-    }
+    // Initialize Lucide Icons
+    lucide.createIcons();
 
-    function closeIframe() {
-      document.getElementById('iframeOverlay').style.display = 'none';
-      document.getElementById('mainFrame').src = '';
-    }
+    function handleAction(type) {
+      const urls = {
+        pendaftaran: 'https://script.google.com/macros/s/AKfycbyZshXex_lBijAevScsyywKkkSA2cmdnouw0U1tynn25MmJf_iP-91nIO7_f_BrpR5X/exec',
+        pon: 'https://elirhabi007.github.io/PON/index.html',
+        job: 'https://elirhabi007.github.io/JTS/jobdesk.html',
+        logistik: 'https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec',
+        absen: 'https://elirhabi007.github.io/JTS/absen',
+        instalasi: 'https://elirhabi007.github.io/JTS/installasi'
+      };
 
-    function action(type) {
-      switch(type) {
-        case 'pendaftaran':
-          openIframe('https://script.google.com/macros/s/AKfycbyZshXex_lBijAevScsyywKkkSA2cmdnouw0U1tynn25MmJf_iP-91nIO7_f_BrpR5X/exec');
-          break;
-        case 'pon':
-          window.location.href = 'https://elirhabi007.github.io/PON/index.html';
-          break;
-        case 'job':
-          window.location.href = 'https://elirhabi007.github.io/JTS/jobdesk.html';
-          break;
-        case 'logistik':
-          openIframe('https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec');
-          break;
-        case 'absen':
-          window.location.href = 'https://elirhabi007.github.io/JTS/absen';
-          break;
-        case 'map':
-          window.location.href = 'https://elirhabi007.github.io/JTS/map';
-          break;
+      if(type === 'pendaftaran' || type === 'logistik') {
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('frame').src = urls[type];
+      } else {
+        window.location.href = urls[type];
       }
+    }
+
+    function closeOverlay() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('frame').src = '';
     }
   </script>
 </body>
