@@ -164,40 +164,6 @@
       letter-spacing: 1px;
       text-transform: uppercase;
     }
-
-    /* OVERLAY */
-    #overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--bg-color);
-      z-index: 1000;
-      flex-direction: column;
-    }
-
-    .overlay-header {
-      padding: 16px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-    }
-
-    .btn-close {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
   </style>
 </head>
 <body>
@@ -219,7 +185,7 @@
     </section>
 
     <main class="menu-grid">
-      <!-- Registrasi -->
+      <!-- Registrasi (Link Baru) -->
       <div class="card" onclick="handleAction('pendaftaran')">
         <div class="icon-box"><i data-lucide="file-text"></i></div>
         <div class="card-info">
@@ -288,20 +254,13 @@
     </footer>
   </div>
 
-  <div id="overlay">
-    <div class="overlay-header">
-      <button class="btn-close" onclick="closeOverlay()">Tutup Panel</button>
-    </div>
-    <iframe id="frame"></iframe>
-  </div>
-
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
 
     function handleAction(type) {
       const urls = {
-        pendaftaran: 'https://script.google.com/macros/s/AKfycbyZshXex_lBijAevScsyywKkkSA2cmdnouw0U1tynn25MmJf_iP-91nIO7_f_BrpR5X/exec',
+        pendaftaran: 'https://elirhabi007.github.io/JTS/daftar.html',
         pon: 'https://elirhabi007.github.io/PON/index.html',
         job: 'https://elirhabi007.github.io/JTS/jobdesk.html',
         logistik: 'https://script.google.com/macros/s/AKfycbzr_BTZ49LYz1ttxdA_XtfsvcIDQahSHUY1vkmyazjAcAf_3HBNOBKcdGco9eVjUtB5wg/exec',
@@ -309,17 +268,8 @@
         instalasi: 'https://elirhabi007.github.io/JTS/installasi'
       };
 
-      if(type === 'pendaftaran' || type === 'logistik') {
-        document.getElementById('overlay').style.display = 'flex';
-        document.getElementById('frame').src = urls[type];
-      } else {
-        window.location.href = urls[type];
-      }
-    }
-
-    function closeOverlay() {
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('frame').src = '';
+      // Semua menu sekarang langsung pindah halaman (Direct Redirect)
+      window.location.href = urls[type];
     }
   </script>
 </body>
