@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Instalasi - PT. Jaringan Teknologi Sejahtera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library OCR Tesseract.js -->
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .checkbox-card input:checked + div {
+            border-color: #1d4ed8;
+            background-color: #eff6ff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-10">
+
+    <!-- Header Perusahaan -->
+    <header class="bg-blue-800 text-white pt-8 pb-12 px-4 shadow-xl text-center">
+        <h1 class="text-2xl font-bold tracking-tight uppercase">Laporan Instalasi</h1>
+        <p class="text-blue-200 text-sm mt-1 uppercase tracking-widest">PT. Jaringan Teknologi Sejahtera</p>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 -mt-8">
+        <form id="reportForm" action="#" method="POST" enctype="multipart/form-data" class="space-y-5">
+            
+            <!-- SECTION ATAS: HARI & TANGGAL (OTOMATIS DARI FOTO) -->
+            <div class="bg-white p-5 rounded-2xl shadow-md border-t-4 border-blue-600">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Waktu Pelaksanaan</h2>
+                    <span id="ocrLoading" class="hidden text-[10px] text-blue-600 font-medium">
+                        <span class="loader"></span> MEMBACA DATA FOTO...
+                    </span>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 uppercase mb-1">Hari</label>
+                        <input type="text" id="disp_hari" name="hari" readonly placeholder="..."
+                            class="w-full bg-gray-50 border-none text-sm font-bold text-gray-700 p-2 rounded-lg outline-none">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-[10px] text-gray-500 uppercase mb-1">Tanggal & Tahun</label>
+                        <input type="text" id="disp_tanggal" name="tanggal" readonly placeholder="Pilih foto dari galeri..."
+                            class="w-full bg-gray-50 border-none text-sm font-bold text-gray-700 p-2 rounded-lg outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Personel (Checklist) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    Teknisi Bertugas
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="teknisi[]" value="Rendi" class="hidden">
+                        <div class="border-2 border-gray-100 rounded-xl p-3 text-center transition-all">
+                            <span class="text-sm font-medium text-gray-600">Rendi</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="teknisi[]" value="Niko" class="hidden">
+                        <div class="border-2 border-gray-100 rounded-xl p-3 text-center transition-all">
+                            <span class="text-sm font-medium text-gray-600">Niko</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Section 2: Data Instalasi -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    Informasi Pelanggan
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Pelanggan</label>
+                        <input type="text" name="nama_pelanggan" required placeholder="Input nama client"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama ODP</label>
+                        <input type="text" name="nama_odp" required placeholder="Contoh: ODP-BGR-01"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Data Teknis -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Hasil Pengukuran (dBm)
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Power Out ODP</label>
+                        <input type="number" step="0.01" name="power_out" required placeholder="-15.00"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Power In ONT</label>
+                        <input type="number" step="0.01" name="power_in" required placeholder="-18.00"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-500 outline-none text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Dokumentasi (Galeri) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Pilih Foto Galeri
+                </h3>
+                
+                <div class="space-y-4">
+                    <!-- INPUT FOTO ODP (Hapus atribut capture) -->
+                    <label class="relative flex flex-col items-center justify-center py-6 border-2 border-dashed border-blue-200 rounded-2xl bg-blue-50 hover:bg-blue-100 cursor-pointer transition-all">
+                        <span id="label_foto_odp" class="text-xs font-bold text-blue-600">Pilih Foto ODP (Timemark)</span>
+                        <input type="file" id="input_foto_odp" name="foto_odp" accept="image/*" class="hidden" required>
+                    </label>
+
+                    <!-- INPUT FOTO CLIENT (Hapus atribut capture) -->
+                    <label class="relative flex flex-col items-center justify-center py-6 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:bg-gray-100 cursor-pointer transition-all">
+                        <span id="label_foto_client" class="text-xs font-bold text-gray-600">Pilih Foto Bersama Client</span>
+                        <input type="file" id="input_foto_client" name="foto_client" accept="image/*" class="hidden" required>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest text-sm">
+                Kirim Laporan
+            </button>
+            
+        </form>
+    </main>
+
+    <footer class="mt-10 text-center text-gray-400 text-[10px] uppercase tracking-widest">
+        &copy; 2025 PT. Jaringan Teknologi Sejahtera
+    </footer>
+
+    <script>
+        const inputOdp = document.getElementById('input_foto_odp');
+        const dispHari = document.getElementById('disp_hari');
+        const dispTanggal = document.getElementById('disp_tanggal');
+        const loading = document.getElementById('ocrLoading');
+
+        // Logic Deteksi Otomatis dari Foto Galeri
+        inputOdp.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                document.getElementById('label_foto_odp').innerText = "📁 File Terpilih: " + file.name;
+                document.getElementById('label_foto_odp').classList.replace('text-blue-600', 'text-green-600');
+
+                loading.classList.remove('hidden');
+
+                Tesseract.recognize(
+                    file,
+                    'ind+eng',
+                    { logger: m => console.log(m) }
+                ).then(({ data: { text } }) => {
+                    loading.classList.add('hidden');
+                    
+                    // Deteksi Tanggal (25/12/2025)
+                    const dateMatch = text.match(/(\d{2}\/\d{2}\/\d{4})/);
+                    if (dateMatch) {
+                        dispTanggal.value = dateMatch[1];
+                    }
+
+                    // Deteksi Nama Hari
+                    const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+                    for (let day of days) {
+                        if (text.toLowerCase().includes(day.toLowerCase())) {
+                            dispHari.value = day;
+                            break;
+                        }
+                    }
+
+                    if(!dateMatch) {
+                        alert("Sistem tidak menemukan tanggal pada foto. Pastikan foto memiliki watermark Timemark yang jelas.");
+                        dispTanggal.placeholder = "Isi Manual...";
+                        dispTanggal.readOnly = false;
+                        dispHari.readOnly = false;
+                    }
+                }).catch(err => {
+                    loading.classList.add('hidden');
+                    console.error(err);
+                });
+            }
+        });
+
+        // Label feedback untuk foto client
+        document.getElementById('input_foto_client').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                document.getElementById('label_foto_client').innerText = "📁 Foto Client Terpilih";
+                document.getElementById('label_foto_client').classList.replace('text-gray-600', 'text-green-600');
+            }
+        });
+    </script>
+</body>
+</html>
