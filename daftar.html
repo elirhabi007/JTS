@@ -1,35 +1,271 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Form Pendaftaran</title>
+  <meta charset="UTF-8" />
+  <title>Form Pendaftaran Layanan Internet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    html,body{height:100%;margin:0;}
-    .frame-wrapper{max-width:900px;margin:0 auto;padding:0;}
-    iframe{width:100%;border:0;display:block;}
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; margin: 0; padding: 16px; }
+    .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 24px; padding: 24px 20px 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    h1 { font-size: 22px; text-align: center; margin: 0 0 4px; font-weight: 700; }
+    .subtitle { text-align: center; font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; color: #111827; }
+    input[type="text"], select, input[type="file"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; }
+    .row { display: flex; gap: 8px; }
+    .row .form-group { flex: 1; }
+    .btn-submit { width: 100%; margin-top: 10px; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 999px; border: none; background: #16a34a; color: #ffffff; cursor: pointer; }
+    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+    .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .status-box { margin-top: 10px; font-size: 13px; border-radius: 12px; padding: 10px 12px; border: 1px solid transparent; display: none; }
+    .status-success { background: #d1fae5; border-color: #6ee7b7; color: #065f46; white-space: pre-line; }
+    .status-error { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+    .terms-title { margin-top: 18px; font-size: 13px; font-weight: 700; color: #111827; }
+    .terms-list { margin: 6px 0 0; padding-left: 18px; font-size: 12px; color: #4b5563; line-height: 1.5; }
+    .combo-wrapper { position: relative; margin-bottom: 14px; }
+    .combo-list { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #e5e7eb; max-height: 200px; overflow-y: auto; z-index: 50; display: none; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .combo-item { padding: 8px 10px; font-size: 14px; cursor: pointer; }
+    .combo-item:hover, .combo-item.active { background: #e5f3ff; }
   </style>
 </head>
 <body>
-  <div class="frame-wrapper">
-    <iframe id="myFrame" src="https://script.google.com/macros/s/AKfycby5PJl59ZOIa6m7A4GjtDxfh3SqVLFWKhn2jv673ZtcD6YN5-S1EXrCqIC-MYB1qYWf/exec"
-      loading="lazy" allowfullscreen></iframe>
-  </div>
 
-  <script>
-    const f = document.getElementById('myFrame');
-    function fit() {
-      // setinggi viewport; ubah multiplier bila ingin lebih tinggi
-      f.style.height = window.innerHeight + 'px';
+<div class="card">
+  <h1>Form Pendaftaran Layanan Internet</h1>
+  <div class="subtitle">Data dikirim ke server pusat PT. JTS</div>
+
+  <form id="formPelanggan">
+    <div class="form-group">
+      <label for="nik">NIK</label>
+      <input type="text" id="nik" name="nik" maxlength="16" placeholder="Masukkan NIK 16 digit" inputmode="numeric" required />
+    </div>
+
+    <div class="form-group">
+      <label for="nama">Nama Lengkap</label>
+      <input type="text" id="nama" name="nama" placeholder="Nama sesuai KTP" required />
+    </div>
+
+    <div class="form-group">
+      <label for="wa">Nomor WhatsApp</label>
+      <input type="text" id="wa" name="wa" placeholder="08xxxxxxxxxx" inputmode="numeric" required />
+    </div>
+
+    <div class="form-group">
+      <label for="paket">Paket Berlangganan</label>
+      <select id="paket" name="paket" required>
+        <option value="">Pilih paket…</option>
+        <option value="Basic">Basic</option>
+        <option value="Clasic">Clasic</option>
+        <option value="Bronze">Bronze</option>
+        <option value="Silver">Silver</option>
+        <option value="Gold">Gold</option>
+      </select>
+    </div>
+
+    <label>Wilayah Domisili</label>
+    <div class="combo-wrapper" data-level="provinsi">
+      <input type="text" id="provinsi_input" class="combo-input" placeholder="Ketik Provinsi..." autocomplete="off" required />
+      <div class="combo-list"></div>
+    </div>
+
+    <div class="combo-wrapper" data-level="kabupaten">
+      <input type="text" id="kota_input" class="combo-input" placeholder="Kota/Kabupaten" autocomplete="off" disabled required />
+      <div class="combo-list"></div>
+    </div>
+
+    <div class="row">
+      <div class="combo-wrapper" data-level="kecamatan">
+        <input type="text" id="kecamatan_input" class="combo-input" placeholder="Kecamatan" autocomplete="off" disabled required />
+        <div class="combo-list"></div>
+      </div>
+      <div class="combo-wrapper" data-level="kelurahan">
+        <input type="text" id="desa_input" class="combo-input" placeholder="Desa/Kelurahan" autocomplete="off" disabled required />
+        <div class="combo-list"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="foto">Upload Foto KTP</label>
+      <input type="file" id="foto" name="foto" accept="image/*" capture="environment" required />
+      <div class="hint">Gunakan kamera belakang untuk hasil maksimal.</div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btnKirim">Daftar Sekarang</button>
+    <div id="statusBox" class="status-box"></div>
+
+    <div class="terms-title">Catatan untuk Calon Pelanggan:</div>
+    <ul class="terms-list">
+      <li>Calon Pelanggan dimohon melampirkan KTP atau NPWP yang masih berlaku saat proses administrasi.</li>
+      <li>Perangkat layanan dipinjamkan oleh Class Home dan diharapkan dijaga dengan baik selama masa berlangganan.</li>
+      <li>Jika saat pemasangan membutuhkan material tambahan di luar standar instalasi, biaya material tambahan ditanggung Calon Pelanggan.</li>
+      <li>Penanganan kendala dilakukan pada jam kerja, pukul 08.00–16.00 WIB pada hari kerjas, senin - sabtu.</li>
+      <li>Pelanggan mendapatkan fasilitas dan layanan sesuai paket berlangganan yang dipilih.</li>
+    </ul>
+  </form>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8FoI2tREEqWNaTKBx7XodOGmexTw750fpJB2vWuBxKsXHgcaCpjoXPDTQIO7QNI9V/exec";
+
+  const BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+  const state = { provinsi: null, kabupaten: null, kecamatan: null, kelurahan: null };
+  const cache = { provinsi: [], kabupaten: new Map(), kecamatan: new Map(), kelurahan: new Map() };
+
+  async function fetchJson(url) {
+    try {
+      const r = await fetch(url);
+      return await r.json();
+    } catch (e) { console.error("Fetch Error:", e); return []; }
+  }
+
+  function enableLevel(level, enabled) {
+    const wrapper = document.querySelector(`[data-level="${level}"]`);
+    const input = wrapper.querySelector('.combo-input');
+    input.disabled = !enabled;
+    if (!enabled) {
+      input.value = "";
+      wrapper.querySelector(".combo-list").style.display = "none";
     }
-    window.addEventListener('resize', fit);
-    window.addEventListener('load', fit);
-    fit();
-  </script>
+  }
+
+  fetchJson(`${BASE}/provinces.json`).then(data => {
+    cache.provinsi = data;
+  });
+
+  document.addEventListener("input", (e) => {
+    if (!e.target.classList.contains('combo-input')) return;
+    const wrapper = e.target.closest(".combo-wrapper");
+    const level = wrapper.dataset.level;
+    const listEl = wrapper.querySelector(".combo-list");
+    const keyword = e.target.value.toLowerCase();
+
+    let source = [];
+    if (level === "provinsi") source = cache.provinsi;
+    else if (level === "kabupaten") source = cache.kabupaten.get(state.provinsi?.id) || [];
+    else if (level === "kecamatan") source = cache.kecamatan.get(state.kabupaten?.id) || [];
+    else if (level === "kelurahan") source = cache.kelurahan.get(state.kecamatan?.id) || [];
+
+    const filtered = source.filter(i => i.name.toLowerCase().includes(keyword)).slice(0, 10);
+    
+    if (filtered.length > 0) {
+      listEl.innerHTML = filtered.map(i => `<div class="combo-item" data-id="${i.id}">${i.name}</div>`).join('');
+      listEl.style.display = "block";
+    } else {
+      listEl.style.display = "none";
+    }
+  });
+
+  document.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains('combo-item')) {
+      document.querySelectorAll(".combo-list").forEach(l => l.style.display = "none");
+      return;
+    }
+    const wrapper = e.target.closest(".combo-wrapper");
+    const level = wrapper.dataset.level;
+    const id = e.target.dataset.id;
+    const name = e.target.textContent;
+
+    wrapper.querySelector('.combo-input').value = name;
+    state[level] = { id, name };
+    wrapper.querySelector(".combo-list").style.display = "none";
+
+    if (level === "provinsi") {
+      const data = await fetchJson(`${BASE}/regencies/${id}.json`);
+      cache.kabupaten.set(id, data);
+      enableLevel("kabupaten", true);
+      enableLevel("kecamatan", false);
+      enableLevel("kelurahan", false);
+    } else if (level === "kabupaten") {
+      const data = await fetchJson(`${BASE}/districts/${id}.json`);
+      cache.kecamatan.set(id, data);
+      enableLevel("kecamatan", true);
+      enableLevel("kelurahan", false);
+    } else if (level === "kecamatan") {
+      const data = await fetchJson(`${BASE}/villages/${id}.json`);
+      cache.kelurahan.set(id, data);
+      enableLevel("kelurahan", true);
+    }
+  });
+
+  const form = document.getElementById("formPelanggan");
+  const btnKirim = document.getElementById("btnKirim");
+  const statusBox = document.getElementById("statusBox");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    
+    if (!state.kelurahan) {
+      alert("Harap lengkapi pilihan wilayah (Provinsi s/d Desa)!");
+      return;
+    }
+
+    btnKirim.disabled = true;
+    statusBox.style.display = "block";
+    statusBox.className = "status-box";
+    statusBox.textContent = "Sedang memproses foto dan mengirim data...";
+
+    const file = document.getElementById("foto").files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (ev) {
+      const payload = {
+        nik: document.getElementById("nik").value,
+        nama: document.getElementById("nama").value,
+        wa: document.getElementById("wa").value,
+        paket: document.getElementById("paket").value,
+        provinsi: state.provinsi.name,
+        kabupaten: state.kabupaten.name,
+        kecamatan: state.kecamatan.name,
+        kelurahan: state.kelurahan.name,
+        fotoDataUrl: ev.target.result
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        kirimKeFonnte(payload);
+      })
+      .catch(err => {
+        statusBox.className = "status-box status-error";
+        statusBox.textContent = "Koneksi Gagal: " + err.message;
+        btnKirim.disabled = false;
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  async function kirimKeFonnte(payload) {
+    const message = `*PENDAFTARAN BARU JTS*\n\n` +
+                    `NIK: ${payload.nik}\n` +
+                    `Nama: ${payload.nama}\n` +
+                    `WA: ${payload.wa}\n` +
+                    `Paket: ${payload.paket}\n` +
+                    `Alamat: ${payload.kelurahan}, ${payload.kecamatan}, ${payload.kabupaten}, ${payload.provinsi}`;
+    
+    try {
+      await fetch("https://api.fonnte.com/send", {
+        method: "POST",
+        headers: { "Authorization": "AiK7CYb8t8Musw5HMBG1" },
+        body: new URLSearchParams({
+          target: "120363401341090123@g.us",
+          message: message
+        })
+      });
+      statusBox.className = "status-box status-success";
+      statusBox.textContent = "Pendaftaran Berhasil Terkirim ke Sistem & WhatsApp Admin!";
+      form.reset();
+      Object.keys(state).forEach(key => state[key] = null);
+      ["kabupaten", "kecamatan", "kelurahan"].forEach(l => enableLevel(l, false));
+    } catch (e) {
+      statusBox.className = "status-box status-success";
+      statusBox.textContent = "Data masuk ke Google Sheet, namun gagal mengirim notifikasi WA.";
+    }
+    btnKirim.disabled = false;
+  }
+</script>
+
 </body>
 </html>
-
-
-
-
-
