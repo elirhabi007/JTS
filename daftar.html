@@ -10,48 +10,80 @@
     h1 { font-size: 22px; text-align: center; margin: 0 0 4px; font-weight: 700; }
     .subtitle { text-align: center; font-size: 13px; color: #6b7280; margin-bottom: 20px; }
     .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #111827; }
-    input[type="text"], input[type="file"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #111827; }
+    input[type="text"], input[type="file"] { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; transition: border 0.2s; }
+    input:focus { outline: none; border-color: #16a34a; }
     
     /* Layout Simetris untuk Kecamatan & Desa */
     .row { display: flex; gap: 8px; margin-bottom: 14px; }
     .row .combo-wrapper { flex: 1; margin-bottom: 0; width: 50%; }
     
-    /* Desain Pilihan Paket (Grid Box) */
-    .package-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 14px; }
-    .package-option { position: relative; }
-    .package-option input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-    .package-card { 
-      border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px 8px; text-align: center; 
-      font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; transition: all 0.2s ease; 
-      background: #fff; display: block;
+    /* DESAIN PAKET PREMIUM */
+    .package-grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 10px; 
+      margin-bottom: 18px; 
     }
-    .package-option input:checked + .package-card { 
-      border-color: #16a34a; background: #f0fdf4; color: #16a34a; box-shadow: 0 0 0 1px #16a34a;
+    .package-option { position: relative; cursor: pointer; }
+    .package-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+    
+    /* Membuat item ke-5 (Gold) memenuhi lebar baris agar simetris */
+    .package-option:nth-child(5) {
+      grid-column: span 2;
     }
-    .package-card:hover { border-color: #16a34a; }
 
-    .btn-submit { width: 100%; margin-top: 10px; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 999px; border: none; background: #16a34a; color: #ffffff; cursor: pointer; }
+    .package-card { 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 10px;
+      background: #fff;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+    }
+    .package-icon { font-size: 20px; margin-bottom: 4px; }
+    .package-name { font-size: 14px; font-weight: 700; color: #374151; }
+    
+    /* Efek Saat Dipilih */
+    .package-option input:checked + .package-card { 
+      border-color: #16a34a; 
+      background: #f0fdf4; 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+    }
+    .package-option input:checked + .package-card .package-name { color: #16a34a; }
+
+    /* Tombol & Status */
+    .btn-submit { width: 100%; margin-top: 10px; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 999px; border: none; background: #16a34a; color: #ffffff; cursor: pointer; transition: background 0.2s; }
+    .btn-submit:active { transform: scale(0.98); }
     .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
-    .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
-    .status-box { margin-top: 10px; font-size: 13px; border-radius: 12px; padding: 10px 12px; border: 1px solid transparent; display: none; }
+    
+    .hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .status-box { margin-top: 10px; font-size: 13px; border-radius: 12px; padding: 12px; border: 1px solid transparent; display: none; }
     .status-success { background: #d1fae5; border-color: #6ee7b7; color: #065f46; white-space: pre-line; }
     .status-error { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
     
-    .terms-title { margin-top: 18px; font-size: 13px; font-weight: 700; color: #111827; }
-    .terms-list { margin: 6px 0 0; padding-left: 18px; font-size: 12px; color: #4b5563; line-height: 1.5; }
+    /* Terms */
+    .terms-title { margin-top: 20px; font-size: 13px; font-weight: 700; color: #111827; }
+    .terms-list { margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: #4b5563; line-height: 1.6; }
     
+    /* Combobox */
     .combo-wrapper { position: relative; margin-bottom: 14px; }
-    .combo-list { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #e5e7eb; max-height: 200px; overflow-y: auto; z-index: 50; display: none; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .combo-item { padding: 8px 10px; font-size: 14px; cursor: pointer; }
-    .combo-item:hover, .combo-item.active { background: #e5f3ff; }
+    .combo-list { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #e5e7eb; max-height: 200px; overflow-y: auto; z-index: 50; display: none; border-radius: 0 0 12px 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .combo-item { padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
+    .combo-item:last-child { border-bottom: none; }
+    .combo-item:hover { background: #f0fdf4; color: #16a34a; }
   </style>
 </head>
 <body>
 
 <div class="card">
   <h1>Form Pendaftaran Layanan Internet</h1>
-  <div class="subtitle">Data dikirim ke server pusat PT. JTS</div>
+  <div class="subtitle">PT. Jaringan Teknologi Sejahtra</div>
 
   <form id="formPelanggan">
     <div class="form-group">
@@ -69,29 +101,44 @@
       <input type="text" id="wa" name="wa" placeholder="08xxxxxxxxxx" inputmode="numeric" required />
     </div>
 
-    <!-- Pilihan Paket Kotak-kotak -->
+    <!-- Pilihan Paket Grid Premium -->
     <div class="form-group">
       <label>Pilih Paket Berlangganan</label>
       <div class="package-grid">
         <label class="package-option">
           <input type="radio" name="paket" value="Basic" required />
-          <span class="package-card">Basic</span>
+          <div class="package-card">
+            <span class="package-icon">🌱</span>
+            <span class="package-name">Basic</span>
+          </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Clasic" />
-          <span class="package-card">Clasic</span>
+          <div class="package-card">
+            <span class="package-icon">🏠</span>
+            <span class="package-name">Clasic</span>
+          </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Bronze" />
-          <span class="package-card">Bronze</span>
+          <div class="package-card">
+            <span class="package-icon">🥉</span>
+            <span class="package-name">Bronze</span>
+          </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Silver" />
-          <span class="package-card">Silver</span>
+          <div class="package-card">
+            <span class="package-icon">🥈</span>
+            <span class="package-name">Silver</span>
+          </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Gold" />
-          <span class="package-card">Gold</span>
+          <div class="package-card">
+            <span class="package-icon">🥇</span>
+            <span class="package-name">Gold Premium</span>
+          </div>
         </label>
       </div>
     </div>
@@ -129,11 +176,10 @@
 
     <div class="terms-title">Catatan untuk Calon Pelanggan:</div>
     <ul class="terms-list">
-      <li>Calon Pelanggan dimohon melampirkan KTP atau NPWP yang masih berlaku saat proses administrasi.</li>
-      <li>Perangkat layanan dipinjamkan oleh Class Home dan diharapkan dijaga dengan baik selama masa berlangganan.</li>
-      <li>Jika saat pemasangan membutuhkan material tambahan di luar standar instalasi, biaya material tambahan ditanggung Calon Pelanggan.</li>
-      <li>Penanganan kendala dilakukan pada jam kerja, pukul 08.00–16.00 WIB pada hari kerjas, senin - sabtu.</li>
-      <li>Pelanggan mendapatkan fasilitas dan layanan sesuai paket berlangganan yang dipilih.</li>
+      <li>Calon Pelanggan dimohon melampirkan KTP atau NPWP yang masih berlaku.</li>
+      <li>Perangkat layanan dipinjamkan dan diharapkan dijaga dengan baik.</li>
+      <li>Biaya material tambahan di luar standar ditanggung pelanggan.</li>
+      <li>Penanganan kendala dilakukan pada jam kerja (08.00–16.00 WIB).</li>
     </ul>
   </form>
 </div>
@@ -161,9 +207,7 @@
     }
   }
 
-  fetchJson(`${BASE}/provinces.json`).then(data => {
-    cache.provinsi = data;
-  });
+  fetchJson(`${BASE}/provinces.json`).then(data => { cache.provinsi = data; });
 
   document.addEventListener("input", (e) => {
     if (!e.target.classList.contains('combo-input')) return;
@@ -179,13 +223,10 @@
     else if (level === "kelurahan") source = cache.kelurahan.get(state.kecamatan?.id) || [];
 
     const filtered = source.filter(i => i.name.toLowerCase().includes(keyword)).slice(0, 10);
-    
     if (filtered.length > 0) {
       listEl.innerHTML = filtered.map(i => `<div class="combo-item" data-id="${i.id}">${i.name}</div>`).join('');
       listEl.style.display = "block";
-    } else {
-      listEl.style.display = "none";
-    }
+    } else { listEl.style.display = "none"; }
   });
 
   document.addEventListener("click", async (e) => {
@@ -226,16 +267,12 @@
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    
-    if (!state.kelurahan) {
-      alert("Harap lengkapi pilihan wilayah (Provinsi s/d Desa)!");
-      return;
-    }
+    if (!state.kelurahan) { alert("Harap lengkapi pilihan wilayah!"); return; }
 
     btnKirim.disabled = true;
     statusBox.style.display = "block";
     statusBox.className = "status-box";
-    statusBox.textContent = "Sedang memproses foto dan mengirim data...";
+    statusBox.textContent = "Sedang memproses data...";
 
     const file = document.getElementById("foto").files[0];
     const reader = new FileReader();
@@ -253,14 +290,8 @@
         fotoDataUrl: ev.target.result
       };
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        kirimKeFonnte(payload);
-      })
+      fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+      .then(() => { kirimKeFonnte(payload); })
       .catch(err => {
         statusBox.className = "status-box status-error";
         statusBox.textContent = "Koneksi Gagal: " + err.message;
@@ -271,17 +302,8 @@
   });
 
   async function kirimKeFonnte(payload) {
-    const messageAdmin = `*PENDAFTARAN BARU JTS*\n\n` +
-                    `NIK: ${payload.nik}\n` +
-                    `Nama: ${payload.nama}\n` +
-                    `WA: ${payload.wa}\n` +
-                    `Paket: ${payload.paket}\n` +
-                    `Alamat: ${payload.kelurahan}, ${payload.kecamatan}, ${payload.kabupaten}, ${payload.provinsi}`;
-    
-    // Notifikasi Pelanggan yang diperbarui
-    const messageUser = `Yth. *${payload.nama}*,\n\n` +
-                    `Terima kasih telah memilih PT. JTS sebagai partner layanan internet Anda.\n` +
-                    `Data pendaftaran Anda telah kami terima dan akan segera ditindaklanjuti oleh tim kami.`;
+    const messageAdmin = `*PENDAFTARAN BARU *\n\nNIK: ${payload.nik}\nNama: ${payload.nama}\nWA: ${payload.wa}\nPaket: ${payload.paket}\nAlamat: ${payload.kelurahan}, ${payload.kecamatan}, ${payload.kabupaten}, ${payload.provinsi}`;
+    const messageUser = `Yth. *${payload.nama}*,\n\nTerima kasih telah memilih PT. JTS sebagai partner layanan internet Anda.\nData pendaftaran Anda telah kami terima dan akan segera ditindaklanjuti oleh tim kami.`;
 
     try {
       await fetch("https://api.fonnte.com/send", {
@@ -297,13 +319,13 @@
       });
 
       statusBox.className = "status-box status-success";
-      statusBox.textContent = "Pendaftaran Berhasil Terkirim ke Sistem & WhatsApp!";
+      statusBox.textContent = "Pendaftaran Berhasil Terkirim!";
       form.reset();
       Object.keys(state).forEach(key => state[key] = null);
       ["kabupaten", "kecamatan", "kelurahan"].forEach(l => enableLevel(l, false));
     } catch (e) {
       statusBox.className = "status-box status-success";
-      statusBox.textContent = "Data terinput ke sistem, namun gagal mengirim notifikasi WA.";
+      statusBox.textContent = "Data terinput, namun notifikasi WA gagal.";
     }
     btnKirim.disabled = false;
   }
