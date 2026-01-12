@@ -10,18 +10,37 @@
     h1 { font-size: 22px; text-align: center; margin: 0 0 4px; font-weight: 700; }
     .subtitle { text-align: center; font-size: 13px; color: #6b7280; margin-bottom: 20px; }
     .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; color: #111827; }
-    input[type="text"], select, input[type="file"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; }
-    .row { display: flex; gap: 8px; }
-    .row .form-group { flex: 1; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #111827; }
+    input[type="text"], input[type="file"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; }
+    
+    /* Layout Simetris untuk Kecamatan & Desa */
+    .row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .row .combo-wrapper { flex: 1; margin-bottom: 0; width: 50%; }
+    
+    /* Desain Pilihan Paket (Grid Box) */
+    .package-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .package-option { position: relative; }
+    .package-option input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+    .package-card { 
+      border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px 8px; text-align: center; 
+      font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; transition: all 0.2s ease; 
+      background: #fff; display: block;
+    }
+    .package-option input:checked + .package-card { 
+      border-color: #16a34a; background: #f0fdf4; color: #16a34a; box-shadow: 0 0 0 1px #16a34a;
+    }
+    .package-card:hover { border-color: #16a34a; }
+
     .btn-submit { width: 100%; margin-top: 10px; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 999px; border: none; background: #16a34a; color: #ffffff; cursor: pointer; }
     .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
     .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
     .status-box { margin-top: 10px; font-size: 13px; border-radius: 12px; padding: 10px 12px; border: 1px solid transparent; display: none; }
     .status-success { background: #d1fae5; border-color: #6ee7b7; color: #065f46; white-space: pre-line; }
     .status-error { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+    
     .terms-title { margin-top: 18px; font-size: 13px; font-weight: 700; color: #111827; }
     .terms-list { margin: 6px 0 0; padding-left: 18px; font-size: 12px; color: #4b5563; line-height: 1.5; }
+    
     .combo-wrapper { position: relative; margin-bottom: 14px; }
     .combo-list { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #e5e7eb; max-height: 200px; overflow-y: auto; z-index: 50; display: none; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .combo-item { padding: 8px 10px; font-size: 14px; cursor: pointer; }
@@ -50,16 +69,31 @@
       <input type="text" id="wa" name="wa" placeholder="08xxxxxxxxxx" inputmode="numeric" required />
     </div>
 
+    <!-- Pilihan Paket Kotak-kotak -->
     <div class="form-group">
-      <label for="paket">Paket Berlangganan</label>
-      <select id="paket" name="paket" required>
-        <option value="">Pilih paket…</option>
-        <option value="Basic">Basic</option>
-        <option value="Clasic">Clasic</option>
-        <option value="Bronze">Bronze</option>
-        <option value="Silver">Silver</option>
-        <option value="Gold">Gold</option>
-      </select>
+      <label>Pilih Paket Berlangganan</label>
+      <div class="package-grid">
+        <label class="package-option">
+          <input type="radio" name="paket" value="Basic" required />
+          <span class="package-card">Basic</span>
+        </label>
+        <label class="package-option">
+          <input type="radio" name="paket" value="Clasic" />
+          <span class="package-card">Clasic</span>
+        </label>
+        <label class="package-option">
+          <input type="radio" name="paket" value="Bronze" />
+          <span class="package-card">Bronze</span>
+        </label>
+        <label class="package-option">
+          <input type="radio" name="paket" value="Silver" />
+          <span class="package-card">Silver</span>
+        </label>
+        <label class="package-option">
+          <input type="radio" name="paket" value="Gold" />
+          <span class="package-card">Gold</span>
+        </label>
+      </div>
     </div>
 
     <label>Wilayah Domisili</label>
@@ -106,7 +140,6 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8FoI2tREEqWNaTKBx7XodOGmexTw750fpJB2vWuBxKsXHgcaCpjoXPDTQIO7QNI9V/exec";
-
   const BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
   const state = { provinsi: null, kabupaten: null, kecamatan: null, kelurahan: null };
   const cache = { provinsi: [], kabupaten: new Map(), kecamatan: new Map(), kelurahan: new Map() };
@@ -212,7 +245,7 @@
         nik: document.getElementById("nik").value,
         nama: document.getElementById("nama").value,
         wa: document.getElementById("wa").value,
-        paket: document.getElementById("paket").value,
+        paket: document.querySelector('input[name="paket"]:checked').value,
         provinsi: state.provinsi.name,
         kabupaten: state.kabupaten.name,
         kecamatan: state.kecamatan.name,
@@ -238,30 +271,39 @@
   });
 
   async function kirimKeFonnte(payload) {
-    const message = `*PENDAFTARAN BARU JTS*\n\n` +
+    const messageAdmin = `*PENDAFTARAN BARU JTS*\n\n` +
                     `NIK: ${payload.nik}\n` +
                     `Nama: ${payload.nama}\n` +
                     `WA: ${payload.wa}\n` +
                     `Paket: ${payload.paket}\n` +
                     `Alamat: ${payload.kelurahan}, ${payload.kecamatan}, ${payload.kabupaten}, ${payload.provinsi}`;
     
+    // Notifikasi Pelanggan yang diperbarui
+    const messageUser = `Yth. *${payload.nama}*,\n\n` +
+                    `Terima kasih telah memilih PT. JTS sebagai partner layanan internet Anda.\n` +
+                    `Data pendaftaran Anda telah kami terima dan akan segera ditindaklanjuti oleh tim kami.`;
+
     try {
       await fetch("https://api.fonnte.com/send", {
         method: "POST",
         headers: { "Authorization": "AiK7CYb8t8Musw5HMBG1" },
-        body: new URLSearchParams({
-          target: "120363401341090123@g.us",
-          message: message
-        })
+        body: new URLSearchParams({ target: "120363401341090123@g.us", message: messageAdmin })
       });
+
+      await fetch("https://api.fonnte.com/send", {
+        method: "POST",
+        headers: { "Authorization": "AiK7CYb8t8Musw5HMBG1" },
+        body: new URLSearchParams({ target: payload.wa, message: messageUser })
+      });
+
       statusBox.className = "status-box status-success";
-      statusBox.textContent = "Pendaftaran Berhasil Terkirim ke Sistem & WhatsApp Admin!";
+      statusBox.textContent = "Pendaftaran Berhasil Terkirim ke Sistem & WhatsApp!";
       form.reset();
       Object.keys(state).forEach(key => state[key] = null);
       ["kabupaten", "kecamatan", "kelurahan"].forEach(l => enableLevel(l, false));
     } catch (e) {
       statusBox.className = "status-box status-success";
-      statusBox.textContent = "Data masuk ke Google Sheet, namun gagal mengirim notifikasi WA.";
+      statusBox.textContent = "Data terinput ke sistem, namun gagal mengirim notifikasi WA.";
     }
     btnKirim.disabled = false;
   }
