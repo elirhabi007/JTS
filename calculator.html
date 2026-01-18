@@ -149,7 +149,6 @@
         </div>
 
         <div>
-          <!-- Label Dimodifikasi -->
           <label for="distance">
              Panjang Fiber (km) <span id="distance_dbm_output"></span>
           </label>
@@ -162,7 +161,6 @@
           <input id="fiber_loss" type="number" step="0.01" value="0.35">
         </div>
 
-        <!-- Loss Feeder Global -->
         <div>
           <label for="conn_loss">Loss Konektor Kabel (dB)</label>
           <input id="conn_loss" type="number" step="0.01" value="0.5">
@@ -178,19 +176,6 @@
         <div>
           <label for="margin">Margin Desain (dB)</label>
           <input id="margin" type="number" step="0.1" value="0">
-        </div>
-
-        <!-- NEW INPUTS FOR SPLITTER LOSSES -->
-        <div>
-          <label for="conn_per_splitter">Konektor per Splitter (dB)</label>
-          <input id="conn_per_splitter" type="number" step="0.01" value="0.5">
-          <div class="small-hint">Tambahan redaman konektor di tiap node splitter.</div>
-        </div>
-
-        <div>
-          <label for="splice_per_splitter">Splice per Splitter (dB)</label>
-          <input id="splice_per_splitter" type="number" step="0.01" value="0.1">
-          <div class="small-hint">Tambahan redaman splice di tiap node splitter.</div>
         </div>
       </div>
 
@@ -213,7 +198,7 @@
       <!-- HASIL -->
       <div class="results-card" id="results" style="display:none;">
         <strong>Hasil Perhitungan</strong>
-        <div class="small-hint" style="margin-bottom:8px">Nilai output sudah dikurangi loss splitter + loss konektor/splice tambahan di level tersebut.</div>
+        <div class="small-hint" style="margin-bottom:8px">Nilai output sudah dikurangi loss splitter + loss global (fiber, konektor, splice) dari input atas.</div>
 
         <div class="results-grid" style="margin-top:10px" id="results_grid"></div>
 
@@ -456,11 +441,6 @@
       const spliceLossGlobal = parseDecimalById("splice_loss", 0.4);
       const marginDesign = parseDecimalById("margin", 0);
       
-      // Loss Tambahan per Node Splitter
-      const connPerSplitter = parseDecimalById("conn_per_splitter", 0.5);
-      const splicePerSplitter = parseDecimalById("splice_per_splitter", 0.1);
-      const extraLossPerNode = connPerSplitter + splicePerSplitter;
-
       const levels = parseInt(document.getElementById("levels").value,10);
 
       // Hitung loss kabel feeder awal (sebelum splitter manapun)
@@ -501,8 +481,8 @@
         const fbtLossArr = fbtLossData[ratio] || [0,0];
         const [lossPort1, lossPort2] = fbtLossArr;
         
-        powerPort1AfterFbt = powerAfterLine - lossPort1 - extraLossPerNode;
-        powerPort2AfterFbt = powerAfterLine - lossPort2 - extraLossPerNode;
+        powerPort1AfterFbt = powerAfterLine - lossPort1;
+        powerPort2AfterFbt = powerAfterLine - lossPort2;
 
         setLevelOutputTag(1,
           `{ ${powerPort1AfterFbt.toFixed(2)} dBm / ${powerPort2AfterFbt.toFixed(2)} dBm }`
@@ -513,7 +493,7 @@
         const plcRatio = parts[1] + ":" + parts[2];
         
         const il1 = plcInsertionLoss[plcRatio] || 0;
-        powerPort1AfterPlcLvl1 = powerAfterLine - il1 - extraLossPerNode;
+        powerPort1AfterPlcLvl1 = powerAfterLine - il1;
 
         setLevelOutputTag(1,
           `{ ${powerPort1AfterPlcLvl1.toFixed(2)} dBm }`
@@ -538,7 +518,7 @@
           const val = sel ? sel.value : "1:8";
           
           const il = plcInsertionLoss[val] || 0;
-          powerIntoPlcChain = powerIntoPlcChain - il - extraLossPerNode;
+          powerIntoPlcChain = powerIntoPlcChain - il;
 
           setLevelOutputTag(i,
             `{ ${powerIntoPlcChain.toFixed(2)} dBm }`
@@ -620,7 +600,7 @@
             if(sel2){
               const val2 = sel2.value;
               const il2 = plcInsertionLoss[val2] || 0;
-              tmpPower = tmpPower - il2 - extraLossPerNode;
+              tmpPower = tmpPower - il2;
               level2Output = tmpPower;
             }
           }
@@ -630,7 +610,7 @@
             if(sel3){
               const val3 = sel3.value;
               const il3 = plcInsertionLoss[val3] || 0;
-              tmpPower = tmpPower - il3 - extraLossPerNode;
+              tmpPower = tmpPower - il3;
               level3Output = tmpPower;
             }
           }
@@ -722,8 +702,7 @@
       const ids = [
         "olt_power","distance","fiber_loss",
         "conn_loss","splice_loss",
-        "margin","levels",
-        "conn_per_splitter","splice_per_splitter"
+        "margin","levels"
       ];
       ids.forEach(id=>{
         const el=document.getElementById(id);
