@@ -1,0 +1,745 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <title>Kalkulator Redaman dan Distribusi PON</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+      margin:0;
+      padding:0;
+    }
+    .container { max-width:960px;margin:24px auto;padding:16px; }
+    .card {
+      background:#fff;
+      padding:20px 24px;
+      border-radius:12px;
+      box-shadow:0 10px 25px rgba(15,23,42,0.08);
+      border-top:8px solid #16a34a;
+    }
+    h1{
+      margin:0 0 6px;
+      font-size:1.4rem;
+      text-align:center;
+    }
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    label{display:block;font-size:0.85rem;color:#374151;margin-bottom:6px;font-weight:600}
+    input[type="text"], input[type="number"], select {
+      width:100%;padding:8px 10px;border-radius:8px;
+      border:1px solid #d1d5db;background:#f9fafb;font-size:0.95rem;
+    }
+    input:focus,select:focus{
+      outline:none;border-color:#2563eb;box-shadow:0 0 0 1px rgba(37,99,235,0.25);background:#fff;
+    }
+    .small-hint{font-size:0.75rem;color:#9ca3af;margin-top:4px}
+    .section-title{
+      font-weight:700;margin-top:16px;margin-bottom:8px;color:#111827;
+      border-bottom:1px dashed #e5e7eb;padding-bottom:6px
+    }
+    .results-card{margin-top:18px;padding:14px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb}
+    .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+    .result-item{background:#fff;border:1px solid #e5e7eb;padding:10px;border-radius:10px}
+    .result-label{font-size:0.75rem;color:#6b7280;text-transform:uppercase;margin-bottom:4px}
+    .result-value{font-weight:700;font-size:1.05rem}
+    .btn{
+      display:inline-block;
+      padding:9px 16px;
+      border-radius:999px;
+      border:none;
+      background:#e5e7eb;
+      color:#374151;
+      font-weight:700;
+      cursor:pointer;
+      font-size:0.85rem;
+      margin-top:10px;
+    }
+
+    /* Baris splitter level 1 */
+    .checkbox-row{
+      margin-top:4px;
+      margin-bottom:4px;
+    }
+    .checkbox-main-line{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      flex-wrap:nowrap;
+    }
+    .checkbox-left-group{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      flex-wrap:nowrap;
+    }
+    .checkbox-row span.title-label{
+      font-weight:600;
+      font-size:0.83rem;
+      color:#374151;
+      white-space:nowrap;
+    }
+    .checkbox-row label{
+      margin:0;
+      font-weight:500;
+      font-size:0.8rem;
+      display:inline-flex;
+      align-items:center;
+      gap:2px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .checkbox-row input[type="checkbox"]{
+      width:14px;
+      height:14px;
+    }
+    .level-output-tag{
+      font-size:0.78rem;
+      color:#6b7280;
+      white-space:nowrap;
+    }
+
+    .splitter-label-with-tag{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .splitter-label-with-tag span.level-output-tag{
+      font-size:0.78rem;
+      color:#6b7280;
+      white-space:nowrap;
+    }
+    
+    /* Style khusus untuk label fiber distance */
+    #distance_dbm_output {
+        font-weight: 500;
+        color: #2563eb;
+        margin-left: 4px;
+    }
+
+    footer{font-size:0.75rem;color:#9ca3af;margin-top:14px;text-align:center}
+    @media(max-width:480px){
+      .checkbox-main-line{
+        flex-wrap:wrap;
+      }
+      .level-output-tag{
+        margin-top:2px;
+      }
+    }
+    @media(max-width:600px){ .card{padding:16px} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Kalkulator Redaman dan Distribusi PON</h1>
+
+      <!-- INPUT DASAR -->
+      <div class="section-title">Input Dasar</div>
+      <div class="grid">
+        <div>
+          <label for="olt_power">Power Input (dBm)</label>
+          <input id="olt_power" type="text" inputmode="decimal" value="-15">
+          <div class="small-hint">Power awal (OLT / ODC / ODP).</div>
+        </div>
+
+        <div>
+          <!-- Label Dimodifikasi -->
+          <label for="distance">
+             Panjang Fiber (km) <span id="distance_dbm_output"></span>
+          </label>
+          <input id="distance" type="number" step="0.01" value="0.2">
+          <div class="small-hint">Panjang kabel feeder/distribusi awal.</div>
+        </div>
+
+        <div>
+          <label for="fiber_loss">Loss Fiber (dB/km)</label>
+          <input id="fiber_loss" type="number" step="0.01" value="0.35">
+        </div>
+
+        <!-- Loss Feeder Global -->
+        <div>
+          <label for="conn_loss">Loss Konektor Kabel (dB)</label>
+          <input id="conn_loss" type="number" step="0.01" value="0.5">
+          <div class="small-hint">Total loss konektor pada kabel awal.</div>
+        </div>
+
+        <div>
+          <label for="splice_loss">Loss Splice Kabel (dB)</label>
+          <input id="splice_loss" type="number" step="0.01" value="0.2">
+          <div class="small-hint">Total loss sambungan pada kabel awal.</div>
+        </div>
+
+        <div>
+          <label for="margin">Margin Desain (dB)</label>
+          <input id="margin" type="number" step="0.1" value="0">
+        </div>
+
+        <!-- NEW INPUTS FOR SPLITTER LOSSES -->
+        <div>
+          <label for="conn_per_splitter">Konektor per Splitter (dB)</label>
+          <input id="conn_per_splitter" type="number" step="0.01" value="0.5">
+          <div class="small-hint">Tambahan redaman konektor di tiap node splitter.</div>
+        </div>
+
+        <div>
+          <label for="splice_per_splitter">Splice per Splitter (dB)</label>
+          <input id="splice_per_splitter" type="number" step="0.01" value="0.1">
+          <div class="small-hint">Tambahan redaman splice di tiap node splitter.</div>
+        </div>
+      </div>
+
+      <!-- SPLITTER -->
+      <div class="section-title">Konfigurasi Splitter</div>
+      <div class="grid">
+        <div>
+          <label for="levels">Jumlah Level Splitter</label>
+          <select id="levels">
+            <option value="1" selected>1 Level</option>
+            <option value="2">2 Level</option>
+            <option value="3">3 Level</option>
+          </select>
+          <div class="small-hint">Level 1 bisa FBT/PLC/tanpa splitter.</div>
+        </div>
+      </div>
+
+      <div id="splitter-levels" class="grid"></div>
+
+      <!-- HASIL -->
+      <div class="results-card" id="results" style="display:none;">
+        <strong>Hasil Perhitungan</strong>
+        <div class="small-hint" style="margin-bottom:8px">Nilai output sudah dikurangi loss splitter + loss konektor/splice tambahan di level tersebut.</div>
+
+        <div class="results-grid" style="margin-top:10px" id="results_grid"></div>
+
+        <button class="btn" type="button" onclick="useOutputAsInput()">
+          Gunakan Power Output sebagai Power Input
+        </button>
+      </div>
+
+      <footer>Kalkulator ini bersifat perkiraan. Sesuaikan nilai loss dengan datasheet perangkat dan hasil pengukuran lapangan.</footer>
+    </div>
+  </div>
+
+  <script>
+    // === DATA LOSS FBT ===
+    const fbtLossData = {
+      "1:99": [20.00, 0.04], "2:98": [16.99, 0.09], "3:97": [15.23, 0.13],
+      "4:96": [13.98, 0.18], "5:95": [13.01, 0.22], "6:94": [12.22, 0.27],
+      "7:93": [11.55, 0.31], "8:92": [10.97, 0.36], "9:91": [10.46, 0.40],
+      "10:90": [10.00, 0.46], "15:85": [8.24, 0.71], "20:80": [6.99, 0.97],
+      "25:75": [6.02, 1.25], "30:70": [5.23, 1.55], "35:65": [4.56, 1.87],
+      "40:60": [3.98, 2.22], "45:55": [3.47, 2.60], "50:50": [3.01, 3.01]
+    };
+
+    // === LOSS PLC SIMETRIS (STANDAR LAPANGAN/KOMERSIAL) ===
+    const plcInsertionLoss = {
+      "1:2": 4.00,   
+      "1:4": 7.30,   
+      "1:8": 10.50,  
+      "1:16": 13.70, 
+      "1:32": 17.10, 
+      "1:64": 20.50  
+    };
+
+    const fbtOptions = [
+      "1:99","2:98","3:97","4:96","5:95","6:94","7:93","8:92","9:91",
+      "10:90","15:85","20:80","25:75","30:70","35:65","40:60","45:55","50:50"
+    ];
+    const plcOptions = ["1:2","1:4","1:8","1:16","1:32","1:64"];
+
+    function createSplitterLevelControls(){
+      const levels = parseInt(document.getElementById("levels").value,10);
+      const container = document.getElementById("splitter-levels");
+      container.innerHTML = "";
+
+      for(let i=1;i<=levels;i++){
+        const wrap = document.createElement("div");
+        const sel = document.createElement("select");
+        sel.id = "splitter_level_" + i;
+
+        if(i === 1){
+          // LEVEL 1: Splitter [ ] PLC [ ] FBT dan tag
+          const checkboxRow = document.createElement("div");
+          checkboxRow.className = "checkbox-row";
+
+          const mainLine = document.createElement("div");
+          mainLine.className = "checkbox-main-line";
+
+          const leftGroup = document.createElement("div");
+          leftGroup.className = "checkbox-left-group";
+
+          const titleSpan = document.createElement("span");
+          titleSpan.className = "title-label";
+          titleSpan.textContent = "Splitter";
+
+          const outTag = document.createElement("span");
+          outTag.id = "level_output_1";
+          outTag.className = "level-output-tag";
+          outTag.textContent = "";
+
+          const cbPLC = document.createElement("input");
+          cbPLC.type = "checkbox";
+          cbPLC.id = "cb_plc_level1";
+          cbPLC.checked = false;
+
+          const plcWrap = document.createElement("label");
+          plcWrap.appendChild(cbPLC);
+          plcWrap.appendChild(document.createTextNode("PLC"));
+
+          const cbFBT = document.createElement("input");
+          cbFBT.type = "checkbox";
+          cbFBT.id = "cb_fbt_level1";
+          cbFBT.checked = false;
+
+          const fbtWrap = document.createElement("label");
+          fbtWrap.appendChild(cbFBT);
+          fbtWrap.appendChild(document.createTextNode("FBT"));
+
+          leftGroup.appendChild(titleSpan);
+          leftGroup.appendChild(plcWrap);
+          leftGroup.appendChild(fbtWrap);
+
+          mainLine.appendChild(leftGroup);
+          mainLine.appendChild(outTag);
+
+          checkboxRow.appendChild(mainLine);
+          wrap.appendChild(checkboxRow);
+
+          // select level 1 (isi oleh updateLevel1Options)
+          sel.appendChild(document.createElement("option"));
+          wrap.appendChild(sel);
+
+          const hint = document.createElement("div");
+          hint.className = "small-hint";
+          hint.textContent = "Centang PLC atau FBT. Bisa uncheck keduanya untuk tanpa splitter.";
+          wrap.appendChild(hint);
+
+          cbPLC.addEventListener("change", () => {
+            if(cbPLC.checked && cbFBT.checked){
+              cbFBT.checked = false;
+            }
+            updateLevel1Options(sel);
+          });
+          cbFBT.addEventListener("change", () => {
+            if(cbFBT.checked && cbPLC.checked){
+              cbPLC.checked = false;
+            }
+            updateLevel1Options(sel);
+          });
+
+          sel.addEventListener("change", calculatePON);
+
+          sel.dataset.level1_plc_id = "cb_plc_level1";
+          sel.dataset.level1_fbt_id = "cb_fbt_level1";
+
+          updateLevel1Options(sel); // awal: tanpa splitter
+        } else {
+          // LEVEL 2 dan 3: PLC saja
+          const lbl = document.createElement("label");
+          lbl.className = "splitter-label-with-tag";
+
+          const textSpan = document.createElement("span");
+          textSpan.textContent = "Splitter Level " + i;
+
+          const outTag = document.createElement("span");
+          outTag.id = "level_output_" + i;
+          outTag.className = "level-output-tag";
+          outTag.textContent = "";
+
+          lbl.appendChild(textSpan);
+          lbl.appendChild(outTag);
+
+          const ogPlc = document.createElement("optgroup");
+          ogPlc.label = "PLC (Simetris)";
+          plcOptions.forEach(v=>{
+            const o=document.createElement("option");
+            o.value=v;
+            const il = plcInsertionLoss[v] || 0;
+            o.textContent=v + " (≈ " + il.toFixed(1) + " dB)";
+            if(v==="1:8") o.selected = true;
+            ogPlc.appendChild(o);
+          });
+          sel.appendChild(ogPlc);
+
+          const hint=document.createElement("div");
+          hint.className="small-hint";
+          if(i===levels){
+            hint.textContent="Level terakhir PLC ke distribusi pelanggan.";
+          }else{
+            hint.textContent="Level tengah (PLC tambahan jika ada).";
+          }
+
+          sel.addEventListener("change", calculatePON);
+          wrap.appendChild(lbl);
+          wrap.appendChild(sel);
+          wrap.appendChild(hint);
+        }
+
+        container.appendChild(wrap);
+      }
+      calculatePON();
+    }
+
+    function updateLevel1Options(selectEl){
+      const cbPLC = document.getElementById("cb_plc_level1");
+      const cbFBT = document.getElementById("cb_fbt_level1");
+
+      const usePLC = !!(cbPLC && cbPLC.checked);
+      const useFBT = !!(cbFBT && cbFBT.checked);
+
+      selectEl.innerHTML = "";
+
+      if(!usePLC && !useFBT){
+        const optNone = document.createElement("option");
+        optNone.value = "NONE";
+        optNone.textContent = "Tanpa splitter";
+        selectEl.appendChild(optNone);
+        selectEl.value = "NONE";
+        calculatePON();
+        return;
+      }
+
+      if(useFBT){
+        const ogFbt = document.createElement("optgroup");
+        ogFbt.label = "FBT (Asimetris)";
+        fbtOptions.forEach(v=>{
+          const o=document.createElement("option");
+          o.value="FBT:"+v;
+          o.textContent="FBT " + v;
+          ogFbt.appendChild(o);
+        });
+        selectEl.appendChild(ogFbt);
+      }
+
+      if(usePLC){
+        const ogPlc = document.createElement("optgroup");
+        ogPlc.label = "PLC (Simetris)";
+        plcOptions.forEach(v=>{
+          const o=document.createElement("option");
+          o.value="PLC:"+v;
+          const il = plcInsertionLoss[v] || 0;
+          o.textContent="PLC " + v + " (≈ " + il.toFixed(1) + " dB)";
+          ogPlc.appendChild(o);
+        });
+        selectEl.appendChild(ogPlc);
+      }
+
+      const firstOption = selectEl.querySelector("option");
+      if(firstOption){
+        selectEl.value = firstOption.value;
+      }
+
+      calculatePON();
+    }
+
+    function parseDecimalById(id, fallback){
+      const el = document.getElementById(id);
+      const v = (el.value || "").replace(",",".").trim();
+      const n = parseFloat(v);
+      return isNaN(n) ? fallback : n;
+    }
+
+    function calculatePON(){
+      // 1. Ambil Input Dasar
+      const powerInput = parseDecimalById("olt_power", 0);
+      const distance = parseDecimalById("distance", 0.2);
+      const fiberLossPerKm = parseDecimalById("fiber_loss", 0.35);
+      
+      // Loss kabel feeder awal
+      const connLossGlobal = parseDecimalById("conn_loss", 0.5);
+      const spliceLossGlobal = parseDecimalById("splice_loss", 0.4);
+      const marginDesign = parseDecimalById("margin", 0);
+      
+      // Loss Tambahan per Node Splitter
+      const connPerSplitter = parseDecimalById("conn_per_splitter", 0.5);
+      const splicePerSplitter = parseDecimalById("splice_per_splitter", 0.1);
+      const extraLossPerNode = connPerSplitter + splicePerSplitter;
+
+      const levels = parseInt(document.getElementById("levels").value,10);
+
+      // Hitung loss kabel feeder awal (sebelum splitter manapun)
+      const fiberLoss = distance * fiberLossPerKm;
+      const lossBeforeAnySplitter = fiberLoss + connLossGlobal + spliceLossGlobal + marginDesign;
+      const powerAfterLine = powerInput - lossBeforeAnySplitter;
+
+      // UPDATE LABEL JARAK FIBER DENGAN HASIL OPM
+      const distLabel = document.getElementById("distance_dbm_output");
+      if(distLabel){
+          distLabel.textContent = `{ ${powerAfterLine.toFixed(2)} dBm }`;
+      }
+
+      resetLevelOutputTag(1);
+      resetLevelOutputTag(2);
+      resetLevelOutputTag(3);
+
+      const lvl1Sel = document.getElementById("splitter_level_1");
+      const lvl1Val = lvl1Sel ? lvl1Sel.value : "NONE";
+
+      let isUsingFbt = false;
+      let isUsingPlcAtLevel1 = false;
+      
+      // Variabel output
+      let powerPort1AfterFbt = powerAfterLine;
+      let powerPort2AfterFbt = null;
+      let powerPort1AfterPlcLvl1 = null;
+
+      // --- LEVEL 1 CALCULATION ---
+      if(lvl1Val === "NONE"){
+        isUsingFbt = false;
+        isUsingPlcAtLevel1 = false;
+        powerPort1AfterPlcLvl1 = powerAfterLine; 
+      } else if(lvl1Val.startsWith("FBT:")){
+        isUsingFbt = true;
+        const parts = lvl1Val.split(":"); 
+        const ratio = parts[1] + ":" + parts[2];
+        const fbtLossArr = fbtLossData[ratio] || [0,0];
+        const [lossPort1, lossPort2] = fbtLossArr;
+        
+        powerPort1AfterFbt = powerAfterLine - lossPort1 - extraLossPerNode;
+        powerPort2AfterFbt = powerAfterLine - lossPort2 - extraLossPerNode;
+
+        setLevelOutputTag(1,
+          `{ ${powerPort1AfterFbt.toFixed(2)} dBm / ${powerPort2AfterFbt.toFixed(2)} dBm }`
+        );
+      } else if(lvl1Val.startsWith("PLC:")){
+        isUsingPlcAtLevel1 = true;
+        const parts = lvl1Val.split(":"); 
+        const plcRatio = parts[1] + ":" + parts[2];
+        
+        const il1 = plcInsertionLoss[plcRatio] || 0;
+        powerPort1AfterPlcLvl1 = powerAfterLine - il1 - extraLossPerNode;
+
+        setLevelOutputTag(1,
+          `{ ${powerPort1AfterPlcLvl1.toFixed(2)} dBm }`
+        );
+      }
+
+      // Tentukan power yang masuk ke rangkaian berikutnya (Level 2 dst)
+      let powerIntoPlcChain;
+
+      if(isUsingFbt){
+        powerIntoPlcChain = powerPort1AfterFbt;
+      } else if(isUsingPlcAtLevel1){
+        powerIntoPlcChain = powerPort1AfterPlcLvl1;
+      } else {
+        powerIntoPlcChain = powerAfterLine;
+      }
+
+      // --- LEVEL 2 & 3 CALCULATION ---
+      if(levels > 1){
+        for(let i=2; i<=levels; i++){
+          const sel = document.getElementById("splitter_level_"+i);
+          const val = sel ? sel.value : "1:8";
+          
+          const il = plcInsertionLoss[val] || 0;
+          powerIntoPlcChain = powerIntoPlcChain - il - extraLossPerNode;
+
+          setLevelOutputTag(i,
+            `{ ${powerIntoPlcChain.toFixed(2)} dBm }`
+          );
+        }
+      }
+
+      // --- TAMPILKAN HASIL ---
+      const resultsEl = document.getElementById("results");
+      const gridEl = document.getElementById("results_grid");
+      gridEl.innerHTML = "";
+
+      // === HASIL UNTUK FBT ===
+      if(isUsingFbt){
+        addResultItem(gridEl, "Power Input", powerInput.toFixed(2) + " dBm");
+        addResultItem(gridEl, "Output Laser PORT 1 (setelah FBT)", powerPort1AfterFbt.toFixed(2) + " dBm");
+
+        if(levels > 1){
+          addResultItem(gridEl, "Output Laser (Port 1 FBT + PLC)", powerIntoPlcChain.toFixed(2) + " dBm");
+        }
+
+        if(powerPort2AfterFbt !== null){
+          addResultItem(gridEl, "Next ODP (Port 2 FBT)", powerPort2AfterFbt.toFixed(2) + " dBm");
+        }
+      } else {
+        // === HASIL UNTUK PLC / TANPA SPLITTER ===
+        addResultItem(gridEl, "Power Input", powerInput.toFixed(2) + " dBm");
+
+        // Cari rasio PLC terakhir
+        let lastPlcVal = null;
+        if(levels >= 1){
+          for(let i=levels;i>=1;i--){
+            const sel = document.getElementById("splitter_level_"+i);
+            if(sel && sel.value && sel.value !== "NONE" && !sel.value.startsWith("FBT:")){
+              let ratio = sel.value;
+              if(ratio.startsWith("PLC:")){
+                const parts = ratio.split(":");
+                ratio = parts[1] + ":" + parts[2];
+              }
+              lastPlcVal = ratio;
+              break;
+            }
+          }
+        }
+        let nPorts = 1;
+        if(lastPlcVal){
+          nPorts = parseFloat(lastPlcVal.split(":")[1]) || 1;
+        }
+
+        // Jika hanya Level 1
+        if(levels === 1){
+          addResultItem(
+            gridEl,
+            "Power Output per Port",
+            powerIntoPlcChain.toFixed(2) + " dBm ("+nPorts+" port)"
+          );
+        }
+
+        // Jika ada level bertingkat
+        if(levels >= 2){
+          // Output Level 1
+          const outL1 = (isUsingPlcAtLevel1 ? powerPort1AfterPlcLvl1 : powerAfterLine);
+          addResultItem(
+            gridEl,
+            "Power Output Level 1",
+            outL1.toFixed(2) + " dBm"
+          );
+        }
+        
+        // Kalkulasi ulang parsial untuk display level 2 & 3
+        if(levels >= 2){
+          let tmpPower = (isUsingPlcAtLevel1 ? powerPort1AfterPlcLvl1 : powerAfterLine);
+          let level2Output = null;
+          let level3Output = null;
+
+          // Level 2
+          if(levels >= 2){
+            const sel2 = document.getElementById("splitter_level_2");
+            if(sel2){
+              const val2 = sel2.value;
+              const il2 = plcInsertionLoss[val2] || 0;
+              tmpPower = tmpPower - il2 - extraLossPerNode;
+              level2Output = tmpPower;
+            }
+          }
+          // Level 3
+          if(levels >= 3){
+            const sel3 = document.getElementById("splitter_level_3");
+            if(sel3){
+              const val3 = sel3.value;
+              const il3 = plcInsertionLoss[val3] || 0;
+              tmpPower = tmpPower - il3 - extraLossPerNode;
+              level3Output = tmpPower;
+            }
+          }
+
+          if(level2Output !== null){
+            addResultItem(
+              gridEl,
+              "Power Output Level 2",
+              level2Output.toFixed(2) + " dBm"
+            );
+          }
+          if(level3Output !== null){
+            addResultItem(
+              gridEl,
+              "Power Output Level 3",
+              level3Output.toFixed(2) + " dBm"
+            );
+          }
+        }
+      }
+
+      resultsEl.style.display = "block";
+
+      window._lastCalcState = {
+        isUsingFbt,
+        powerPort2AfterFbt,
+        powerOutputPerPort: getPowerOutputPerPortFromGrid()
+      };
+    }
+
+    function setLevelOutputTag(level, text){
+      const tag = document.getElementById("level_output_"+level);
+      if(tag){
+        tag.textContent = text;
+      }
+    }
+
+    function resetLevelOutputTag(level){
+      const tag = document.getElementById("level_output_"+level);
+      if(tag){
+        tag.textContent = "";
+      }
+    }
+
+    function addResultItem(parent, label, value){
+      const box = document.createElement("div");
+      box.className = "result-item";
+      const l = document.createElement("div");
+      l.className = "result-label";
+      l.textContent = label;
+      const v = document.createElement("div");
+      v.className = "result-value";
+      v.textContent = value;
+      box.appendChild(l);
+      box.appendChild(v);
+      parent.appendChild(box);
+    }
+
+    function getPowerOutputPerPortFromGrid(){
+      const items = document.querySelectorAll("#results_grid .result-item");
+      for(const item of items){
+        const label = item.querySelector(".result-label")?.textContent || "";
+        if(label.includes("Power Output per Port")){
+          const valText = item.querySelector(".result-value")?.textContent || "";
+          const n = parseFloat(valText);
+          if(isFinite(n)) return n;
+        }
+      }
+      return null;
+    }
+
+    function useOutputAsInput(){
+      const state = window._lastCalcState || {};
+      let newInput = null;
+
+      if(state.isUsingFbt && state.powerPort2AfterFbt != null){
+        newInput = state.powerPort2AfterFbt;
+      } else if(!state.isUsingFbt && state.powerOutputPerPort != null){
+        newInput = state.powerOutputPerPort;
+      }
+
+      if(newInput == null || !isFinite(newInput)) return;
+
+      document.getElementById("olt_power").value = newInput.toFixed(2);
+      calculatePON();
+    }
+
+    function attachAutoCalc(){
+      const ids = [
+        "olt_power","distance","fiber_loss",
+        "conn_loss","splice_loss",
+        "margin","levels",
+        "conn_per_splitter","splice_per_splitter"
+      ];
+      ids.forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el) return;
+        if(id==="levels"){
+          el.addEventListener("change", createSplitterLevelControls);
+        }else{
+          el.addEventListener("input", calculatePON);
+        }
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", ()=>{
+      attachAutoCalc();
+      createSplitterLevelControls(); 
+    });
+  </script>
+</body>
+</html>
