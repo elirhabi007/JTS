@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiberSync Pro - Enterprise FTTH System</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#1e293b' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 hidden md:flex flex-col h-full shadow-xl z-20">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="activity" class="text-blue-500"></i>
+                FiberSync<span class="text-blue-500">Pro</span>
+            </h1>
+        </div>
+        
+        <nav class="flex-1 px-4 py-4 overflow-y-auto space-y-1">
+
+            <!-- UMUM -->
+            <button onclick="switchTab('dashboard')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left bg-blue-600 text-white" id="nav-dashboard">
+                <i data-lucide="layout-dashboard" width="18"></i>
+                <span class="text-sm font-semibold">Dashboard</span>
+            </button>
+
+            <!-- JARINGAN FISIK -->
+            <div class="pt-3 pb-1">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-2">Jaringan Fisik</p>
+            </div>
+            <button onclick="switchTab('visualizer')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left" id="nav-visualizer">
+                <i data-lucide="cable" width="18"></i>
+                <span class="text-sm font-semibold">Kabel Feeder</span>
+            </button>
+            <button onclick="switchTab('branching')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left" id="nav-branching">
+                <i data-lucide="git-branch" width="18"></i>
+                <span class="text-sm font-semibold">Branching</span>
+            </button>
+            <button onclick="switchTab('infra')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left" id="nav-infra">
+                <i data-lucide="network" width="18"></i>
+                <span class="text-sm font-semibold">ODC & ODP</span>
+            </button>
+
+            <!-- MANAJEMEN -->
+            <div class="pt-3 pb-1">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-2">Manajemen</p>
+            </div>
+            <button onclick="switchTab('customers')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left" id="nav-customers">
+                <i data-lucide="users" width="18"></i>
+                <span class="text-sm font-semibold">Pelanggan</span>
+            </button>
+            <button onclick="switchTab('tracking')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left" id="nav-tracking">
+                <i data-lucide="radar" width="18"></i>
+                <span class="text-sm font-semibold">Tracking</span>
+            </button>
+            <a href="fibersync_wa_blast.html" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left text-slate-300 group">
+                <i data-lucide="message-circle" width="18" class="text-green-400 group-hover:text-green-300"></i>
+                <span class="text-sm font-semibold">WA Blast</span>
+                <span class="ml-auto text-[9px] bg-green-500 text-white font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span>
+            </a>
+            <a href="fibersync_map.html" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left text-slate-300 group">
+                <i data-lucide="map" width="18" class="text-sky-400 group-hover:text-sky-300"></i>
+                <span class="text-sm font-semibold">Peta Topologi</span>
+                <span class="ml-auto text-[9px] bg-sky-500 text-white font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span>
+            </a>
+
+            <!-- TOOLS -->
+            <div class="pt-3 pb-1">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-2">Tools</p>
+            </div>
+            <button onclick="switchTab('ai')" class="nav-item w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all text-left" id="nav-ai">
+                <i data-lucide="brain-circuit" width="18"></i>
+                <span class="text-sm font-semibold">AI Planner</span>
+            </button>
+
+        </nav>
+
+        <div class="p-4 space-y-2">
+            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+                <p class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Google Sheets Sync</p>
+                <div class="flex items-center gap-2">
+                    <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-slate-500 animate-pulse flex-shrink-0"></span>
+                    <span id="sync-status-text" class="text-xs text-slate-300 leading-tight">Memuat...</span>
+                </div>
+            </div>
+            <button onclick="openSettingsModal()" class="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-semibold py-2 px-3 rounded-lg transition-all border border-slate-600">
+                <i data-lucide="settings" width="13"></i> Pengaturan URL
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10 flex-shrink-0 gap-8">
+            <div class="flex-shrink-0">
+                <h2 id="page-title" class="text-xl font-bold text-slate-800">Dashboard</h2>
+                <p class="text-xs text-slate-500">FTTH Infrastructure Management</p>
+            </div>
+
+            <!-- GLOBAL SEARCH BAR -->
+            <div class="flex-1 max-w-2xl relative">
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="text-slate-400 w-4 h-4 group-focus-within:text-teal-500 transition-colors"></i>
+                    </div>
+                    <input type="text" id="global-search" autocomplete="off"
+                           oninput="globalSearchInput(this.value)"
+                           onkeydown="globalSearchKeyNav(event)"
+                           placeholder="Cari Feeder, Branching, ODC, ODP, Pelanggan..."
+                           class="block w-full pl-10 pr-4 py-2 border border-slate-200 rounded-full bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 sm:text-sm transition-all shadow-sm">
+                </div>
+                <div id="global-search-drop" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 z-[999] max-h-96 overflow-y-auto"></div>
+            </div>
+
+            <div class="flex items-center gap-4 flex-shrink-0">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-bold text-slate-700">Admin Network</p>
+                    <p class="text-xs text-slate-500">Super User</p>
+                </div>
+                <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm border border-blue-200">
+                    AD
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic View Container -->
+        <div class="flex-1 overflow-y-auto bg-[#f8fafc] scroll-smooth relative" id="main-container">
+            
+            <!-- 1. DASHBOARD VIEW -->
+            <div id="view-dashboard" class="view-section fade-in p-8 space-y-8">
+
+                <!-- STAT CARDS -->
+                <div id="stats-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+
+                <!-- RINGKASAN PER FEEDER -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-5 bg-blue-600 rounded-full"></div>
+                        <h3 class="text-base font-bold text-slate-700">Ringkasan per Feeder</h3>
+                    </div>
+                    <div id="feeder-summary-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- UTILISASI ODP + ODP HAMPIR PENUH -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
+                            <h3 class="text-base font-bold text-slate-700">Utilisasi ODP</h3>
+                        </div>
+                        <div id="odp-util-list" class="overflow-y-auto max-h-72 pr-1"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-5 bg-amber-500 rounded-full"></div>
+                            <h3 class="text-base font-bold text-slate-700">ODP Hampir Penuh <span class="text-xs text-slate-400 font-normal ml-1">(≥ 75%)</span></h3>
+                        </div>
+                        <div id="odp-warning-list" class="space-y-2 overflow-y-auto max-h-72"></div>
+                        <div id="odp-warning-empty" class="hidden text-center text-slate-400 text-sm italic py-8">
+                            <i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-emerald-400 block"></i>
+                            Semua ODP masih punya kapasitas cukup
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REKAP TOPOLOGI -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-5 bg-violet-500 rounded-full"></div>
+                        <h3 class="text-base font-bold text-slate-700">Rekap Topologi Jaringan</h3>
+                    </div>
+                    <div id="topology-container" class="space-y-3"></div>
+                </div>
+
+            </div>
+
+            <!-- 2. INFRASTRUCTURE VIEW (NEW: Tab + Sidebar-Detail) -->
+            <div id="view-infra" class="view-section hidden fade-in h-full flex flex-col overflow-hidden">
+
+                <!-- TOP BAR: Tabs + Add Button + Search -->
+                <div class="flex-shrink-0 bg-white border-b border-slate-200 px-6 pt-4 pb-0 flex flex-col gap-3 shadow-sm z-10">
+                    <div class="flex items-center justify-between gap-4">
+                        <!-- Search bar -->
+                        <div class="relative flex-1 max-w-xs">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                            <input type="text" id="infra-search" placeholder="Cari nama / ID..." 
+                                oninput="renderInfraTables()"
+                                class="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all">
+                        </div>
+                        <!-- Add button (dynamic) -->
+                        <button id="infra-add-btn" onclick="infraAddClick()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm font-medium flex items-center gap-2 transition-all text-sm flex-shrink-0">
+                            <i data-lucide="plus" width="16"></i> <span id="infra-add-label">Tambah ODC L1</span>
+                        </button>
+                    </div>
+                    <!-- Tabs -->
+                    <div class="flex gap-1">
+                        <button onclick="switchInfraTab('odc-l1')" id="infra-tab-odc-l1"
+                            class="infra-tab px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 border-blue-600 text-blue-600 bg-blue-50 transition-all">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="box" width="14"></i>
+                                ODC L1
+                                <span id="infra-count-odc-l1" class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">0</span>
+                            </span>
+                        </button>
+                        <button onclick="switchInfraTab('odc-l2')" id="infra-tab-odc-l2"
+                            class="infra-tab px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="cpu" width="14"></i>
+                                ODC L2
+                                <span id="infra-count-odc-l2" class="bg-slate-300 text-slate-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">0</span>
+                            </span>
+                        </button>
+                        <button onclick="switchInfraTab('odp')" id="infra-tab-odp"
+                            class="infra-tab px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="radio" width="14"></i>
+                                ODP
+                                <span id="infra-count-odp" class="bg-slate-300 text-slate-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">0</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BODY: Sidebar List + Detail Panel -->
+                <div class="flex-1 flex overflow-hidden">
+
+                    <!-- SIDEBAR LIST -->
+                    <aside class="w-72 flex-shrink-0 flex flex-col bg-white border-r border-slate-200 overflow-hidden">
+                        <div id="infra-list" class="flex-1 overflow-y-auto p-3 space-y-1.5"></div>
+                        <div id="infra-list-empty" class="hidden flex-1 flex items-center justify-center p-6 text-slate-400 text-sm text-center">
+                            <div>
+                                <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+                                <p>Belum ada data</p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- DETAIL PANEL -->
+                    <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
+                        <!-- Empty state -->
+                        <div id="infra-detail-empty" class="h-full flex items-center justify-center">
+                            <div class="text-center text-slate-400">
+                                <i data-lucide="mouse-pointer-click" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+                                <p class="font-semibold">Pilih item dari daftar</p>
+                                <p class="text-sm mt-1">Detail akan tampil di sini</p>
+                            </div>
+                        </div>
+                        <!-- Detail content -->
+                        <div id="infra-detail-content" class="hidden space-y-5 max-w-3xl mx-auto"></div>
+                    </div>
+
+                </div>
+
+                <!-- Hidden grid containers (kept for backward compat) -->
+                <div class="hidden">
+                    <div id="odc-l1-grid"></div>
+                    <div id="odc-l2-grid"></div>
+                    <div id="odp-grid"></div>
+                    <div id="odp-empty"></div>
+                </div>
+            </div>
+
+            <!-- 3. VISUALIZER VIEW (FEEDER CABLES) -->
+            <div id="view-visualizer" class="view-section hidden fade-in h-full flex flex-col md:flex-row overflow-hidden">
+                <aside class="w-full md:w-80 flex flex-col p-6 overflow-y-auto border-r border-slate-200 bg-white flex-shrink-0 z-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daftar Kabel</h3>
+                        <button onclick="openCableModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 font-bold shadow-sm transition-all">
+                            <i data-lucide="plus" width="14"></i> ADD
+                        </button>
+                    </div>
+                    <div id="feeder-list" class="space-y-3"></div>
+                </aside>
+
+                <div class="flex-1 p-8 overflow-y-auto bg-slate-50">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 max-w-5xl mx-auto">
+                        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-6 gap-4">
+                            <div>
+                                <div class="flex items-center gap-3 mb-1">
+                                    <h2 id="view-cable-name" class="text-xl font-bold text-slate-900">Select Cable</h2>
+                                    <span id="view-cable-type" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2 py-0.5 rounded border border-slate-200"></span>
+                                    <span id="view-cable-cores" class="bg-blue-50 text-blue-600 text-xs font-semibold px-2 py-0.5 rounded border border-blue-100"></span>
+                                </div>
+                                <div class="flex items-center text-sm font-mono text-slate-400 gap-2">
+                                    <span id="view-cable-id">ID</span>
+                                </div>
+                            </div>
+                            <!-- Legend visual -->
+                            <div class="flex flex-wrap gap-3">
+                                <div class="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center shadow-sm shadow-blue-300">
+                                        <span class="text-white text-[9px] font-black">U</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-blue-700 leading-none">TERPAKAI</p>
+                                        <p class="text-[9px] text-blue-400">Digunakan ODC</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md border-2 border-dashed border-slate-400 bg-white flex items-center justify-center">
+                                        <span class="text-slate-400 text-[9px] font-black">K</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-slate-600 leading-none">KOSONG</p>
+                                        <p class="text-[9px] text-slate-400">Tersedia</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md bg-red-500 pattern-stripes border border-red-600 flex items-center justify-center">
+                                        <span class="text-white text-[9px] font-black">R</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-red-600 leading-none">RUSAK</p>
+                                        <p class="text-[9px] text-red-400">Tidak bisa dipakai</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-violet-50 border border-violet-100 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md bg-violet-500 flex items-center justify-center shadow-sm shadow-violet-300">
+                                        <span class="text-white text-[9px] font-black">B</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-violet-700 leading-none">BRANCHING</p>
+                                        <p class="text-[9px] text-violet-400">Digunakan cabang</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary bar -->
+                        <div id="core-summary-bar" class="mb-6"></div>
+
+                        <div id="cable-core-grid" class="flex flex-wrap gap-3 mb-8"></div>
+
+                        <div class="bg-slate-50 rounded-xl border border-slate-100 p-6">
+                            <div class="flex items-center gap-2 mb-4 text-slate-800 font-semibold">
+                                <i data-lucide="info" class="w-5 h-5 text-blue-600 fill-blue-100"></i>
+                                Informasi Teknis Kabel
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Source Point</p>
+                                    <p id="info-start" class="font-semibold text-slate-700">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Destination</p>
+                                    <p id="info-end" class="font-semibold text-slate-700">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Utilisasi</p>
+                                    <p id="info-util" class="font-semibold text-blue-600">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Kesehatan</p>
+                                    <p id="info-health" class="font-semibold text-red-500">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. CUSTOMER VIEW -->
+            <div id="view-customers" class="view-section hidden fade-in p-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-lg font-bold text-slate-800">Daftar Pelanggan</h3>
+                            <span id="customer-count-badge" class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+                            <button onclick="openCustomerModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
+                                <i data-lucide="user-plus" width="16"></i> Tambah Pelanggan
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-2.5 text-slate-400 w-4 h-4"></i>
+                            <input type="text" id="search-customer" oninput="renderCustomers()" placeholder="Cari nama, ID, atau ODP..." class="pl-10 pr-4 py-2 border border-slate-300 rounded-lg w-full md:w-72 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-600">
+                            <thead class="bg-slate-50 border-b border-slate-200 uppercase text-xs font-bold text-slate-500">
+                                <tr>
+                                    <th class="px-4 py-3 w-10">No</th>
+                                    <th class="px-4 py-3">Nama</th>
+                                    <th class="px-4 py-3">Kontak & Lokasi</th>
+                                    <th class="px-4 py-3">ODP Terhubung</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customer-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. TRACKING VIEW -->
+            <div id="view-tracking" class="view-section hidden fade-in p-8">
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <!-- Search Box -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                            <i data-lucide="radar" class="text-teal-500 w-5 h-5"></i>
+                            Network Tracking
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-4">Cari Feeder, ODC, ODP, atau Pelanggan untuk melihat informasi jaringan lengkap</p>
+                        <div class="flex gap-2 mb-4 flex-wrap">
+                            <button onclick="setTrackingCategory('all')" id="trk-btn-all" class="trk-cat-btn px-4 py-1.5 rounded-full text-xs font-bold border-2 border-teal-500 bg-teal-500 text-white transition-all">Semua</button>
+                            <button onclick="setTrackingCategory('feeder')" id="trk-btn-feeder" class="trk-cat-btn px-4 py-1.5 rounded-full text-xs font-bold border-2 border-slate-200 text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-all">🔵 Feeder</button>
+                            <button onclick="setTrackingCategory('branching')" id="trk-btn-branching" class="trk-cat-btn px-4 py-1.5 rounded-full text-xs font-bold border-2 border-slate-200 text-slate-500 hover:border-violet-400 hover:text-violet-600 transition-all">🟣 Branching</button>
+                            <button onclick="setTrackingCategory('odc')" id="trk-btn-odc" class="trk-cat-btn px-4 py-1.5 rounded-full text-xs font-bold border-2 border-slate-200 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 transition-all">🔷 ODC</button>
+                            <button onclick="setTrackingCategory('odp')" id="trk-btn-odp" class="trk-cat-btn px-4 py-1.5 rounded-full text-xs font-bold border-2 border-slate-200 text-slate-500 hover:border-emerald-400 hover:text-emerald-600 transition-all">🟢 ODP</button>
+                            <button onclick="setTrackingCategory('customer')" id="trk-btn-customer" class="trk-cat-btn px-4 py-1.5 rounded-full text-xs font-bold border-2 border-slate-200 text-slate-500 hover:border-orange-400 hover:text-orange-600 transition-all">🟠 Pelanggan</button>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-lucide="search" class="text-slate-400 w-5 h-5"></i>
+                            </div>
+                            <input type="text" id="tracking-search" autocomplete="off"
+                                placeholder="Ketik nama Feeder, Branching, ODC, ODP, atau Pelanggan..."
+                                class="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 text-sm transition-all"
+                                oninput="renderTrackingAutocomplete()"
+                                onkeydown="trackingKeyNav(event)">
+                            <div id="tracking-autocomplete" class="autocomplete-items hidden" style="z-index:200;"></div>
+                        </div>
+                    </div>
+                    <div id="tracking-result" class="hidden"></div>
+                </div>
+            </div>
+
+            <!-- 6. BRANCHING VIEW — sama layout dengan Feeder -->
+            <div id="view-branching" class="view-section hidden fade-in h-full flex flex-col md:flex-row overflow-hidden">
+                <!-- Sidebar list -->
+                <aside class="w-full md:w-80 flex flex-col p-6 overflow-y-auto border-r border-slate-200 bg-white flex-shrink-0 z-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daftar Branching</h3>
+                        <button onclick="openBranchModal()" class="bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 font-bold shadow-sm transition-all">
+                            <i data-lucide="plus" width="14"></i> ADD
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Filter Feeder</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="filterBranching('all')" id="br-filter-all" class="br-filter-btn px-2.5 py-1 rounded-full text-[10px] font-bold bg-violet-600 text-white border-2 border-violet-600 transition-all">Semua</button>
+                            <div id="br-filter-feeders" class="flex gap-1.5 flex-wrap"></div>
+                        </div>
+                    </div>
+                    <div id="branching-list" class="space-y-3"></div>
+                    <div id="branching-empty" class="hidden text-center text-slate-400 text-xs py-8 italic">
+                        <i data-lucide="git-branch" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
+                        Belum ada branching
+                    </div>
+                </aside>
+
+                <!-- Detail panel — mirip feeder -->
+                <div class="flex-1 p-8 overflow-y-auto bg-slate-50">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 max-w-5xl mx-auto">
+                        <!-- Header + Legend -->
+                        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-6 gap-4">
+                            <div>
+                                <div class="flex items-center gap-3 mb-1">
+                                    <h2 id="br-detail-name" class="text-xl font-bold text-slate-900">Pilih Branching</h2>
+                                    <span id="br-detail-feeder-badge" class="hidden bg-violet-50 text-violet-600 text-xs font-semibold px-2 py-0.5 rounded border border-violet-100"></span>
+                                </div>
+                                <div class="font-mono text-sm text-slate-400"><span id="br-detail-id"></span></div>
+                            </div>
+                            <!-- Legend sama persis dengan feeder -->
+                            <div class="flex flex-wrap gap-3">
+                                <div class="flex items-center gap-2 bg-violet-50 border border-violet-100 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md bg-violet-600 flex items-center justify-center shadow-sm"><span class="text-white text-[9px] font-black">B</span></div>
+                                    <div><p class="text-[10px] font-bold text-violet-700 leading-none">BRANCHING</p><p class="text-[9px] text-violet-400">Core ini</p></div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center shadow-sm"><span class="text-white text-[9px] font-black">U</span></div>
+                                    <div><p class="text-[10px] font-bold text-blue-700 leading-none">TERPAKAI</p><p class="text-[9px] text-blue-400">ODC / Branch lain</p></div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md border-2 border-dashed border-slate-400 bg-white flex items-center justify-center"><span class="text-slate-400 text-[9px] font-black">K</span></div>
+                                    <div><p class="text-[10px] font-bold text-slate-600 leading-none">KOSONG</p><p class="text-[9px] text-slate-400">Tersedia</p></div>
+                                </div>
+                                <div class="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                                    <div class="w-6 h-6 rounded-md bg-red-500 border border-red-600 flex items-center justify-center" style="background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,.3) 3px,rgba(255,255,255,.3) 6px)"><span class="text-white text-[9px] font-black">R</span></div>
+                                    <div><p class="text-[10px] font-bold text-red-600 leading-none">RUSAK</p><p class="text-[9px] text-red-400">Tidak bisa dipakai</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Summary bar -->
+                        <div id="br-summary-bar" class="mb-6"></div>
+                        <!-- Core grid -->
+                        <div id="br-core-grid" class="flex flex-wrap gap-3 mb-8"></div>
+                        <!-- Info teknis -->
+                        <div class="bg-slate-50 rounded-xl border border-slate-100 p-6">
+                            <div class="flex items-center gap-2 mb-4 text-slate-800 font-semibold">
+                                <i data-lucide="info" class="w-5 h-5 text-violet-600 fill-violet-100"></i>
+                                Informasi Teknis Branching
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
+                                <div><p class="text-xs font-bold text-slate-400 uppercase mb-1">Feeder Sumber</p><p id="br-info-feeder" class="font-semibold text-slate-700">-</p></div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase mb-1">Tujuan</p><p id="br-info-dest" class="font-semibold text-slate-700">-</p></div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase mb-1">Panjang Kabel</p><p id="br-info-length" class="font-semibold text-violet-600">-</p></div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase mb-1">Lokasi Tujuan</p><p id="br-info-loc" class="font-semibold text-blue-600">-</p></div>
+                            </div>
+                            <div id="br-info-note" class="hidden mt-4 bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm text-amber-700 italic"></div>
+                        </div>
+
+                        <!-- INFO KABEL BRANCHING -->
+                        <div id="br-cable-section" class="hidden bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i data-lucide="cable" class="w-5 h-5 text-slate-600"></i>
+                                <span class="font-semibold text-slate-800 text-sm">Kabel Branching</span>
+                                <span id="br-cable-badge" class="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"></span>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-xs font-bold text-slate-400 uppercase mb-2">Visual Core Kabel Branching</p>
+                                <div id="br-cable-grid" class="flex flex-wrap gap-2"></div>
+                            </div>
+                            <div id="br-cable-faulty-info" class="hidden bg-red-50 border border-red-100 rounded-lg px-3 py-2 text-xs font-bold text-red-600"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. AI PLANNER VIEW -->
+            <div id="view-ai" class="view-section hidden fade-in p-8">
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="p-3 bg-purple-100 rounded-xl text-purple-600"><i data-lucide="brain-circuit" width="32"></i></div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">AI Network Architect</h2>
+                            <p class="text-slate-500">Analisis cerdas jaringan FTTH Anda menggunakan Google Gemini</p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Gemini API Key</label>
+                        <input type="password" id="ai-api-key" placeholder="Masukkan API Key Gemini..." class="w-full p-3 border border-slate-200 rounded-lg bg-slate-50 text-sm">
+                    </div>
+                    <textarea id="ai-prompt" class="w-full p-4 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-purple-500 outline-none resize-none h-32 mb-4" placeholder="Contoh: Analisis utilisasi ODC Sentul 01..."></textarea>
+                    <button onclick="runAI()" id="btn-ai-run" class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:opacity-90 transition shadow-lg flex justify-center items-center gap-2">
+                        <span>Mulai Analisis</span> <i data-lucide="zap" width="18"></i>
+                    </button>
+                    <div id="ai-result" class="mt-8 p-6 bg-slate-50 rounded-xl border border-slate-200 hidden">
+                        <h4 class="font-bold text-slate-700 mb-2">Hasil Analisis:</h4>
+                        <p id="ai-response-text" class="text-sm text-slate-600 whitespace-pre-line leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL PENGATURAN GOOGLE SHEETS -->
+    <div id="settings-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeSettingsModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-white rounded-2xl shadow-2xl p-7">
+            <div class="flex justify-between items-center mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-green-100 rounded-lg"><i data-lucide="sheet" class="text-green-600 w-5 h-5"></i></div>
+                    <h3 class="text-lg font-bold text-slate-800">Pengaturan Google Sheets</h3>
+                </div>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="22"></i></button>
+            </div>
+
+            <div class="space-y-5">
+                <!-- Main WebApp URL -->
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                    <label class="block text-xs font-bold text-blue-700 uppercase mb-1">
+                        🔗 URL Google Apps Script (Data Utama)
+                    </label>
+                    <p class="text-[11px] text-blue-500 mb-2">Untuk cables, ODC, ODP, customers, branchings. Baca & tulis otomatis.</p>
+                    <input type="url" id="input-main-url"
+                        placeholder="https://script.google.com/macros/s/.../exec"
+                        class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-400 outline-none font-mono text-slate-700">
+                </div>
+
+                <!-- Customer CSV URL -->
+                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+                    <label class="block text-xs font-bold text-emerald-700 uppercase mb-1">
+                        📋 URL CSV Google Sheet (Data Pelanggan Eksternal)
+                    </label>
+                    <p class="text-[11px] text-emerald-500 mb-2">Untuk autocomplete nama pelanggan. Paste URL apapun dari Google Sheet (pubhtml, pub?output=csv, dll) — otomatis dikonversi. Buka Google Sheet → File → Bagikan & Ekspor → Publikasikan ke Web.</p>
+                    <input type="url" id="input-customer-csv"
+                        placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
+                        class="w-full px-3 py-2 border border-emerald-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-400 outline-none font-mono text-slate-700">
+                </div>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 text-[11px] text-amber-700 leading-relaxed">
+                    <strong>📌 Cara setup Apps Script:</strong> Buka Google Sheet data utama → Extensions → Apps Script → Tempel kode dari file <code class="bg-amber-100 px-1 rounded">fibersync_appsscript.gs</code> → Deploy sebagai Web App (Anyone can access) → Copy URL-nya ke field di atas.
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeSettingsModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 transition">Batal</button>
+                <button onclick="saveSettings()" class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition flex items-center justify-center gap-2">
+                    <i data-lucide="save" width="16"></i> Simpan & Muat Ulang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL INFRASTRUCTURE -->
+    <div id="infra-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeInfraModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-800">Tambah Data</h3>
+                <button onclick="closeInfraModal()" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="24"></i></button>
+            </div>
+            <form id="infra-form" onsubmit="handleInfraSubmit(event)" class="space-y-4">
+                <input type="hidden" id="form-type"><input type="hidden" id="form-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Perangkat</label>
+                    <input type="text" id="form-name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Nama...">
+                </div>
+
+                <div class="col-span-2">
+                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Google Maps Link</label>
+                     <div class="flex gap-2">
+                        <input type="text" id="form-maps-url" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Paste link Google Maps di sini...">
+                        <button type="button" onclick="parseMapUrl('form')" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 font-bold text-xs flex items-center gap-1">
+                            <i data-lucide="search" width="14"></i> Get
+                        </button>
+                     </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Latitude</label>
+                        <input type="text" id="form-lat" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono" placeholder="-6.123">
+                    </div>
+                    <div>
+                        <div class="flex items-end gap-2">
+                             <div class="flex-1">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Longitude</label>
+                                <input type="text" id="form-lng" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono" placeholder="106.321">
+                             </div>
+                             <button type="button" onclick="getGeoLocation('form')" class="bg-blue-600 hover:bg-blue-700 text-white h-[38px] w-[50px] rounded-lg flex items-center justify-center shadow-md transition-all">
+                                 <i data-lucide="map-pin" width="20"></i>
+                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="block-feeder" class="hidden space-y-4">
+                    <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 text-xs text-blue-800">
+                        <i data-lucide="info" width="14" class="inline mb-0.5"></i> <b>ODC Level 1</b> mengambil sumber dari <b>Kabel Feeder</b> lalu displit ke ODC L2.
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Catuan Feeder (Parent)</label>
+                        <select id="form-feeder-id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white" onchange="updateFeederCoreOptions()">
+                            <option value="">-- Pilih Feeder --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Core Feeder Masuk ke ODC L1</label>
+                        <select id="form-feeder-core" onchange="updateODCL1SplitterPorts()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="">-- Pilih Feeder Terlebih Dahulu --</option>
+                        </select>
+                    </div>
+                    <!-- Splitter ODC L1 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Splitter di ODC L1</label>
+                        <select id="form-l1-splitter" onchange="updateODCL1SplitterPorts()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="">-- Pilih Tipe Splitter --</option>
+                            <option value="1:2">1:2 (2 output)</option>
+                            <option value="1:4">1:4 (4 output)</option>
+                            <option value="1:8">1:8 (8 output)</option>
+                            <option value="1:16">1:16 (16 output)</option>
+                        </select>
+                    </div>
+                    <!-- Port warna kabel output ODC L1 → ODC L2 -->
+                    <div id="block-l1-ports" class="hidden">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Warna Kabel Output per Port (ODC L1 → ODC L2)</label>
+                        <div id="l1-port-colors" class="space-y-2"></div>
+                        <p class="text-[10px] text-slate-400 mt-1">Tentukan warna kabel yang keluar dari tiap port splitter ODC L1 menuju ODC L2</p>
+                    </div>
+                </div>
+
+                <div id="block-parent-l1" class="hidden space-y-3">
+                    <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100 text-xs text-indigo-800">
+                        <i data-lucide="info" width="14" class="inline mb-0.5"></i> <b>ODC Level 2</b> menerima input dari port splitter <b>ODC Level 1</b>, lalu displit lagi ke ODP.
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Parent: ODC Level 1</label>
+                        <select id="form-parent-l1" onchange="updateODCL2PortOptions()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white"></select>
+                    </div>
+                    <!-- Port dari ODC L1 yang dipakai ODC L2 ini -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Port Splitter ODC L1 yang Masuk ke ODC L2 ini</label>
+                        <select id="form-l1-port-used" onchange="updateODCL2SplitterPorts()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
+                            <option value="">-- Pilih ODC L1 dulu --</option>
+                        </select>
+                        <div id="l1-port-color-preview" class="hidden mt-1 flex items-center gap-2 px-3 py-1.5 bg-indigo-50 rounded-lg border border-indigo-100">
+                            <span id="l1-port-color-dot" class="w-3 h-3 rounded-full flex-shrink-0"></span>
+                            <span id="l1-port-color-label" class="text-xs font-bold text-indigo-700"></span>
+                        </div>
+                    </div>
+                    <!-- Splitter ODC L2 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Splitter di ODC L2</label>
+                        <select id="form-l2-splitter" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
+                            <option value="">-- Pilih Tipe Splitter --</option>
+                            <option value="1:2">1:2 (2 output ke ODP)</option>
+                            <option value="1:4">1:4 (4 output ke ODP)</option>
+                            <option value="1:8">1:8 (8 output ke ODP)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="block-parent-l2" class="hidden space-y-3">
+                    <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-xs text-emerald-800">
+                        <i data-lucide="info" width="14" class="inline mb-0.5"></i> <b>ODP</b> menerima sinyal dari port splitter <b>ODC Level 2</b>.
+                    </div>
+                    <!-- Banner pre-fill otomatis -->
+                    <div id="odp-prefill-banner" class="hidden p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 font-semibold flex items-center gap-2">
+                        <i data-lucide="zap" width="13" class="flex-shrink-0 text-blue-500"></i>
+                        <span id="odp-prefill-text"></span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Parent: ODC Level 2</label>
+                        <select id="form-parent-l2" onchange="onODCL2Changed()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white"></select>
+                    </div>
+
+                    <!-- Port splitter ODC L2 yang dipakai ODP ini -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Port Splitter ODC L2 ke ODP ini</label>
+                        <select id="form-odp-core" onchange="autoSuggestODPName()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none text-sm bg-white">
+                            <option value="">-- Pilih ODC L2 dulu --</option>
+                        </select>
+                        <div id="odp-port-color-preview" class="hidden mt-1 flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
+                            <span id="odp-port-color-dot" class="w-3 h-3 rounded-full flex-shrink-0"></span>
+                            <span id="odp-port-color-label" class="text-xs font-bold text-emerald-700"></span>
+                        </div>
+                    </div>
+
+                    <!-- Splitter ODP -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Splitter / Kapasitas ODP</label>
+                        <select id="form-odp-splitter" onchange="updateODPCapacity()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none text-sm bg-white">
+                            <option value="">-- Pilih Kapasitas ODP --</option>
+                            <option value="1:4">1:4 (4 port pelanggan)</option>
+                            <option value="1:8">1:8 (8 port pelanggan)</option>
+                            <option value="1:16">1:16 (16 port pelanggan)</option>
+                        </select>
+                        <div id="odp-capacity-badge" class="hidden mt-1 flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
+                            <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            <span id="odp-capacity-label" class="text-xs font-bold text-emerald-700"></span>
+                        </div>
+                    </div>
+
+                    <!-- Nama Lokasi / Landmark -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Lokasi / Landmark</label>
+                        <input type="text" id="form-odp-landmark" oninput="autoSuggestODPName()"
+                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none text-sm uppercase"
+                            placeholder="Contoh: HERMAN, PASAR, MASJID...">
+                        <p class="text-[10px] text-slate-400 mt-1">Nama mudah diingat untuk identifikasi lapangan</p>
+                    </div>
+
+                    <!-- Auto-generate nama ODP -->
+                    <div id="odp-name-suggest" class="hidden">
+                        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-3">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="wand-2" class="w-3.5 h-3.5 text-emerald-600 flex-shrink-0"></i>
+                                    <p class="text-[10px] text-emerald-600 font-bold uppercase">Nama ODP Otomatis</p>
+                                </div>
+                                <button type="button" onclick="applyODPSuggest()"
+                                    class="flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1 rounded-lg transition flex items-center gap-1">
+                                    <i data-lucide="check" width="11"></i> Pakai
+                                </button>
+                            </div>
+                            <p id="odp-name-suggest-text" class="text-base font-bold text-emerald-900 font-mono break-all mb-2"></p>
+                            <div id="odp-name-breakdown" class="flex flex-wrap gap-1 items-end"></div>
+                            <p id="odp-name-suggest-info" class="text-[10px] text-slate-400 mt-2"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="form-capacity" value="0">
+                
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeInfraModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 transition">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CUSTOMER (UPDATED) -->
+    <div id="customer-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeCustomerModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 transform transition-all scale-100 max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="customer-modal-title" class="text-lg font-bold text-slate-800">Tambah Pelanggan Baru</h3>
+                <button onclick="closeCustomerModal()" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="24"></i></button>
+            </div>
+            
+            <form id="customer-form" onsubmit="handleCustomerSubmit(event)" class="space-y-4">
+                <input type="hidden" id="cust-edit-id">
+                
+                <!-- Autocomplete Nama -->
+                <div class="relative">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-500 uppercase">Nama Pelanggan (Auto Complete)</label>
+                        <!-- Loading Indicator -->
+                        <div id="sheet-status" class="text-[10px] font-bold text-orange-500 flex items-center gap-1 hidden">
+                            <i class="animate-spin" data-lucide="loader-2" width="12"></i> Memuat Data...
+                        </div>
+                    </div>
+                    <input type="text" id="cust-name" autocomplete="off" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Ketik nama pelanggan...">
+                    <div id="cust-name-list" class="autocomplete-items hidden"></div>
+                </div>
+
+                <!-- Whatsapp Auto Fill -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nomor WhatsApp</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-slate-400 text-sm font-semibold">+62</span>
+                        <input type="text" id="cust-wa" required class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="8123456789">
+                    </div>
+                </div>
+
+                <!-- Maps Input / GPS -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Lokasi (Link Google Maps)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="cust-map" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="https://maps.app.goo.gl/...">
+                        <button type="button" onclick="getGeoLocation('cust-map')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 rounded-lg flex items-center justify-center shadow-md transition-all">
+                             <i data-lucide="map-pin" width="16"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Autocomplete ODP -->
+                <div class="relative">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Koneksi ke ODP (Cari ODP)</label>
+                    <input type="text" id="cust-odp-search" autocomplete="off" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Ketik nama ODP...">
+                    <input type="hidden" id="cust-odp-id">
+                    <div id="cust-odp-list" class="autocomplete-items hidden"></div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeCustomerModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 transition">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-lg shadow-green-600/20 transition">Simpan Pelanggan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CABLE (FEEDER) -->
+    <div id="cable-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeCableModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 transform transition-all scale-100 max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="cable-modal-title" class="text-lg font-bold text-slate-800">Tambah Kabel Feeder</h3>
+                <button onclick="closeCableModal()" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="24"></i></button>
+            </div>
+            <form id="cable-form" class="space-y-4">
+                <input type="hidden" id="cable-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">ID Kabel / Nama</label>
+                    <input type="text" id="cable-name" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Contoh: FDR-JKT-01">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jenis Kabel</label>
+                        <select id="cable-type" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="Drop Core">Drop Core</option>
+                            <option value="Fig 8">Fig 8</option>
+                            <option value="ADSS">ADSS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Core Count</label>
+                        <select id="cable-capacity" onchange="updateFaultyCoreVisual()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="1">1 Core</option>
+                            <option value="2">2 Core</option>
+                            <option value="4">4 Core</option>
+                            <option value="8">8 Core</option>
+                            <option value="12">12 Core</option>
+                            <option value="24">24 Core</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Faulty Cores Visual Picker -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Core Rusak <span class="text-red-400 font-normal normal-case">(klik core untuk tandai rusak)</span></label>
+                    <div id="faulty-core-visual" class="p-3 bg-red-50/40 rounded-xl border border-red-100 min-h-[56px] flex flex-wrap gap-2 items-start">
+                        <p class="text-xs text-slate-400 italic w-full text-center py-1">Pilih jumlah core terlebih dahulu</p>
+                    </div>
+                    <p id="faulty-core-info" class="hidden text-[10px] text-red-600 font-semibold mt-1"></p>
+                    <input type="hidden" id="cable-faulty">
+                </div>
+
+                <!-- Locations with GPS/Map -->
+                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Lokasi Awal (Start)</label>
+                        <input type="text" id="cable-start" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-xs" placeholder="Lat, Lng">
+                        <div class="flex gap-1 mt-1">
+                            <button type="button" onclick="getGeoLocation('cable-start')" class="bg-slate-200 px-2 py-1 rounded text-[10px] hover:bg-slate-300 flex items-center gap-1"><i data-lucide="map-pin" width="10"></i> GPS</button>
+                            <input type="text" id="map-url-start" class="flex-1 border px-2 py-1 rounded text-[10px]" placeholder="Map URL..." onchange="parseMapUrl('cable-start')">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Lokasi Akhir (End)</label>
+                        <input type="text" id="cable-end" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-xs" placeholder="Lat, Lng">
+                        <div class="flex gap-1 mt-1">
+                            <button type="button" onclick="getGeoLocation('cable-end')" class="bg-slate-200 px-2 py-1 rounded text-[10px] hover:bg-slate-300 flex items-center gap-1"><i data-lucide="map-pin" width="10"></i> GPS</button>
+                            <input type="text" id="map-url-end" class="flex-1 border px-2 py-1 rounded text-[10px]" placeholder="Map URL..." onchange="parseMapUrl('cable-end')">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeCableModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 transition">Batal</button>
+                    <button type="button" onclick="handleCableSubmit()" class="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition">Simpan Kabel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL BRANCHING -->
+    <div id="branch-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeBranchModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 max-h-[94vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-violet-100 rounded-lg"><i data-lucide="git-branch" class="text-violet-600 w-5 h-5"></i></div>
+                    <h3 id="branch-modal-title" class="text-lg font-bold text-slate-800">Tambah Branching</h3>
+                </div>
+                <button onclick="closeBranchModal()" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="24"></i></button>
+            </div>
+            <div class="space-y-5">
+                <input type="hidden" id="branch-edit-id">
+
+                <!-- NAMA -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Branching</label>
+                    <input type="text" id="branch-name" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm" placeholder="Contoh: Drop Ke Perumahan A">
+                </div>
+
+                <!-- FEEDER SUMBER -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Feeder Sumber</label>
+                    <select id="branch-feeder" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm bg-white" onchange="updateBranchCoreVisual()">
+                        <option value="">-- Pilih Feeder --</option>
+                    </select>
+                </div>
+
+                <!-- CORE FEEDER YANG DIAMBIL -->
+                <div class="bg-violet-50 border border-violet-100 rounded-xl p-4">
+                    <label class="block text-xs font-bold text-violet-700 uppercase mb-2">
+                        <i data-lucide="layers" class="inline w-3.5 h-3.5 mr-1"></i>Core Feeder yang Diambil
+                        <span class="text-violet-400 normal-case font-normal ml-1">(klik untuk pilih)</span>
+                    </label>
+                    <div id="branch-core-visual" class="flex flex-wrap gap-2 min-h-[56px] items-start">
+                        <p class="text-xs text-violet-400 italic w-full text-center py-2">Pilih Feeder terlebih dahulu</p>
+                    </div>
+                    <div id="branch-core-selected-info" class="mt-2 hidden pt-2 border-t border-violet-200">
+                        <p class="text-xs text-violet-700 font-semibold" id="branch-core-selected-text"></p>
+                    </div>
+                </div>
+
+                <!-- KABEL BRANCHING -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <p class="text-xs font-bold text-slate-600 uppercase flex items-center gap-1.5">
+                        <i data-lucide="cable" class="w-3.5 h-3.5"></i>Kabel Branching
+                    </p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tipe Kabel</label>
+                            <select id="branch-cable-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm bg-white" onchange="updateBranchCableVisual()">
+                                <option value="">-- Pilih Tipe --</option>
+                                <option value="Drop Core">Drop Core</option>
+                                <option value="FIG 8">FIG 8</option>
+                                <option value="ADSS">ADSS</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Core</label>
+                            <select id="branch-cable-cores" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm bg-white" onchange="updateBranchCableVisual()">
+                                <option value="">-- Pilih Core --</option>
+                                <option value="1">1 Core</option>
+                                <option value="2">2 Core</option>
+                                <option value="4">4 Core</option>
+                                <option value="6">6 Core</option>
+                                <option value="8">8 Core</option>
+                                <option value="12">12 Core</option>
+                                <option value="16">16 Core</option>
+                                <option value="24">24 Core</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Visual Core Kabel Branching + Faulty Marker -->
+                    <div id="branch-cable-section" class="hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Tandai Core Rusak</label>
+                            <span class="text-[10px] text-slate-400">Klik core untuk tandai rusak</span>
+                        </div>
+                        <div id="branch-cable-visual" class="flex flex-wrap gap-1.5 p-3 bg-white rounded-lg border border-slate-200 min-h-[56px]"></div>
+                        <div id="branch-cable-faulty-info" class="hidden mt-2 text-xs text-red-600 font-semibold"></div>
+                    </div>
+                </div>
+
+                <!-- TUJUAN -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tujuan / Menuju Ke</label>
+                    <input type="text" id="branch-destination" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm" placeholder="Contoh: Perumahan Grand Sentul">
+                </div>
+
+                <!-- LOKASI -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Lokasi Titik Tujuan</label>
+                    <div class="flex gap-2 mb-1">
+                        <input type="text" id="branch-loc" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm font-mono" placeholder="-6.123, 106.456">
+                        <button type="button" onclick="getBranchGPS()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 rounded-lg flex items-center justify-center gap-1 text-xs font-bold transition-all shadow-sm">
+                            <i data-lucide="map-pin" width="14"></i> GPS
+                        </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="branch-map-url" class="flex-1 border border-slate-200 px-3 py-1.5 rounded-lg text-[11px] text-slate-500" placeholder="Atau paste URL Google Maps...">
+                        <button type="button" onclick="parseBranchMapUrl()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all">Ambil</button>
+                    </div>
+                </div>
+
+                <!-- PANJANG + NOTE -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Panjang Kabel (m)</label>
+                        <input type="number" id="branch-length" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm" placeholder="Contoh: 250">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Keterangan</label>
+                        <input type="text" id="branch-note" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none text-sm" placeholder="Opsional...">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeBranchModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 transition">Batal</button>
+                    <button type="button" onclick="handleBranchSubmit()" class="flex-1 py-2.5 bg-violet-600 text-white rounded-lg font-bold hover:bg-violet-700 shadow-lg shadow-violet-600/20 transition flex items-center justify-center gap-2">
+                        <i data-lucide="save" width="16"></i> Simpan Branching
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT MODULES -->
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/ui-utils.js"></script>
+    <script src="js/ui-feeder.js"></script>
+    <script src="js/ui-infra.js"></script>
+    <script src="js/ui-infra-render.js"></script>
+    <script src="js/ui-customers.js"></script>
+    <script src="js/ui-tracking.js"></script>
+    <script src="js/ui-dashboard.js"></script>
+    <script src="js/ui-branching.js"></script>
+</body>
+</html>

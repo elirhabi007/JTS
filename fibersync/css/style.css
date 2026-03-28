@@ -1,0 +1,80 @@
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Pattern Arsir untuk Status Rusak */
+        .pattern-stripes {
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 5px,
+                rgba(255,255,255,0.3) 5px,
+                rgba(255,255,255,0.3) 10px
+            );
+        }
+        
+        /* Style untuk Autocomplete Dropdown */
+        /* ODC/ODP Tab Layout */
+        #view-infra { height: 100%; }
+        .infra-tab.active {
+            border-bottom-color: var(--tab-color, #2563eb) !important;
+            color: var(--tab-color, #2563eb) !important;
+            background-color: var(--tab-bg, #eff6ff) !important;
+        }
+        /* Infra sidebar list item */
+        .infra-list-item {
+            cursor: pointer;
+            border-radius: 0.625rem;
+            padding: 0.625rem 0.75rem;
+            border: 1.5px solid transparent;
+            transition: all 0.15s;
+            background: white;
+        }
+        .infra-list-item:hover { background: #f8fafc; border-color: #e2e8f0; }
+        .infra-list-item.selected { background: #eff6ff; border-color: #93c5fd; }
+        .infra-list-item.selected.indigo { background: #eef2ff; border-color: #a5b4fc; }
+        .infra-list-item.selected.emerald { background: #ecfdf5; border-color: #6ee7b7; }
+        /* Utilization bar */
+        .util-bar-track { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; padding: 0; }
+        .util-bar-fill { height: 100%; border-radius: 0; transition: width 0.4s ease; min-width: 0; }
+
+        /* When infra view is active, fix height chain */
+        #main-container:has(#view-infra:not(.hidden)) {
+            overflow: hidden;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #e2e8f0;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 0 0 0.5rem 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+        }
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background-color: #f1f5f9;
+        }
+        .autocomplete-item-highlight {
+            background-color: #e0f2fe !important;
+        }
