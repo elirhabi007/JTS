@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MikroTik Traffic Monitor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+:root{--bg:#050a0e;--bg2:#0a1520;--bg3:#0d1e2e;--card:#0b1925;--border:#1a3a52;--accent:#00d4ff;--accent2:#00ff88;--accent3:#ff6b35;--warn:#ffd700;--danger:#ff3366;--text:#c8e6f5;--muted:#4a7a9b;--glow:0 0 20px rgba(0,212,255,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+header{position:sticky;top:0;z-index:100;background:rgba(5,10,14,.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:58px;backdrop-filter:blur(10px)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border:2px solid var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow)}
+.logo-text{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:2px}
+.logo-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:3px}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.status-pill{display:flex;align-items:center;gap:7px;padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg2)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:all .3s}
+.dot.ok{background:var(--accent2);box-shadow:0 0 8px var(--accent2);animation:blink 2s infinite}
+.dot.err{background:var(--danger);box-shadow:0 0 8px var(--danger)}
+.dot.poll{background:var(--warn);animation:blink .5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#hdrStatus{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted)}
+#hdrTime{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted)}
+.btn{padding:7px 14px;border:none;cursor:pointer;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;border-radius:4px;transition:all .2s;text-transform:uppercase}
+.btn-p{background:var(--accent);color:var(--bg)}
+.btn-p:hover{background:#33ddff;box-shadow:var(--glow)}
+.btn-s{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.btn-s:hover{background:rgba(255,51,102,.1)}
+.btn-sm{padding:5px 10px;font-size:9px}
+.cfg{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px;position:relative;z-index:1}
+.cfg.hidden{display:none}
+.cfg-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end}
+@media(max-width:900px){.cfg-grid{grid-template-columns:1fr 1fr 1fr}}
+.fld label{display:block;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:5px;text-transform:uppercase}
+.fld input,.fld select{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 11px;font-family:'Share Tech Mono',monospace;font-size:12px;border-radius:4px;outline:none;transition:border-color .2s}
+.fld input:focus,.fld select:focus{border-color:var(--accent)}
+.fld input::placeholder{color:var(--muted);opacity:.5}
+.cfg-note{margin-top:10px;padding:9px 13px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:4px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7}
+.cfg-note b{color:var(--accent)}
+.topbar{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(26,58,82,.4);position:relative;z-index:1}
+.tabs{display:flex;gap:4px}
+.tab{padding:5px 14px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);cursor:pointer;border:1px solid transparent;border-radius:3px;transition:all .2s;text-transform:uppercase}
+.tab.active{color:var(--accent);border-color:var(--border);background:rgba(0,212,255,.05)}
+.tab:hover:not(.active){color:var(--text)}
+.tbr{display:flex;align-items:center;gap:8px}
+.tbr select{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:4px 9px;font-family:'Share Tech Mono',monospace;font-size:10px;border-radius:4px;outline:none}
+#pollCount{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted)}
+main{padding:16px 20px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:13px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+.kpi.g::before{background:var(--accent2)}.kpi.o::before{background:var(--accent3)}.kpi.y::before{background:var(--warn)}.kpi.r::before{background:var(--danger)}
+.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.kpi-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--accent);line-height:1}
+.kpi.g .kpi-val{color:var(--accent2)}.kpi.o .kpi-val{color:var(--accent3)}.kpi.y .kpi-val{color:var(--warn)}.kpi.r .kpi-val{color:var(--danger)}
+.kpi-unit{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);margin-top:3px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.card-hdr{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase}
+.card-meta{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted)}
+.card-body{padding:14px}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:750px){.chart-grid{grid-template-columns:1fr}}
+canvas{display:block;max-width:100%}
+.bw-item{margin-bottom:12px}
+.bw-head{display:flex;justify-content:space-between;margin-bottom:3px}
+.bw-name{font-family:'Orbitron',monospace;font-size:10px;color:var(--accent)}
+.bw-type{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted)}
+.bw-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.bw-dir{font-family:'Share Tech Mono',monospace;font-size:9px;width:18px;color:var(--muted)}
+.bw-track{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bw-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.bw-tx .bw-fill{background:linear-gradient(90deg,var(--accent3),var(--warn))}
+.bw-rx .bw-fill{background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.bw-val{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text);min-width:80px;text-align:right}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:11px}
+thead th{padding:9px 12px;text-align:left;color:var(--muted);font-size:9px;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg2);white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(26,58,82,.25);transition:background .15s}
+tbody tr:hover{background:rgba(0,212,255,.03)}
+tbody td{padding:8px 12px;color:var(--text);white-space:nowrap}
+td.hl{color:var(--accent);font-weight:600}
+td.tg{color:var(--accent2)}
+td.to{color:var(--accent3)}
+td.ty{color:var(--warn)}
+td.tm{color:var(--muted)}
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;letter-spacing:1px;font-weight:700}
+.b-up{background:rgba(0,255,136,.1);color:var(--accent2);border:1px solid rgba(0,255,136,.3)}
+.b-dn{background:rgba(255,51,102,.1);color:var(--danger);border:1px solid rgba(255,51,102,.3)}
+.b-dis{background:rgba(74,122,155,.1);color:var(--muted);border:1px solid rgba(74,122,155,.3)}
+.log-panel{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.log-hdr{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.log-title{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:2px}
+.log-body{padding:10px 14px;height:135px;overflow-y:auto;font-family:'Share Tech Mono',monospace;font-size:10px;line-height:1.9}
+.log-body::-webkit-scrollbar{width:3px}
+.log-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.ll{color:var(--muted)}.ll .tag{color:var(--accent2)}.ll.err .tag{color:var(--danger)}.ll.warn .tag{color:var(--warn)}.ll.info .tag{color:var(--accent)}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);padding:10px 18px;border-radius:6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);z-index:9998;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}#toast.ok{border-color:var(--accent2);color:var(--accent2)}#toast.fail{border-color:var(--danger);color:var(--danger)}
+.empty{text-align:center;padding:36px;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M6 8h.01M9 8h.01M6 11h12"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">MIKROTIK MONITOR</div>
+      <div class="logo-sub">REALTIME TRAFFIC ANALYZER</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="status-pill"><div class="dot" id="dot"></div><span id="hdrStatus">OFFLINE</span></div>
+    <span id="hdrTime">--:--:--</span>
+    <button class="btn btn-sm btn-p" onclick="toggleCfg()" id="cfgBtn">⚙ CONFIG</button>
+  </div>
+</header>
+
+<div class="cfg" id="cfg">
+  <div class="cfg-grid">
+    <div class="fld"><label>Router Base URL</label><input id="apiUrl" value="http://163.227.143.18" placeholder="http://IP_MIKROTIK"></div>
+    <div class="fld"><label>Username</label><input id="apiUser" value="admin"></div>
+    <div class="fld"><label>Password</label><input id="apiPass" type="password" placeholder="(kosong jika tidak ada)"></div>
+    <div class="fld"><label>Mode</label>
+      <select id="modeSelect" onchange="onModeChange()">
+        <option value="live">Live REST API</option>
+        <option value="demo">Demo Simulasi</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-end">
+      <button class="btn btn-p" onclick="startMonitor()" id="startBtn">▶ START</button>
+      <button class="btn btn-s" onclick="stopMonitor()" id="stopBtn" style="display:none">■ STOP</button>
+    </div>
+  </div>
+  <div class="cfg-note" id="cfgNote">
+    <b>Live Mode:</b> Akses langsung ke <b>http://163.227.143.18/rest/interface</b>. 
+    Jika gagal karena CORS, buka router di browser dulu lalu coba lagi, atau gunakan ekstensi CORS browser. 
+    RouterOS v7+ diperlukan untuk REST API.
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview',this)">Overview</div>
+    <div class="tab" onclick="switchTab('interfaces',this)">Interfaces</div>
+    <div class="tab" onclick="switchTab('traffic',this)">Traffic</div>
+    <div class="tab" onclick="switchTab('system',this)">System</div>
+  </div>
+  <div class="tbr">
+    <span id="pollCount" style="display:none;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted)">Poll #<span id="pNum">0</span></span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted)">INTERVAL</span>
+    <select id="ivSel" onchange="onIntervalChange()">
+      <option value="2000">2s</option>
+      <option value="5000" selected>5s</option>
+      <option value="10000">10s</option>
+      <option value="30000">30s</option>
+    </select>
+  </div>
+</div>
+
+<main>
+
+<div id="tab-overview">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">▲ TX (SFP Uplink)</div><div class="kpi-val" id="k-tx">—</div><div class="kpi-unit">Mbps</div></div>
+    <div class="kpi g"><div class="kpi-lbl">▼ RX (SFP Uplink)</div><div class="kpi-val" id="k-rx">—</div><div class="kpi-unit">Mbps</div></div>
+    <div class="kpi o"><div class="kpi-lbl">TX Total (SFP)</div><div class="kpi-val" id="k-txT">—</div><div class="kpi-unit" id="k-txU">GB</div></div>
+    <div class="kpi y"><div class="kpi-lbl">RX Total (SFP)</div><div class="kpi-val" id="k-rxT">—</div><div class="kpi-unit" id="k-rxU">GB</div></div>
+    <div class="kpi"><div class="kpi-lbl">Iface Aktif</div><div class="kpi-val" id="k-up">—</div><div class="kpi-unit">/ <span id="k-total">—</span> total</div></div>
+    <div class="kpi r"><div class="kpi-lbl">⚠ Link Drops</div><div class="kpi-val" id="k-ld">—</div><div class="kpi-unit">total events</div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="card"><div class="card-hdr"><span class="card-title">SFP Uplink (UPLINK-JTS)</span><span class="card-meta">sfp-sfpplus1</span></div><div class="card-body"><canvas id="cSfp" height="165"></canvas></div></div>
+    <div class="card"><div class="card-hdr"><span class="card-title">Distribusi LAN</span><span class="card-meta">ether1-LINK-TO-DISTRIBUSI</span></div><div class="card-body"><canvas id="cEth" height="165"></canvas></div></div>
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-title">Bandwidth Per Interface</span><span class="card-meta" id="bwMeta">—</span></div><div class="card-body" id="bwBars"><div class="empty">MENUNGGU DATA...</div></div></div>
+</div>
+
+<div id="tab-interfaces" style="display:none">
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Semua Interface</span><span class="card-meta" id="ifMeta">—</span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Nama</th><th>Tipe</th><th>Status</th><th>TX Rate</th><th>RX Rate</th><th>TX Total</th><th>RX Total</th><th>Link↓</th><th>Last Link Up</th><th>MAC</th><th>Comment</th></tr></thead>
+        <tbody id="ifBody"><tr><td colspan="12"><div class="empty">BELUM ADA DATA — KLIK START</div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="tab-traffic" style="display:none">
+  <div class="card"><div class="card-hdr"><span class="card-title">VLAN-631 Traffic</span><span class="card-meta">VLAN tag 631</span></div><div class="card-body"><canvas id="cVlan" height="180"></canvas></div></div>
+  <div class="card" style="margin-top:0"><div class="card-hdr"><span class="card-title">All Active — Combined</span><span class="card-meta">60 data points</span></div><div class="card-body"><canvas id="cAll" height="200"></canvas></div></div>
+</div>
+
+<div id="tab-system" style="display:none">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">CPU Load</div><div class="kpi-val" id="s-cpu">—</div><div class="kpi-unit">%</div></div>
+    <div class="kpi g"><div class="kpi-lbl">Free Memory</div><div class="kpi-val" id="s-mem">—</div><div class="kpi-unit">MB</div></div>
+    <div class="kpi o"><div class="kpi-lbl">Uptime</div><div class="kpi-val" id="s-up" style="font-size:13px">—</div><div class="kpi-unit">router uptime</div></div>
+    <div class="kpi y"><div class="kpi-lbl">RouterOS</div><div class="kpi-val" id="s-ros" style="font-size:14px">—</div><div class="kpi-unit">version</div></div>
+    <div class="kpi"><div class="kpi-lbl">Board</div><div class="kpi-val" id="s-board" style="font-size:13px">—</div><div class="kpi-unit">model</div></div>
+    <div class="kpi r"><div class="kpi-lbl">HDD Free</div><div class="kpi-val" id="s-hdd">—</div><div class="kpi-unit">MB</div></div>
+  </div>
+  <div class="card"><div class="card-hdr"><span class="card-title">CPU & Memory History</span></div><div class="card-body"><canvas id="cSys" height="200"></canvas></div></div>
+</div>
+
+<div class="log-panel">
+  <div class="log-hdr">
+    <span class="log-title">SYSTEM LOG</span>
+    <button onclick="clearLog()" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 8px;cursor:pointer;border-radius:3px">CLR</button>
+  </div>
+  <div class="log-body" id="logBody">
+    <div class="ll info"><span class="tag">[INIT]</span> MikroTik Traffic Monitor ready. Klik ⚙ CONFIG → START.</div>
+  </div>
+</div>
+
+</main>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// STATE
+let running = false, timer = null, pollNum = 0, mode = 'live';
+let prevBytes = {}, demoTick = 0;
+const MAX = 60;
+let charts = {};
+
+// DEMO DATA — snapshot dari router nyata
+const DEMO_BASE = [
+  {name:'ether1-LINK-TO-DISTRIBUSI',type:'ether',disabled:false,running:true,comment:'',mac:'04:F4:1C:20:7A:AA','link-downs':'2','last-link-up-time':'2026-03-30 03:06:16','tx-byte':6940187245500,'rx-byte':678014472865},
+  {name:'ether2',type:'ether',disabled:false,running:false,comment:'',mac:'04:F4:1C:20:7A:AB','link-downs':'0','last-link-up-time':'','tx-byte':0,'rx-byte':0},
+  {name:'ether3',type:'ether',disabled:false,running:false,comment:'',mac:'04:F4:1C:20:7A:AC','link-downs':'0','last-link-up-time':'','tx-byte':0,'rx-byte':0},
+  {name:'ether4',type:'ether',disabled:false,running:false,comment:'',mac:'04:F4:1C:20:7A:AD','link-downs':'0','last-link-up-time':'','tx-byte':0,'rx-byte':0},
+  {name:'ether5',type:'ether',disabled:false,running:false,comment:'',mac:'04:F4:1C:20:7A:AE','link-downs':'0','last-link-up-time':'','tx-byte':0,'rx-byte':0},
+  {name:'ether6',type:'ether',disabled:false,running:false,comment:'',mac:'04:F4:1C:20:7A:AF','link-downs':'0','last-link-up-time':'','tx-byte':0,'rx-byte':0},
+  {name:'ether7',type:'ether',disabled:false,running:false,comment:'REMOTE OLT1',mac:'04:F4:1C:20:7A:B0','link-downs':'0','last-link-up-time':'','tx-byte':0,'rx-byte':0},
+  {name:'ether8',type:'ether',disabled:false,running:false,comment:'REMOTE OLT2',mac:'04:F4:1C:20:7A:B1','link-downs':'1','last-link-up-time':'2026-03-26 00:32:31','tx-byte':33361,'rx-byte':20352},
+  {name:'sfp-sfpplus1',type:'ether',disabled:false,running:true,comment:'UPLINK-JTS',mac:'04:F4:1C:20:7A:B2','link-downs':'2','last-link-up-time':'2026-03-26 00:54:51','tx-byte':686501273167,'rx-byte':6961857091972},
+  {name:'VLAN-631',type:'vlan',disabled:false,running:true,comment:'',mac:'04:F4:1C:20:7A:B2','link-downs':'2','last-link-up-time':'2026-03-26 00:54:51','tx-byte':665752829242,'rx-byte':6915423183532},
+  {name:'lo',type:'loopback',disabled:false,running:true,comment:'',mac:'00:00:00:00:00:00','link-downs':'0','last-link-up-time':'','tx-byte':110410479,'rx-byte':110410479},
+  {name:'zerotier1',type:'zerotier',disabled:false,running:true,comment:'',mac:'3E:7D:62:6A:5F:23','link-downs':'0','last-link-up-time':'','tx-byte':1152404074,'rx-byte':5880629},
+];
+let demoCur = {};
+DEMO_BASE.forEach(i => { demoCur[i.name] = {tx: i['tx-byte'], rx: i['rx-byte']}; });
+
+// DEMO TRAFFIC SPEEDS (Mbps avg)
+const DEMO_SPEED = {
+  'sfp-sfpplus1':    {tx:85,  rx:320},
+  'VLAN-631':        {tx:80,  rx:300},
+  'ether1-LINK-TO-DISTRIBUSI': {tx:300, rx:80},
+  'zerotier1':       {tx:0.5, rx:0.08},
+  'lo':              {tx:0.01,rx:0.01},
+};
+
+// ===== INIT =====
+window.onload = () => {
+  initCharts();
+  setInterval(() => { document.getElementById('hdrTime').textContent = new Date().toLocaleTimeString('en-GB'); }, 1000);
+  log('Sistem ready. Klik CONFIG → isi kredensial → START.', 'info');
+};
+
+// ===== CHARTS =====
+const C = {
+  base: {responsive:true,maintainAspectRatio:false,animation:{duration:200},
+    plugins:{legend:{labels:{color:'#4a7a9b',font:{family:'Share Tech Mono',size:9},boxWidth:10}}},
+    scales:{
+      x:{ticks:{color:'#4a7a9b',font:{family:'Share Tech Mono',size:8},maxTicksLimit:6,maxRotation:0},grid:{color:'rgba(26,58,82,.3)'}},
+      y:{ticks:{color:'#4a7a9b',font:{family:'Share Tech Mono',size:9}},grid:{color:'rgba(26,58,82,.3)'},beginAtZero:true}
+    }
+  }
+};
+
+function lds(label, hex, fill=0.07) {
+  return {label, data:Array(MAX).fill(0), borderColor:hex,
+    backgroundColor:hex+(Math.round(fill*255).toString(16).padStart(2,'0')),
+    borderWidth:2, pointRadius:0, fill:true, tension:0.35};
+}
+
+function initCharts() {
+  const mk = (id, ds, extra={}) => {
+    const el = document.getElementById(id); if (!el) return null;
+    const opts = JSON.parse(JSON.stringify(C.base));
+    if (extra.yMax !== undefined) opts.scales.y.max = extra.yMax;
+    return new Chart(el, {type: extra.type || 'line', data:{labels:Array(MAX).fill(''), datasets:ds}, options:opts});
+  };
+  charts.sfp  = mk('cSfp',  [lds('TX Mbps','#ff6b35'), lds('RX Mbps','#00d4ff')]);
+  charts.eth  = mk('cEth',  [lds('TX Mbps','#ffd700'), lds('RX Mbps','#00ff88')]);
+  charts.vlan = mk('cVlan', [lds('TX Mbps','#ff3366'), lds('RX Mbps','#a855f7')]);
+  charts.all  = mk('cAll',  [
+    lds('SFP TX','#ff6b35'), lds('SFP RX','#00d4ff'),
+    lds('ETH1 TX','#ffd700'), lds('ETH1 RX','#00ff88'),
+  ]);
+  charts.sys  = mk('cSys',  [lds('CPU %','#ffd700'), lds('MEM used %','#00ff88')], {yMax:100});
+}
+
+function push(chart, ...vals) {
+  if (!chart) return;
+  chart.data.labels.push('');
+  if (chart.data.labels.length > MAX) chart.data.labels.shift();
+  vals.forEach((v,i) => {
+    chart.data.datasets[i].data.push(typeof v === 'number' ? +v.toFixed(3) : 0);
+    if (chart.data.datasets[i].data.length > MAX) chart.data.datasets[i].data.shift();
+  });
+  chart.update('none');
+}
+
+// ===== MONITOR CONTROL =====
+function startMonitor() {
+  if (running) return;
+  mode = document.getElementById('modeSelect').value;
+  running = true; pollNum = 0; prevBytes = {};
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display = 'inline-block';
+  document.getElementById('pollCount').style.display = 'inline';
+  document.getElementById('cfg').classList.add('hidden');
+  document.getElementById('cfgBtn').textContent = '⚙ CONFIG';
+  setDot('poll','CONNECTING...');
+
+  const msg = mode === 'demo'
+    ? 'Demo mode — simulasi data router nyata (RB5009, sfp-sfpplus1 UPLINK-JTS).'
+    : `Live mode → ${document.getElementById('apiUrl').value}/rest/interface`;
+  log(msg, 'info');
+  if (mode === 'demo') toast('Demo aktif', 'ok');
+
+  poll();
+  const iv = parseInt(document.getElementById('ivSel').value);
+  timer = setInterval(poll, iv);
+}
+
+function stopMonitor() {
+  running = false;
+  if (timer) { clearInterval(timer); timer = null; }
+  setDot('','OFFLINE');
+  document.getElementById('startBtn').style.display = 'inline-block';
+  document.getElementById('stopBtn').style.display = 'none';
+  document.getElementById('pollCount').style.display = 'none';
+  log('Monitor dihentikan.', 'warn');
+  toast('Dihentikan','fail');
+}
+
+function onIntervalChange() {
+  if (!running) return;
+  clearInterval(timer);
+  const iv = parseInt(document.getElementById('ivSel').value);
+  timer = setInterval(poll, iv);
+  log('Interval → ' + iv/1000 + 's', 'info');
+}
+
+// ===== POLL =====
+async function poll() {
+  if (!running) return;
+  pollNum++;
+  document.getElementById('pNum').textContent = pollNum;
+
+  if (mode === 'demo') { doPollDemo(); return; }
+
+  const base = document.getElementById('apiUrl').value.trim().replace(/\/$/,'');
+  const auth = 'Basic ' + btoa(document.getElementById('apiUser').value + ':' + document.getElementById('apiPass').value);
+
+  try {
+    setDot('poll','POLLING...');
+    const [r1, r2] = await Promise.all([
+      fetch(base + '/rest/interface', {headers:{Authorization:auth}}),
+      fetch(base + '/rest/system/resource', {headers:{Authorization:auth}}).catch(()=>null)
+    ]);
+    if (!r1.ok) {
+      const t = await r1.text().catch(()=>r1.status);
+      throw new Error(`HTTP ${r1.status} — ${String(t).slice(0,100)}`);
+    }
+    const ifaces = await r1.json();
+    const sys = r2 && r2.ok ? await r2.json() : null;
+    processIfaces(ifaces);
+    if (sys) processSys(sys);
+    setDot('ok','LIVE');
+    if (pollNum === 1) { log(`✓ Connected. ${ifaces.length} interfaces.`, 'info'); toast('Connected ✓','ok'); }
+  } catch(e) {
+    setDot('err','ERROR');
+    log('Poll error: ' + e.message, 'err');
+    if (pollNum <= 3) toast(e.message.slice(0,70), 'fail');
+  }
+}
+
+function doPollDemo() {
+  demoTick++;
+  const interval = parseInt(document.getElementById('ivSel').value) / 1000;
+  const ifaces = DEMO_BASE.map(base => {
+    const n = base.name;
+    const sp = DEMO_SPEED[n];
+    let txDelta = 0, rxDelta = 0;
+    if (sp && base.running) {
+      const jitter = () => 0.6 + Math.random()*0.8 + Math.sin(demoTick*0.25 + n.length*0.3)*0.3;
+      txDelta = Math.round(sp.tx * 1e6 / 8 * jitter() * interval);
+      rxDelta = Math.round(sp.rx * 1e6 / 8 * jitter() * interval);
+    }
+    demoCur[n].tx += txDelta;
+    demoCur[n].rx += rxDelta;
+    return {...base, 'tx-byte': demoCur[n].tx, 'rx-byte': demoCur[n].rx};
+  });
+  processIfaces(ifaces);
+  processSys({
+    'cpu-load': String(Math.round(12 + 18*Math.abs(Math.sin(demoTick*.12)) + Math.random()*8)),
+    'total-memory':'536870912','free-memory':String(Math.round(210e6 + 40e6*Math.sin(demoTick*.06))),
+    uptime:'4d2h13m', version:'7.14.3 (stable)', 'board-name':'RB5009UG+S+','free-hdd-space':'52428800'
+  });
+  setDot('ok','DEMO');
+}
+
+// ===== PROCESS INTERFACES =====
+function processIfaces(rawIfaces) {
+  const now = Date.now();
+  const rates = {};
+
+  rawIfaces.forEach(iface => {
+    const n = iface.name;
+    const txB = parseInt(iface['tx-byte'] || 0);
+    const rxB = parseInt(iface['rx-byte'] || 0);
+    if (prevBytes[n] && now > prevBytes[n].ts) {
+      const dt = (now - prevBytes[n].ts) / 1000;
+      rates[n] = {
+        tx: Math.max(0, (txB - prevBytes[n].tx) * 8 / dt / 1e6),
+        rx: Math.max(0, (rxB - prevBytes[n].rx) * 8 / dt / 1e6)
+      };
+    } else { rates[n] = {tx:0, rx:0}; }
+    prevBytes[n] = {tx:txB, rx:rxB, ts:now};
+  });
+
+  renderKPI(rawIfaces, rates);
+  renderBwBars(rawIfaces, rates);
+  renderIfTable(rawIfaces, rates);
+  if (pollNum > 1) updateCharts(rawIfaces, rates);
+}
+
+// ===== RENDER KPI =====
+function renderKPI(ifaces, rates) {
+  const sfp = ifaces.find(i => i.name === 'sfp-sfpplus1');
+  if (sfp) {
+    const r = rates['sfp-sfpplus1'] || {tx:0,rx:0};
+    set('k-tx', pollNum<=1 ? '...' : r.tx.toFixed(2));
+    set('k-rx', pollNum<=1 ? '...' : r.rx.toFixed(2));
+    const [tv,tu] = fmtB(parseInt(sfp['tx-byte']||0));
+    const [rv,ru] = fmtB(parseInt(sfp['rx-byte']||0));
+    set('k-txT', tv); set('k-txU', tu);
+    set('k-rxT', rv); set('k-rxU', ru);
+  }
+  const up = ifaces.filter(i => i.running===true||i.running==='true').length;
+  set('k-up', up); set('k-total', ifaces.length);
+  const ld = ifaces.reduce((s,i)=>s+parseInt(i['link-downs']||0),0);
+  set('k-ld', ld);
+}
+
+// ===== RENDER BW BARS =====
+function renderBwBars(ifaces, rates) {
+  const active = ifaces.filter(i => (i.running===true||i.running==='true') && i.type!=='loopback');
+  if (!active.length) { document.getElementById('bwBars').innerHTML='<div class="empty">TIDAK ADA INTERFACE AKTIF</div>'; return; }
+  const maxR = Math.max(...active.flatMap(i=>[rates[i.name]?.tx||0, rates[i.name]?.rx||0]), 0.1);
+  const total = active.reduce((s,i)=>s+(rates[i.name]?.tx||0)+(rates[i.name]?.rx||0),0);
+  set('bwMeta', fmtRate(total) + ' combined');
+  document.getElementById('bwBars').innerHTML = active.map(iface => {
+    const r = rates[iface.name]||{tx:0,rx:0};
+    const txP = Math.min(100,(r.tx/maxR)*100);
+    const rxP = Math.min(100,(r.rx/maxR)*100);
+    const cmt = iface.comment ? ` <span style="color:var(--muted);font-size:9px;margin-left:6px">${iface.comment}</span>` : '';
+    return `<div class="bw-item">
+      <div class="bw-head"><span class="bw-name">${iface.name}${cmt}</span><span class="bw-type">${iface.type}</span></div>
+      <div class="bw-row bw-tx"><span class="bw-dir">TX</span><div class="bw-track"><div class="bw-fill" style="width:${txP}%"></div></div><span class="bw-val">${fmtRate(r.tx)}</span></div>
+      <div class="bw-row bw-rx"><span class="bw-dir">RX</span><div class="bw-track"><div class="bw-fill" style="width:${rxP}%"></div></div><span class="bw-val">${fmtRate(r.rx)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER TABLE =====
+function renderIfTable(ifaces, rates) {
+  set('ifMeta', ifaces.length + ' interfaces, ' + ifaces.filter(i=>i.running===true||i.running==='true').length + ' running');
+  document.getElementById('ifBody').innerHTML = ifaces.map((iface, idx) => {
+    const up = iface.running===true||iface.running==='true';
+    const dis = iface.disabled===true||iface.disabled==='true';
+    const r = rates[iface.name]||{tx:0,rx:0};
+    const txB = parseInt(iface['tx-byte']||0);
+    const rxB = parseInt(iface['rx-byte']||0);
+    const ld = parseInt(iface['link-downs']||0);
+    const badge = dis?'b-dis':up?'b-up':'b-dn';
+    const stxt = dis?'DISABLED':up?'UP':'DOWN';
+    const lup = iface['last-link-up-time'] || '—';
+    return `<tr>
+      <td class="tm">${idx+1}</td>
+      <td class="hl">${iface.name}</td>
+      <td class="tm">${iface.type}</td>
+      <td><span class="badge ${badge}">${stxt}</span></td>
+      <td class="${up?'to':'tm'}">${fmtRate(r.tx)}</td>
+      <td class="${up?'tg':'tm'}">${fmtRate(r.rx)}</td>
+      <td class="tm">${fmtBStr(txB)}</td>
+      <td class="tm">${fmtBStr(rxB)}</td>
+      <td class="${ld>0?'ty':'tm'}">${ld}</td>
+      <td class="tm" style="font-size:10px">${lup}</td>
+      <td class="tm" style="font-size:10px">${iface['mac-address']||'—'}</td>
+      <td class="tm">${iface.comment||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== CHARTS UPDATE =====
+function updateCharts(ifaces, rates) {
+  const sfp  = rates['sfp-sfpplus1']||{tx:0,rx:0};
+  const eth  = rates['ether1-LINK-TO-DISTRIBUSI']||{tx:0,rx:0};
+  const vlan = rates['VLAN-631']||{tx:0,rx:0};
+  push(charts.sfp, sfp.tx, sfp.rx);
+  push(charts.eth, eth.tx, eth.rx);
+  push(charts.vlan, vlan.tx, vlan.rx);
+  push(charts.all, sfp.tx, sfp.rx, eth.tx, eth.rx);
+}
+
+// ===== SYSTEM =====
+function processSys(sys) {
+  const cpu = parseInt(sys['cpu-load']||0);
+  const memT = parseInt(sys['total-memory']||1);
+  const memF = parseInt(sys['free-memory']||0);
+  const memPct = Math.round(((memT-memF)/memT)*100);
+  set('s-cpu', cpu);
+  set('s-mem', Math.round(memF/1024/1024));
+  set('s-up', sys.uptime||'—');
+  set('s-ros', sys.version||'—');
+  set('s-board', sys['board-name']||'—');
+  set('s-hdd', Math.round(parseInt(sys['free-hdd-space']||0)/1024/1024));
+  push(charts.sys, cpu, memPct);
+}
+
+// ===== UTILS =====
+function fmtRate(mbps) {
+  if (!mbps || mbps < 0) return '0';
+  if (mbps < 0.001) return (mbps*1e6).toFixed(0)+' bps';
+  if (mbps < 1) return (mbps*1000).toFixed(1)+' Kbps';
+  if (mbps >= 1000) return (mbps/1000).toFixed(2)+' Gbps';
+  return mbps.toFixed(2)+' Mbps';
+}
+function fmtB(b) {
+  if (b>=1e15) return [(b/1e15).toFixed(2),'PB'];
+  if (b>=1e12) return [(b/1e12).toFixed(2),'TB'];
+  if (b>=1e9)  return [(b/1e9).toFixed(2),'GB'];
+  if (b>=1e6)  return [(b/1e6).toFixed(1),'MB'];
+  if (b>=1e3)  return [(b/1e3).toFixed(0),'KB'];
+  return [b,'B'];
+}
+function fmtBStr(b) { const [v,u]=fmtB(b); return v+' '+u; }
+function set(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+// ===== UI =====
+function setDot(cls, txt) {
+  document.getElementById('dot').className = 'dot '+(cls||'');
+  document.getElementById('hdrStatus').textContent = txt;
+}
+function toggleCfg() {
+  const cfg = document.getElementById('cfg');
+  cfg.classList.toggle('hidden');
+  document.getElementById('cfgBtn').textContent = cfg.classList.contains('hidden') ? '⚙ CONFIG' : '✕ TUTUP';
+}
+function onModeChange() {
+  const demo = document.getElementById('modeSelect').value === 'demo';
+  document.getElementById('cfgNote').innerHTML = demo
+    ? '<b>Demo Mode:</b> Simulasi realtime berbasis snapshot router nyata (RB5009UG+S+). Interface: sfp-sfpplus1 UPLINK-JTS, ether1-LINK-TO-DISTRIBUSI, VLAN-631, zerotier1, dll. Tidak memerlukan koneksi ke router.'
+    : `<b>Live Mode:</b> Fetch langsung ke REST API. Endpoint: <b>${document.getElementById('apiUrl').value}/rest/interface</b>. Jika ada error CORS, pastikan mengakses dari jaringan yang sama atau setup CORS di RouterOS.`;
+}
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['overview','interfaces','traffic','system'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===name?'':'none';
+  });
+}
+function log(msg, type='info') {
+  const body = document.getElementById('logBody');
+  const now = new Date().toLocaleTimeString('en-GB');
+  const tags = {info:'INFO',warn:'WARN',err:'ERROR'};
+  const div = document.createElement('div');
+  div.className = 'll '+(type||'info');
+  div.innerHTML = `<span class="tag">[${tags[type]||type}]</span> ${now} — ${msg}`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  if (body.children.length > 150) body.removeChild(body.firstChild);
+}
+function clearLog() { document.getElementById('logBody').innerHTML = ''; }
+function toast(msg, cls) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show '+(cls||'');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.className='', 3500);
+}
+</script>
+</body>
+</html>
