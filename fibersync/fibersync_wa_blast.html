@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiberSync WA Blast — Notifikasi WhatsApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+        .fade-in { animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        .pulse-dot { animation: pulseDot 1.4s ease-in-out infinite; }
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.5;transform:scale(.85);} }
+
+        .status-ok    { background:#dcfce7; color:#16a34a; border:1px solid #bbf7d0; }
+        .status-fail  { background:#fee2e2; color:#dc2626; border:1px solid #fecaca; }
+        .status-wait  { background:#fef9c3; color:#ca8a04; border:1px solid #fde68a; }
+        .status-send  { background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; }
+
+        .recipient-row:hover { background:#f8fafc; }
+        .recipient-row.sent  { background:#f0fdf4; }
+        .recipient-row.fail  { background:#fff1f2; }
+        .recipient-row.sending { background:#eff6ff; }
+
+        /* Progress bar animated */
+        .progress-bar { transition: width 0.4s ease; }
+
+        /* Sidebar active */
+        .nav-item.active { background:#16a34a; color:white; }
+
+        /* Card hover */
+        .target-card { cursor:pointer; border:2px solid #e2e8f0; transition:all .15s; }
+        .target-card:hover { border-color:#22c55e; background:#f0fdf4; }
+        .target-card.selected { border-color:#16a34a; background:#dcfce7; }
+
+        /* Toggle switch */
+        .toggle-track { width:44px; height:24px; border-radius:99px; background:#e2e8f0; position:relative; cursor:pointer; transition:background .2s; }
+        .toggle-track.on { background:#16a34a; }
+        .toggle-thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:white; transition:left .2s; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+        .toggle-track.on .toggle-thumb { left:23px; }
+
+        .wa-green { color:#16a34a; }
+        .bg-wa { background:#16a34a; }
+        .bg-wa-dark { background:#15803d; }
+        .ring-wa:focus { --tw-ring-color:#16a34a; }
+
+        /* Autocomplete dropdown */
+        .autocomplete-wrap { position:relative; }
+        .autocomplete-drop {
+            position:absolute; top:calc(100% + 4px); left:0; right:0;
+            background:white; border:1.5px solid #e2e8f0;
+            border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.12);
+            z-index:999; max-height:220px; overflow-y:auto;
+            display:none;
+        }
+        .autocomplete-drop.open { display:block; }
+        .ac-item {
+            padding:8px 12px; cursor:pointer; border-bottom:1px solid #f1f5f9;
+            transition:background .1s; display:flex; align-items:center; gap:8px;
+        }
+        .ac-item:last-child { border-bottom:none; }
+        .ac-item:hover, .ac-item.active { background:#f0fdf4; }
+        .ac-item-icon {
+            width:22px; height:22px; border-radius:6px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:10px; font-weight:800; flex-shrink:0;
+        }
+        .ac-item-main { font-size:12px; font-weight:600; color:#1e293b; line-height:1.3; }
+        .ac-item-sub  { font-size:10px; color:#94a3b8; line-height:1.3; }
+        .ac-section-label {
+            padding:5px 12px 3px; font-size:9px; font-weight:800;
+            letter-spacing:.08em; text-transform:uppercase; color:#94a3b8;
+            background:#f8fafc; border-bottom:1px solid #f1f5f9;
+            position:sticky; top:0; z-index:1;
+        }
+
+        /* Search bar tabel */
+        .tbl-search-wrap { position:relative; }
+        .tbl-search-wrap input { padding-left:30px; }
+        .tbl-search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:#94a3b8; pointer-events:none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex overflow-hidden">
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col h-full shadow-xl z-20">
+    <div class="p-5 border-b border-slate-800">
+        <div class="flex items-center gap-2 mb-1">
+            <div class="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center">
+                <i data-lucide="message-circle" class="w-4 h-4 text-white"></i>
+            </div>
+            <h1 class="text-lg font-black text-white">WA<span class="text-green-400">Blast</span></h1>
+        </div>
+        <p class="text-[10px] text-slate-500 font-mono">FiberSync Notification Tool</p>
+    </div>
+
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-3 mb-2">Menu</p>
+        <button onclick="switchPage('blast')" id="nav-blast" class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left">
+            <i data-lucide="send" class="w-4 h-4"></i> Kirim Pesan
+        </button>
+        <button onclick="switchPage('template')" id="nav-template" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left hover:bg-slate-800">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Template Pesan
+        </button>
+        <button onclick="switchPage('history')" id="nav-history" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left hover:bg-slate-800">
+            <i data-lucide="clock" class="w-4 h-4"></i> Riwayat Blast
+        </button>
+        <button onclick="switchPage('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left hover:bg-slate-800">
+            <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan
+        </button>
+
+        <!-- Link balik ke FiberSync -->
+        <div class="pt-4 border-t border-slate-800 mt-4">
+            <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-3 mb-2">Navigasi</p>
+            <a href="fibersync_v2.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke FiberSync
+            </a>
+        </div>
+    </nav>
+
+    <!-- Status Fonnte -->
+    <div class="p-4">
+        <div class="bg-slate-800 rounded-xl p-3 border border-slate-700">
+            <div class="flex items-center gap-2 mb-1">
+                <span id="fonnte-dot" class="w-2 h-2 rounded-full bg-slate-500 pulse-dot"></span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Fonnte API</span>
+            </div>
+            <p id="fonnte-status-text" class="text-xs text-slate-400">Belum terhubung</p>
+        </div>
+    </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 flex-shrink-0">
+        <div>
+            <h2 id="page-title" class="text-base font-bold text-slate-800">Kirim Pesan WhatsApp</h2>
+            <p class="text-[10px] text-slate-400">via Fonnte API · Token: <span id="header-token" class="mono text-green-600">—</span></p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div id="blast-progress-header" class="hidden items-center gap-2">
+                <div class="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="blast-prog-bar" class="progress-bar h-full bg-green-500 rounded-full" style="width:0%"></div>
+                </div>
+                <span id="blast-prog-text" class="text-xs font-bold text-slate-600 mono">0/0</span>
+            </div>
+            <button id="btn-stop" onclick="stopBlast()" class="hidden items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-red-100 transition">
+                <i data-lucide="square" class="w-3 h-3"></i> Stop
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto bg-slate-50">
+
+    <!-- ===== PAGE: BLAST ===== -->
+    <div id="page-blast" class="p-5 fade-in h-full">
+        <div class="flex gap-5 h-full" style="min-height:calc(100vh - 56px)">
+
+            <!-- ===== KOLOM KIRI (fixed width) ===== -->
+            <div class="flex flex-col gap-4" style="width:280px;flex-shrink:0">
+
+                <!-- Target Selector -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center"><i data-lucide="target" class="w-3 h-3 text-blue-600"></i></div>
+                        <h3 class="font-bold text-slate-800 text-sm">Target Penerima</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button onclick="setTargetType('all')" id="ttype-all" class="target-card selected rounded-xl p-2.5 text-center">
+                            <i data-lucide="users" class="w-4 h-4 mx-auto mb-1 text-green-600"></i>
+                            <p class="text-[10px] font-bold text-slate-700">Semua</p>
+                        </button>
+                        <button onclick="setTargetType('feeder')" id="ttype-feeder" class="target-card rounded-xl p-2.5 text-center">
+                            <i data-lucide="cable" class="w-4 h-4 mx-auto mb-1 text-blue-600"></i>
+                            <p class="text-[10px] font-bold text-slate-700">Per Feeder</p>
+                        </button>
+                        <button onclick="setTargetType('odc')" id="ttype-odc" class="target-card rounded-xl p-2.5 text-center">
+                            <i data-lucide="server" class="w-4 h-4 mx-auto mb-1 text-indigo-600"></i>
+                            <p class="text-[10px] font-bold text-slate-700">Per ODC</p>
+                        </button>
+                        <button onclick="setTargetType('odp')" id="ttype-odp" class="target-card rounded-xl p-2.5 text-center">
+                            <i data-lucide="radio" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
+                            <p class="text-[10px] font-bold text-slate-700">Per ODP</p>
+                        </button>
+                    </div>
+                    <div id="target-filter-wrap" class="hidden mb-3">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pilih <span id="target-filter-label">Feeder</span></label>
+                        <select id="target-filter-select" onchange="buildRecipients()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-green-400 outline-none"></select>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cari & Tambah Penerima</label>
+                        <div class="autocomplete-wrap">
+                            <input type="text" id="manual-wa"
+                                placeholder="Ketik nama, ODP, ODC, atau no WA..."
+                                autocomplete="off"
+                                oninput="onManualInput(this.value)"
+                                onkeydown="onManualKeydown(event)"
+                                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-green-400 outline-none">
+                            <div id="manual-ac-drop" class="autocomplete-drop"></div>
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-1">Cari pelanggan, ODP, atau ODC — atau ketik <span class="font-mono">Nama|08xxx</span> untuk tambah manual</p>
+                    </div>
+                    <div class="mt-3 bg-green-50 border border-green-100 rounded-xl px-3 py-2 flex items-center justify-between">
+                        <span class="text-xs text-green-700 font-semibold">Total Penerima</span>
+                        <span id="recipient-count" class="text-xl font-black text-green-700 mono">0</span>
+                    </div>
+                </div>
+
+                <!-- Pengaturan Kirim -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center"><i data-lucide="sliders" class="w-3 h-3 text-amber-600"></i></div>
+                        <h3 class="font-bold text-slate-800 text-sm">Pengaturan Kirim</h3>
+                    </div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Jeda Antar Pesan</label>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button onclick="setDelay(5)"  id="delay-5"  class="delay-btn bg-slate-100 hover:bg-green-100 hover:text-green-700 text-slate-600 py-2 rounded-lg text-xs font-bold transition border-2 border-transparent">5d</button>
+                        <button onclick="setDelay(15)" id="delay-15" class="delay-btn bg-slate-100 hover:bg-green-100 hover:text-green-700 text-slate-600 py-2 rounded-lg text-xs font-bold transition border-2 border-transparent">15d</button>
+                        <button onclick="setDelay(30)" id="delay-30" class="delay-btn bg-green-600 text-white py-2 rounded-lg text-xs font-bold border-2 border-green-600">30d</button>
+                        <button onclick="setDelay(60)" id="delay-60" class="delay-btn bg-slate-100 hover:bg-green-100 hover:text-green-700 text-slate-600 py-2 rounded-lg text-xs font-bold transition border-2 border-transparent">60d</button>
+                    </div>
+                    <p class="text-[9px] text-slate-400 mt-1.5">Jeda dalam detik antar pengiriman</p>
+                </div>
+
+                <!-- Stat cards (muncul saat blast) -->
+                <div id="stat-cards" class="hidden grid grid-cols-3 gap-2">
+                    <div class="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
+                        <p class="text-lg font-black text-green-600 mono" id="cnt-ok">0</p>
+                        <p class="text-[9px] text-green-500 font-bold uppercase">Terkirim</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+                        <p class="text-lg font-black text-red-500 mono" id="cnt-fail">0</p>
+                        <p class="text-[9px] text-red-400 font-bold uppercase">Gagal</p>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 text-center">
+                        <p class="text-lg font-black text-amber-500 mono" id="cnt-wait">0</p>
+                        <p class="text-[9px] text-amber-400 font-bold uppercase">Antrian</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== KOLOM KANAN (flex-1, tinggi penuh) ===== -->
+            <div class="flex-1 flex flex-col gap-4 min-w-0">
+
+                <!-- Komposer + Tombol Blast (atas) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                    <!-- Header komposer -->
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center"><i data-lucide="message-square" class="w-3 h-3 text-green-600"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm">Komposer Pesan</h3>
+                        </div>
+                        <div class="flex gap-1.5 flex-wrap justify-end">
+                            <button onclick="loadTemplate()" class="text-[10px] font-bold text-slate-500 hover:text-green-600 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-green-50 transition border border-slate-200">
+                                <i data-lucide="file-text" class="w-3 h-3"></i> Template
+                            </button>
+                            <button onclick="insertVar('{nama}')" class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-1 rounded-lg hover:bg-blue-100 transition border border-blue-100">{nama}</button>
+                            <button onclick="insertVar('{odp}')"  class="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-1 rounded-lg hover:bg-indigo-100 transition border border-indigo-100">{odp}</button>
+                            <button onclick="insertVar('{no}')"   class="text-[10px] bg-violet-50 text-violet-600 font-bold px-2 py-1 rounded-lg hover:bg-violet-100 transition border border-violet-100">{no}</button>
+                        </div>
+                    </div>
+
+                    <!-- Textarea + preview side by side -->
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <textarea id="msg-body" rows="6" placeholder="Tulis pesan di sini...
+
+Contoh:
+Yth. Bapak/Ibu {nama},
+
+Kami informasikan bahwa terdapat gangguan pada jaringan optik di area Anda (ODP: {odp}).
+
+Tim teknisi kami sedang dalam proses perbaikan.
+
+Salam,
+Tim FiberSync"
+                            class="w-full border border-slate-200 rounded-xl p-3 text-sm resize-none focus:ring-2 focus:ring-green-400 outline-none bg-slate-50 focus:bg-white transition leading-relaxed"></textarea>
+                            <div class="flex items-center justify-between mt-1.5">
+                                <p class="text-[9px] text-slate-400"><span id="char-count">0</span> karakter · <span class="text-blue-500 font-semibold">{nama}</span> · <span class="text-indigo-500 font-semibold">{odp}</span> · <span class="text-violet-500 font-semibold">{no}</span></p>
+                                <button onclick="previewMsg()" class="text-[10px] text-slate-400 hover:text-green-600 flex items-center gap-1 font-bold transition">
+                                    <i data-lucide="eye" class="w-3 h-3"></i> Preview
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview panel (muncul saat klik preview) -->
+                        <div id="msg-preview-wrap" class="hidden w-56 flex-shrink-0 fade-in">
+                            <div class="bg-[#e5ddd5] rounded-xl p-3 h-full">
+                                <p class="text-[9px] text-slate-500 font-bold mb-2 text-center">📱 Preview</p>
+                                <div class="bg-white rounded-xl p-2.5 shadow-sm">
+                                    <p id="msg-preview-text" class="text-xs text-slate-800 whitespace-pre-line leading-relaxed"></p>
+                                    <p class="text-[8px] text-slate-400 text-right mt-1">09:41 ✓✓</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Blast + Progress dalam satu baris -->
+                    <div class="mt-3 flex items-center gap-3">
+                        <button onclick="startBlast()" id="btn-blast" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-green-600/20 text-sm">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span id="btn-blast-text">Mulai Blast</span>
+                        </button>
+                        <button onclick="clearAll()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold rounded-xl transition text-sm" title="Reset">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Progress bar (muncul saat blast) -->
+                    <div id="blast-progress-wrap" class="hidden mt-3">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                            <span>Progress Pengiriman</span>
+                            <span id="prog-text-main">0 / 0 terkirim</span>
+                        </div>
+                        <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="prog-bar-main" class="progress-bar h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Penerima (flex-1, mengisi sisa tinggi) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col flex-1 min-h-0">
+                    <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 flex-shrink-0 gap-3">
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <i data-lucide="list" class="w-4 h-4 text-slate-400"></i>
+                            <h3 class="font-bold text-slate-800 text-sm">Daftar Penerima</h3>
+                            <span id="tbl-count" class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <!-- Search bar tabel -->
+                        <div class="tbl-search-wrap flex-1 max-w-xs">
+                            <svg class="tbl-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="tbl-search" placeholder="Filter nama, WA, ODP..."
+                                oninput="filterTable(this.value)"
+                                class="w-full py-1.5 pr-3 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-green-400 outline-none bg-slate-50 focus:bg-white transition">
+                        </div>
+                        <div class="flex gap-2 items-center flex-shrink-0">
+                            <button onclick="selectAll(true)"  class="text-[10px] font-bold text-green-600 hover:underline">Pilih Semua</button>
+                            <span class="text-slate-200">|</span>
+                            <button onclick="selectAll(false)" class="text-[10px] font-bold text-slate-400 hover:underline">Batal</button>
+                            <span class="text-slate-200">|</span>
+                            <button onclick="removeSelected()" class="text-[10px] font-bold text-red-400 hover:underline">Hapus Terpilih</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto">
+                        <!-- Filter info bar -->
+                        <div id="tbl-filter-info" class="hidden px-5 py-1.5 bg-green-50 border-b border-green-100 text-[10px] font-semibold text-green-700 flex items-center gap-2">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <span></span>
+                            <button onclick="document.getElementById('tbl-search').value='';filterTable('')" class="ml-auto text-green-500 hover:text-green-700 font-bold">✕ Hapus Filter</button>
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-100 sticky top-0 z-10">
+                                <tr>
+                                    <th class="w-8 px-4 py-2.5"><input type="checkbox" id="chk-all" onclick="selectAll(this.checked)" class="rounded"></th>
+                                    <th class="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase">No</th>
+                                    <th class="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase">Nama</th>
+                                    <th class="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase">No. WA</th>
+                                    <th class="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase">ODP</th>
+                                    <th class="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase">Status</th>
+                                    <th class="px-3 py-2.5 text-left text-[10px] font-black text-slate-400 uppercase">Hasil Kirim</th>
+                                    <th class="px-3 py-2.5 w-8"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipient-table-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                        <div id="recipient-empty" class="py-14 text-center text-slate-400 text-sm">
+                            <i data-lucide="inbox" class="w-9 h-9 mx-auto mb-2 opacity-30"></i>
+                            <p>Pilih target, cari pelanggan/ODP/ODC, atau tambah manual</p>
+                            <p class="text-xs mt-1 text-slate-300">Ketik di kolom "Cari & Tambah Penerima" ↖</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end kolom kanan -->
+        </div>
+    </div>
+
+    <!-- ===== PAGE: TEMPLATE ===== -->
+    <div id="page-template" class="hidden p-6 fade-in">
+        <div class="max-w-2xl mx-auto space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-800">Template Pesan</h3>
+                <button onclick="addTemplate()" class="bg-green-600 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1 hover:bg-green-700 transition">
+                    <i data-lucide="plus" class="w-3 h-3"></i> Tambah Template
+                </button>
+            </div>
+            <div id="template-list" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- ===== PAGE: HISTORY ===== -->
+    <div id="page-history" class="hidden p-6 fade-in">
+        <div class="max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-800">Riwayat Blast</h3>
+                <button onclick="clearHistory()" class="text-xs font-bold text-red-400 hover:underline">Hapus Semua</button>
+            </div>
+            <div id="history-list" class="space-y-3"></div>
+            <div id="history-empty" class="py-16 text-center text-slate-400 text-sm">
+                <i data-lucide="clock" class="w-10 h-10 mx-auto mb-2 opacity-30"></i>
+                <p>Belum ada riwayat blast</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PAGE: SETTINGS ===== -->
+    <div id="page-settings" class="hidden p-6 fade-in">
+        <div class="max-w-lg mx-auto space-y-5">
+            <h3 class="font-bold text-slate-800">Pengaturan Koneksi</h3>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Token Fonnte</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="set-token" placeholder="Masukkan token Fonnte..." class="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-sm mono focus:ring-2 focus:ring-green-400 outline-none bg-slate-50">
+                        <button onclick="testToken()" class="bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition">Test</button>
+                    </div>
+                    <p id="token-test-result" class="text-xs mt-1 hidden"></p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">URL Google Apps Script (Data FiberSync)</label>
+                    <input type="url" id="set-gs-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm mono focus:ring-2 focus:ring-green-400 outline-none bg-slate-50">
+                </div>
+                <button onclick="saveSettings()" class="w-full bg-green-600 text-white font-bold py-2.5 rounded-xl hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="save" class="w-4 h-4"></i> Simpan & Muat Data
+                </button>
+                <div id="settings-result" class="hidden text-sm text-center font-semibold"></div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-700 leading-relaxed">
+                <strong>⚠️ Perhatian:</strong> Token Fonnte tersimpan di <code class="bg-amber-100 px-1 rounded">sessionStorage</code> browser. Jangan gunakan di komputer umum. Token tidak akan dikirim ke server manapun selain <code class="bg-amber-100 px-1 rounded">api.fonnte.com</code>.
+            </div>
+        </div>
+    </div>
+
+    </div><!-- end main scroll -->
+</main>
+
+<!-- MODAL TEMPLATE PICKER -->
+<div id="modal-tpl" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeModal('modal-tpl')"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 max-h-[80vh] overflow-y-auto">
+        <div class="flex justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Pilih Template</h3>
+            <button onclick="closeModal('modal-tpl')" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="20"></i></button>
+        </div>
+        <div id="modal-tpl-list" class="space-y-2"></div>
+    </div>
+</div>
+
+<!-- MODAL ADD TEMPLATE -->
+<div id="modal-add-tpl" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeModal('modal-add-tpl')"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6">
+        <div class="flex justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Tambah Template</h3>
+            <button onclick="closeModal('modal-add-tpl')" class="text-slate-400 hover:text-red-500"><i data-lucide="x" width="20"></i></button>
+        </div>
+        <input type="hidden" id="tpl-edit-idx">
+        <div class="space-y-3">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Template</label>
+                <input type="text" id="tpl-name" class="w-full px-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-green-400 outline-none" placeholder="Contoh: Gangguan Jaringan">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Isi Pesan</label>
+                <textarea id="tpl-body" rows="6" class="w-full px-4 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-green-400 outline-none" placeholder="Tulis template pesan..."></textarea>
+            </div>
+            <button onclick="saveTemplate()" class="w-full bg-green-600 text-white font-bold py-2.5 rounded-xl hover:bg-green-700 transition text-sm">Simpan Template</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const FONNTE_URL = 'https://api.fonnte.com/send';
+const DEFAULT_TOKEN = 'AiK7CYb8t8Musw5HMBG1';
+const DEFAULT_GS_URL = 'https://script.google.com/macros/s/AKfycbzti70DwVvi9XFESBSMyuRP7vjJuR4fAqp27163nsnZvYnstWfKQYMmi36WXaOJlMO0/exec';
+
+// ============================================================
+// STATE
+// ============================================================
+let cables=[], odcs=[], odps=[], customers=[];
+let recipients = [];       // { id, name, wa, odpName, status, sendResult, checked }
+let templates  = [];
+let blastHistory = [];
+let currentDelay   = 30;
+let typingEnabled  = true;
+let activeOnly     = true;
+let currentTarget  = 'all';
+let isBlasting     = false;
+let stopRequested  = false;
+let cntOk=0, cntFail=0;
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = function() {
+    lucide.createIcons();
+    // Load config
+    const token  = sessionStorage.getItem('wa_token') || DEFAULT_TOKEN;
+    const gsUrl  = sessionStorage.getItem('wa_gs_url') || DEFAULT_GS_URL;
+    document.getElementById('set-token').value  = token;
+    document.getElementById('set-gs-url').value = gsUrl;
+    document.getElementById('header-token').textContent = token.substring(0,8)+'...';
+
+    // Load templates dari localStorage
+    templates = JSON.parse(localStorage.getItem('wa_templates')||'[]');
+    if(templates.length === 0) loadDefaultTemplates();
+    blastHistory = JSON.parse(localStorage.getItem('wa_history')||'[]');
+
+    renderTemplates();
+    renderHistory();
+
+    // Char counter
+    document.getElementById('msg-body').addEventListener('input', function(){
+        document.getElementById('char-count').textContent = this.value.length;
+    });
+
+    // Load data FiberSync
+    loadFibersyncData();
+};
+
+function loadDefaultTemplates() {
+    templates = [
+        { name: 'Gangguan Jaringan', body: 'Yth. Bapak/Ibu {nama},\n\nKami informasikan bahwa saat ini terdapat gangguan pada jaringan optik di area Anda (ODP: {odp}).\n\nTim teknisi kami sedang dalam proses perbaikan. Mohon maaf atas ketidaknyamanan ini.\n\nSalam,\nTim Network FiberSync' },
+        { name: 'Perawatan Terjadwal', body: 'Yth. Bapak/Ibu {nama},\n\nKami ingin menginformasikan bahwa akan dilakukan pemeliharaan jaringan terjadwal pada area ODP: {odp}.\n\nLayanan mungkin akan terganggu sementara. Kami berupaya menyelesaikan secepatnya.\n\nTerima kasih atas pengertiannya.\n\nSalam,\nTim Network FiberSync' },
+        { name: 'Perbaikan Selesai', body: 'Yth. Bapak/Ibu {nama},\n\nKami informasikan bahwa perbaikan jaringan di area Anda (ODP: {odp}) telah SELESAI.\n\nLayanan internet Anda kini sudah kembali normal. Terima kasih atas kesabaran Anda.\n\nSalam,\nTim Network FiberSync' },
+    ];
+    localStorage.setItem('wa_templates', JSON.stringify(templates));
+}
+
+// ============================================================
+// LOAD DATA FIBERSYNC
+// ============================================================
+async function loadFibersyncData() {
+    const url = sessionStorage.getItem('wa_gs_url') || DEFAULT_GS_URL;
+    if(!url) { setFonnteStatus('warn','URL GS belum diisi'); return; }
+    setFonnteStatus('loading','Memuat data jaringan...');
+    try {
+        const res  = await fetch(url+'?action=getData', { cache:'no-store' });
+        const json = await res.json();
+        cables    = (json.cables    ||[]).filter(r=>r.id);
+        odcs      = (json.odcs      ||[]).filter(r=>r.id);
+        odps      = (json.odps      ||[]).filter(r=>r.id);
+        customers = (json.customers ||[]).filter(r=>r.id && (r.name||r.odpId));
+        setFonnteStatus('ok', `Data dimuat · ${customers.length} pelanggan`);
+        buildRecipients();
+    } catch(e) {
+        setFonnteStatus('error','Gagal muat data: '+e.message);
+    }
+}
+
+// ============================================================
+// TARGET SELECTOR
+// ============================================================
+function setTargetType(type) {
+    currentTarget = type;
+    document.querySelectorAll('.target-card').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('ttype-'+type).classList.add('selected');
+
+    const wrap  = document.getElementById('target-filter-wrap');
+    const sel   = document.getElementById('target-filter-select');
+    const lbl   = document.getElementById('target-filter-label');
+
+    if(type === 'all') {
+        wrap.classList.add('hidden');
+    } else {
+        wrap.classList.remove('hidden');
+        sel.innerHTML = '';
+        if(type === 'feeder') {
+            lbl.textContent = 'Feeder';
+            cables.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+        } else if(type === 'odc') {
+            lbl.textContent = 'ODC';
+            odcs.forEach(o => sel.innerHTML += `<option value="${o.id}">[${o.level}] ${o.name}</option>`);
+        } else if(type === 'odp') {
+            lbl.textContent = 'ODP';
+            odps.forEach(p => sel.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+        }
+    }
+    buildRecipients();
+}
+
+function buildRecipients() {
+    const sel = document.getElementById('target-filter-select').value;
+    let filteredCustomers = [...customers];
+
+    if(activeOnly) filteredCustomers = filteredCustomers.filter(c=>c.status==='Active'||!c.status||c.status===''||c.status==='active');
+
+    if(currentTarget === 'feeder') {
+        // Semua pelanggan di ODP yang terhubung ke Feeder ini (via ODC L1 → ODC L2 → ODP)
+        const l1s   = odcs.filter(o=>o.feederId===sel&&o.level==='L1').map(o=>o.id);
+        const l2s   = odcs.filter(o=>l1s.includes(o.parentId)).map(o=>o.id);
+        const odpIds= odps.filter(p=>l2s.includes(p.odcId)).map(p=>p.id);
+        filteredCustomers = filteredCustomers.filter(c=>odpIds.includes(c.odpId));
+    } else if(currentTarget === 'odc') {
+        const odc = odcs.find(o=>o.id===sel);
+        let odpIds = [];
+        if(odc?.level==='L1') {
+            const l2s = odcs.filter(o=>o.parentId===sel).map(o=>o.id);
+            odpIds = odps.filter(p=>l2s.includes(p.odcId)).map(p=>p.id);
+        } else {
+            odpIds = odps.filter(p=>p.odcId===sel).map(p=>p.id);
+        }
+        filteredCustomers = filteredCustomers.filter(c=>odpIds.includes(c.odpId));
+    } else if(currentTarget === 'odp') {
+        filteredCustomers = filteredCustomers.filter(c=>c.odpId===sel);
+    }
+
+    recipients = filteredCustomers.map((c,i)=>({
+        id: c.id, name: c.name||'—',
+        wa: (c.wa||'').replace(/\D/g,''),
+        odpName: odps.find(p=>p.id===c.odpId)?.name||'—',
+        status: c.status||'Active',
+        sendResult: null,
+        checked: true
+    }));
+
+    renderRecipientTable();
+}
+
+// ============================================================
+// RENDER TABEL PENERIMA
+// ============================================================
+function renderRecipientTable() {
+    const tbody = document.getElementById('recipient-table-body');
+    const empty = document.getElementById('recipient-empty');
+    const count = document.getElementById('recipient-count');
+    const tblCnt= document.getElementById('tbl-count');
+
+    count.textContent = recipients.filter(r=>r.checked).length;
+    tblCnt.textContent = recipients.length;
+
+    // Apply filter
+    const f = _tableFilter;
+    const visible = f
+        ? recipients.filter(r =>
+            r.name.toLowerCase().includes(f) ||
+            (r.wa||'').includes(f) ||
+            (r.odpName||'').toLowerCase().includes(f) ||
+            (r.status||'').toLowerCase().includes(f))
+        : recipients;
+
+    if(!recipients.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+
+    tbody.innerHTML = visible.map((r)=>{
+        const i = recipients.indexOf(r);
+        const resultHtml = r.sendResult === null
+            ? '<span class="text-slate-300 text-xs">—</span>'
+            : r.sendResult === true
+                ? '<span class="status-ok text-[10px] font-bold px-2 py-0.5 rounded-full">✓ Terkirim</span>'
+                : `<span class="status-fail text-[10px] font-bold px-2 py-0.5 rounded-full">✗ ${r.sendResult||'Gagal'}</span>`;
+        const rowCls = r.sendResult===true?'sent':r.sendResult===false?'fail':r.sendResult==='sending'?'sending':'';
+        // Highlight filter match
+        const hl = (str) => {
+            if(!f || !str) return str||'';
+            const re = new RegExp(`(${f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+            return str.replace(re, '<mark style="background:#bbf7d0;border-radius:2px;padding:0 1px">$1</mark>');
+        };
+        return `<tr class="recipient-row ${rowCls} transition-colors">
+            <td class="px-4 py-2.5"><input type="checkbox" ${r.checked?'checked':''} onchange="toggleCheck(${i},this.checked)" class="rounded"></td>
+            <td class="px-4 py-2.5 mono text-xs text-slate-400">${i+1}</td>
+            <td class="px-4 py-2.5 text-sm font-semibold text-slate-700">${hl(r.name)}</td>
+            <td class="px-4 py-2.5 mono text-xs text-slate-500">${hl(r.wa)||'—'}</td>
+            <td class="px-4 py-2.5 text-xs text-slate-500">${hl(r.odpName)}</td>
+            <td class="px-4 py-2.5"><span class="text-[10px] font-semibold ${r.status==='Active'?'text-green-600':'text-slate-400'}">${r.status||'Active'}</span></td>
+            <td class="px-4 py-2.5">${resultHtml}</td>
+            <td class="px-4 py-2.5"><button onclick="removeRecipient(${i})" class="text-slate-300 hover:text-red-400 transition"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></td>
+        </tr>`;
+    }).join('');
+
+    // Tampilkan info jumlah hasil filter
+    const filterInfo = document.getElementById('tbl-filter-info');
+    if(filterInfo) {
+        if(f && visible.length !== recipients.length) {
+            filterInfo.textContent = `Menampilkan ${visible.length} dari ${recipients.length}`;
+            filterInfo.classList.remove('hidden');
+        } else { filterInfo.classList.add('hidden'); }
+    }
+    lucide.createIcons();
+}
+
+// ============================================================
+// BLAST ENGINE
+// ============================================================
+async function startBlast() {
+    if(isBlasting) return;
+    const token = sessionStorage.getItem('wa_token') || DEFAULT_TOKEN;
+    if(!token) { alert('Token Fonnte belum diisi. Buka Pengaturan.'); return; }
+    const msg = document.getElementById('msg-body').value.trim();
+    if(!msg) { alert('Tulis pesan terlebih dahulu.'); return; }
+    const targets = recipients.filter(r=>r.checked && r.wa);
+    if(!targets.length) { alert('Tidak ada penerima yang valid (nomor WA kosong?).'); return; }
+    if(!confirm(`Kirim pesan ke ${targets.length} penerima?\nJeda: ${currentDelay} detik antar pesan.`)) return;
+
+    isBlasting    = true;
+    stopRequested = false;
+    cntOk         = 0;
+    cntFail        = 0;
+
+    // UI
+    document.getElementById('btn-blast').disabled = true;
+    document.getElementById('btn-blast-text').textContent = 'Sedang Blast...';
+    document.getElementById('blast-progress-wrap').classList.remove('hidden');
+    document.getElementById('blast-progress-header').classList.remove('hidden');
+    document.getElementById('blast-progress-header').classList.add('flex');
+    document.getElementById('btn-stop').classList.remove('hidden');
+    document.getElementById('btn-stop').classList.add('flex');
+    document.getElementById('stat-cards').classList.remove('hidden');
+    document.getElementById('stat-cards').classList.add('grid');
+
+    // Reset semua status
+    recipients.forEach(r=>{ r.sendResult=null; });
+    renderRecipientTable();
+
+    const total = targets.length;
+    const startTime = Date.now();
+
+    for(let i=0; i<total; i++) {
+        if(stopRequested) break;
+        const r = targets[i];
+        // Tandai sedang kirim
+        const globalIdx = recipients.findIndex(x=>x.id===r.id);
+        if(globalIdx>=0) recipients[globalIdx].sendResult = 'sending';
+        renderRecipientTable();
+
+        // Bangun pesan dengan variabel
+        const odpName = r.odpName||'—';
+        const finalMsg = msg
+            .replace(/\{nama\}/gi, r.name)
+            .replace(/\{odp\}/gi, odpName)
+            .replace(/\{no\}/gi, String(i+1));
+
+        // Kirim via Fonnte
+        const success = await sendWA(token, r.wa, finalMsg);
+
+        if(globalIdx>=0) recipients[globalIdx].sendResult = success;
+        if(success===true) cntOk++; else cntFail++;
+
+        // Update progress
+        const done = i+1;
+        const pct  = Math.round(done/total*100);
+        document.getElementById('prog-bar-main').style.width = pct+'%';
+        document.getElementById('prog-text-main').textContent = `${done} / ${total} terkirim`;
+        document.getElementById('blast-prog-bar').style.width  = pct+'%';
+        document.getElementById('blast-prog-text').textContent = `${done}/${total}`;
+        document.getElementById('cnt-ok').textContent   = cntOk;
+        document.getElementById('cnt-fail').textContent = cntFail;
+        document.getElementById('cnt-wait').textContent = total-done;
+        renderRecipientTable();
+
+        // Delay (kecuali pesan terakhir)
+        if(i < total-1 && !stopRequested) {
+            await sleep(currentDelay * 1000);
+        }
+    }
+
+    // Selesai
+    isBlasting = false;
+    document.getElementById('btn-blast').disabled = false;
+    document.getElementById('btn-blast-text').textContent = 'Mulai Blast';
+    document.getElementById('btn-stop').classList.add('hidden');
+    document.getElementById('btn-stop').classList.remove('flex');
+
+    // Simpan ke history
+    saveToHistory(msg, total, cntOk, cntFail, Date.now()-startTime);
+    renderHistory();
+    renderRecipientTable();
+}
+
+async function sendWA(token, target, message) {
+    try {
+        const formData = new FormData();
+        formData.append('target', target);
+        formData.append('message', message);
+        formData.append('delay', '0');
+        formData.append('countryCode', '62');
+        if(typingEnabled) formData.append('typing', 'true');
+
+        const res = await fetch(FONNTE_URL, {
+            method: 'POST',
+            headers: { 'Authorization': token },
+            body: formData
+        });
+        const json = await res.json();
+        return json.status === true ? true : (json.reason || json.detail || 'Gagal');
+    } catch(e) {
+        return e.message || 'Network error';
+    }
+}
+
+function stopBlast() {
+    stopRequested = true;
+    document.getElementById('btn-stop').textContent = 'Menghentikan...';
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function saveSettings() {
+    const token = document.getElementById('set-token').value.trim();
+    const url   = document.getElementById('set-gs-url').value.trim();
+    sessionStorage.setItem('wa_token', token);
+    sessionStorage.setItem('wa_gs_url', url);
+    document.getElementById('header-token').textContent = token.substring(0,8)+'...';
+    const res = document.getElementById('settings-result');
+    res.classList.remove('hidden');
+    res.className = 'text-sm text-center font-semibold text-green-600';
+    res.textContent = '✓ Disimpan! Memuat ulang data...';
+    loadFibersyncData();
+    setTimeout(()=>res.classList.add('hidden'), 3000);
+}
+
+async function testToken() {
+    const token = document.getElementById('set-token').value.trim();
+    if(!token) return;
+    const el = document.getElementById('token-test-result');
+    el.className = 'text-xs mt-1 text-amber-500 font-semibold';
+    el.textContent = '⏳ Menguji token...';
+    el.classList.remove('hidden');
+    try {
+        const fd = new FormData();
+        fd.append('target','08000000000');
+        fd.append('message','test');
+        fd.append('countryCode','62');
+        const res = await fetch(FONNTE_URL, { method:'POST', headers:{'Authorization':token}, body:fd });
+        const json = await res.json();
+        // Token invalid = status:false reason:token invalid
+        if(json.reason === 'token invalid') {
+            el.className = 'text-xs mt-1 text-red-600 font-semibold';
+            el.textContent = '✗ Token tidak valid';
+        } else {
+            el.className = 'text-xs mt-1 text-green-600 font-semibold';
+            el.textContent = '✓ Token valid & terhubung';
+            sessionStorage.setItem('wa_token', token);
+            document.getElementById('header-token').textContent = token.substring(0,8)+'...';
+            setFonnteStatus('ok','Token valid');
+        }
+    } catch(e) {
+        el.className = 'text-xs mt-1 text-red-600 font-semibold';
+        el.textContent = '✗ Koneksi gagal: '+e.message;
+    }
+}
+
+function setFonnteStatus(type, msg) {
+    const dot = document.getElementById('fonnte-dot');
+    const txt = document.getElementById('fonnte-status-text');
+    txt.textContent = msg;
+    dot.className = 'w-2 h-2 rounded-full pulse-dot';
+    if(type==='ok')      dot.classList.add('bg-green-500');
+    else if(type==='error') dot.classList.add('bg-red-500');
+    else if(type==='warn')  dot.classList.add('bg-amber-400');
+    else                    dot.classList.add('bg-blue-400');
+}
+
+// ============================================================
+// TEMPLATE
+// ============================================================
+function renderTemplates() {
+    const el = document.getElementById('template-list');
+    if(!templates.length){ el.innerHTML='<p class="text-slate-400 text-sm italic text-center py-8">Belum ada template</p>'; return; }
+    el.innerHTML = templates.map((t,i)=>`
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-slate-800 text-sm">${t.name}</h4>
+                <div class="flex gap-1.5">
+                    <button onclick="editTemplate(${i})" class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-1 rounded hover:bg-blue-100 transition">Edit</button>
+                    <button onclick="deleteTemplate(${i})" class="text-[10px] bg-red-50 text-red-500 font-bold px-2 py-1 rounded hover:bg-red-100 transition">Hapus</button>
+                </div>
+            </div>
+            <p class="text-xs text-slate-500 whitespace-pre-line line-clamp-3">${t.body}</p>
+        </div>`).join('');
+}
+
+function addTemplate() {
+    document.getElementById('tpl-edit-idx').value='';
+    document.getElementById('tpl-name').value='';
+    document.getElementById('tpl-body').value='';
+    document.getElementById('modal-add-tpl').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function editTemplate(i) {
+    document.getElementById('tpl-edit-idx').value=i;
+    document.getElementById('tpl-name').value=templates[i].name;
+    document.getElementById('tpl-body').value=templates[i].body;
+    document.getElementById('modal-add-tpl').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function saveTemplate() {
+    const name = document.getElementById('tpl-name').value.trim();
+    const body = document.getElementById('tpl-body').value.trim();
+    if(!name||!body){alert('Isi nama dan pesan template');return;}
+    const idx  = document.getElementById('tpl-edit-idx').value;
+    if(idx!=='') templates[parseInt(idx)]={name,body};
+    else templates.push({name,body});
+    localStorage.setItem('wa_templates',JSON.stringify(templates));
+    renderTemplates();
+    closeModal('modal-add-tpl');
+}
+
+function deleteTemplate(i) {
+    if(!confirm('Hapus template ini?'))return;
+    templates.splice(i,1);
+    localStorage.setItem('wa_templates',JSON.stringify(templates));
+    renderTemplates();
+}
+
+function loadTemplate() {
+    const el = document.getElementById('modal-tpl-list');
+    el.innerHTML = templates.length
+        ? templates.map((t,i)=>`
+            <div onclick="applyTemplate(${i})" class="p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-green-50 hover:border-green-300 transition">
+                <p class="font-bold text-sm text-slate-800 mb-1">${t.name}</p>
+                <p class="text-xs text-slate-400 line-clamp-2 whitespace-pre-line">${t.body}</p>
+            </div>`).join('')
+        : '<p class="text-slate-400 text-sm italic text-center py-6">Belum ada template. Buat di menu Template.</p>';
+    document.getElementById('modal-tpl').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function applyTemplate(i) {
+    document.getElementById('msg-body').value = templates[i].body;
+    document.getElementById('char-count').textContent = templates[i].body.length;
+    closeModal('modal-tpl');
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function saveToHistory(msg, total, ok, fail, ms) {
+    blastHistory.unshift({
+        time: new Date().toLocaleString('id-ID'),
+        msg: msg.substring(0,80)+(msg.length>80?'...':''),
+        total, ok, fail,
+        duration: Math.round(ms/1000)+'d'
+    });
+    if(blastHistory.length>50) blastHistory.pop();
+    localStorage.setItem('wa_history', JSON.stringify(blastHistory));
+}
+
+function renderHistory() {
+    const el  = document.getElementById('history-list');
+    const emp = document.getElementById('history-empty');
+    if(!blastHistory.length){ el.innerHTML=''; emp.classList.remove('hidden'); return; }
+    emp.classList.add('hidden');
+    el.innerHTML = blastHistory.map(h=>`
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm fade-in">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-[10px] text-slate-400 mono">${h.time}</span>
+                <div class="flex gap-2 text-[10px] font-bold">
+                    <span class="text-green-600">✓ ${h.ok}</span>
+                    <span class="text-red-500">✗ ${h.fail}</span>
+                    <span class="text-slate-400">⏱ ${h.duration}</span>
+                </div>
+            </div>
+            <p class="text-sm text-slate-600 italic whitespace-pre-line line-clamp-2">"${h.msg}"</p>
+            <div class="mt-2 flex gap-3 text-[10px] text-slate-400">
+                <span>${h.total} penerima</span>
+                <span>·</span>
+                <span>${h.ok} berhasil, ${h.fail} gagal</span>
+            </div>
+        </div>`).join('');
+}
+
+function clearHistory() {
+    if(!confirm('Hapus semua riwayat?'))return;
+    blastHistory=[];
+    localStorage.setItem('wa_history','[]');
+    renderHistory();
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function switchPage(p) {
+    ['blast','template','history','settings'].forEach(id=>{
+        document.getElementById('page-'+id).classList.add('hidden');
+        document.getElementById('nav-'+id).classList.remove('active');
+        document.getElementById('nav-'+id).classList.add('hover:bg-slate-800');
+    });
+    document.getElementById('page-'+p).classList.remove('hidden');
+    document.getElementById('nav-'+p).classList.add('active');
+    document.getElementById('nav-'+p).classList.remove('hover:bg-slate-800');
+    const titles = {blast:'Kirim Pesan WhatsApp',template:'Template Pesan',history:'Riwayat Blast',settings:'Pengaturan'};
+    document.getElementById('page-title').textContent = titles[p];
+    lucide.createIcons();
+}
+
+function setDelay(d) {
+    currentDelay = d;
+    document.querySelectorAll('.delay-btn').forEach(b=>{
+        b.className='delay-btn bg-slate-100 hover:bg-green-100 hover:text-green-700 text-slate-600 py-2 rounded-lg text-xs font-bold transition border-2 border-transparent';
+    });
+    const btn = document.getElementById('delay-'+d);
+    if(btn) btn.className='delay-btn bg-green-600 text-white py-2 rounded-lg text-xs font-bold border-2 border-green-600';
+}
+
+function toggleTyping() {
+    typingEnabled = !typingEnabled;
+    const el = document.getElementById('toggle-typing');
+    el.classList.toggle('on', typingEnabled);
+}
+
+function toggleActiveOnly() {
+    activeOnly = !activeOnly;
+    const el = document.getElementById('toggle-active');
+    el.classList.toggle('on', activeOnly);
+    buildRecipients();
+}
+
+function toggleCheck(i, val) {
+    recipients[i].checked = val;
+    document.getElementById('recipient-count').textContent = recipients.filter(r=>r.checked).length;
+}
+
+function selectAll(v) {
+    recipients.forEach(r=>r.checked=v);
+    document.getElementById('chk-all').checked = v;
+    document.getElementById('recipient-count').textContent = v ? recipients.length : 0;
+    renderRecipientTable();
+}
+
+function removeRecipient(i) {
+    recipients.splice(i,1);
+    renderRecipientTable();
+}
+
+function removeSelected() {
+    recipients = recipients.filter(r=>!r.checked);
+    renderRecipientTable();
+}
+
+// ============================================================
+// AUTOCOMPLETE TAMBAH PENERIMA
+// ============================================================
+let _acIdx = -1;
+let _acItems = [];
+let _tableFilter = '';
+
+function onManualInput(val) {
+    _acIdx = -1;
+    const drop = document.getElementById('manual-ac-drop');
+    const q = val.trim().toLowerCase();
+
+    // Jika format Nama|nomor → langsung bisa add manual, tidak perlu suggestions
+    if(val.includes('|') || /^08\d{7,}$/.test(val.replace(/\D/g,''))) {
+        drop.classList.remove('open');
+        return;
+    }
+    if(q.length < 1) { drop.classList.remove('open'); return; }
+
+    _acItems = [];
+    const sections = [];
+
+    // 1. Cocokkan pelanggan
+    const matchCust = customers.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        (c.wa||'').includes(q) ||
+        (odps.find(p=>p.id===c.odpId)?.name||'').toLowerCase().includes(q)
+    ).slice(0, 8);
+    if(matchCust.length) {
+        sections.push({ label:'Pelanggan', items: matchCust.map(c => {
+            const odpName = odps.find(p=>p.id===c.odpId)?.name || '—';
+            return { type:'customer', icon:'👤', iconBg:'#f0fdf4', iconColor:'#16a34a',
+                     main: c.name, sub: `${c.wa||'—'} · ${odpName}`,
+                     wa: (c.wa||'').replace(/\D/g,''), name: c.name, odpName };
+        })});
+        _acItems.push(...sections[sections.length-1].items);
+    }
+
+    // 2. Cocokkan ODP — tambah SEMUA pelanggan di ODP itu
+    const matchODP = odps.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.landmark||'').toLowerCase().includes(q)
+    ).slice(0, 5);
+    if(matchODP.length) {
+        sections.push({ label:'ODP', items: matchODP.map(p => {
+            const cnt = customers.filter(c=>c.odpId===p.id).length;
+            return { type:'odp', icon:'📡', iconBg:'#ecfdf5', iconColor:'#059669',
+                     main: p.name, sub: `${cnt} pelanggan${p.landmark?' · '+p.landmark:''}`,
+                     odpId: p.id, odpName: p.name };
+        })});
+        _acItems.push(...sections[sections.length-1].items);
+    }
+
+    // 3. Cocokkan ODC — tambah semua pelanggan di bawah ODC
+    const matchODC = odcs.filter(o =>
+        o.name.toLowerCase().includes(q)
+    ).slice(0, 4);
+    if(matchODC.length) {
+        sections.push({ label:'ODC', items: matchODC.map(o => {
+            let cnt = 0;
+            if(o.level==='L1') {
+                const l2ids = odcs.filter(x=>x.parentId===o.id).map(x=>x.id);
+                const odpIds = odps.filter(p=>l2ids.includes(p.odcId)).map(p=>p.id);
+                cnt = customers.filter(c=>odpIds.includes(c.odpId)).length;
+            } else {
+                const odpIds = odps.filter(p=>p.odcId===o.id).map(p=>p.id);
+                cnt = customers.filter(c=>odpIds.includes(c.odpId)).length;
+            }
+            return { type:'odc', icon: o.level==='L1'?'🔷':'💜',
+                     iconBg: o.level==='L1'?'#eef2ff':'#f5f3ff',
+                     iconColor: o.level==='L1'?'#4f46e5':'#7c3aed',
+                     main: o.name, sub: `ODC ${o.level} · ${cnt} pelanggan`,
+                     odcId: o.id, odcLevel: o.level };
+        })});
+        _acItems.push(...sections[sections.length-1].items);
+    }
+
+    if(!_acItems.length) {
+        drop.innerHTML = `<div class="ac-item" style="color:#94a3b8;font-size:11px">Tidak ditemukan — tekan Enter untuk tambah manual</div>`;
+        drop.classList.add('open');
+        return;
+    }
+
+    // Render dropdown dengan section headers
+    let html = '';
+    let idx = 0;
+    sections.forEach(sec => {
+        html += `<div class="ac-section-label">${sec.label}</div>`;
+        sec.items.forEach(item => {
+            html += `<div class="ac-item" data-idx="${idx}" onmousedown="pickAcItem(${idx})">
+                <div class="ac-item-icon" style="background:${item.iconBg};color:${item.iconColor}">${item.icon}</div>
+                <div>
+                    <div class="ac-item-main">${item.main}</div>
+                    <div class="ac-item-sub">${item.sub}</div>
+                </div>
+            </div>`;
+            idx++;
+        });
+    });
+    drop.innerHTML = html;
+    drop.classList.add('open');
+}
+
+function onManualKeydown(e) {
+    const drop = document.getElementById('manual-ac-drop');
+    const items = drop.querySelectorAll('.ac-item[data-idx]');
+    if(e.key === 'ArrowDown') {
+        e.preventDefault();
+        _acIdx = Math.min(_acIdx+1, items.length-1);
+        items.forEach((el,i)=>el.classList.toggle('active', i===_acIdx));
+    } else if(e.key === 'ArrowUp') {
+        e.preventDefault();
+        _acIdx = Math.max(_acIdx-1, 0);
+        items.forEach((el,i)=>el.classList.toggle('active', i===_acIdx));
+    } else if(e.key === 'Enter') {
+        e.preventDefault();
+        if(_acIdx >= 0 && _acItems[_acIdx]) {
+            pickAcItem(_acIdx);
+        } else {
+            // Tambah manual biasa
+            addManualRaw(document.getElementById('manual-wa').value);
+        }
+    } else if(e.key === 'Escape') {
+        drop.classList.remove('open');
+    }
+}
+
+function pickAcItem(idx) {
+    const item = _acItems[idx];
+    if(!item) return;
+    const drop = document.getElementById('manual-ac-drop');
+    drop.classList.remove('open');
+    document.getElementById('manual-wa').value = '';
+
+    if(item.type === 'customer') {
+        // Tambah 1 pelanggan
+        if(recipients.find(r=>r.wa===item.wa && r.name===item.name)) {
+            showToast('Pelanggan sudah ada di daftar', 'warn'); return;
+        }
+        recipients.push({ id:'ac-'+Date.now(), name:item.name, wa:item.wa,
+            odpName:item.odpName, status:'Active', sendResult:null, checked:true });
+        renderRecipientTable();
+        showToast(`✓ ${item.name} ditambahkan`);
+    } else if(item.type === 'odp') {
+        // Tambah semua pelanggan di ODP
+        const custs = customers.filter(c=>c.odpId===item.odpId);
+        let added = 0;
+        custs.forEach(c => {
+            const wa = (c.wa||'').replace(/\D/g,'');
+            if(!recipients.find(r=>r.wa===wa)) {
+                recipients.push({ id:c.id, name:c.name||'—', wa,
+                    odpName:item.odpName, status:c.status||'Active', sendResult:null, checked:true });
+                added++;
+            }
+        });
+        renderRecipientTable();
+        showToast(`✓ ${added} pelanggan dari ${item.odpName} ditambahkan`);
+    } else if(item.type === 'odc') {
+        // Tambah semua pelanggan di ODC
+        let odpIds = [];
+        if(item.odcLevel === 'L1') {
+            const l2ids = odcs.filter(x=>x.parentId===item.odcId).map(x=>x.id);
+            odpIds = odps.filter(p=>l2ids.includes(p.odcId)).map(p=>p.id);
+        } else {
+            odpIds = odps.filter(p=>p.odcId===item.odcId).map(p=>p.id);
+        }
+        const custs = customers.filter(c=>odpIds.includes(c.odpId));
+        let added = 0;
+        custs.forEach(c => {
+            const wa = (c.wa||'').replace(/\D/g,'');
+            const odpName = odps.find(p=>p.id===c.odpId)?.name||'—';
+            if(!recipients.find(r=>r.wa===wa)) {
+                recipients.push({ id:c.id, name:c.name||'—', wa,
+                    odpName, status:c.status||'Active', sendResult:null, checked:true });
+                added++;
+            }
+        });
+        renderRecipientTable();
+        showToast(`✓ ${added} pelanggan dari ${item.main} ditambahkan`);
+    }
+}
+
+function addManualRaw(raw) {
+    raw = (raw||'').trim();
+    if(!raw) return;
+    // Format: Nama|08xxx atau 08xxx saja
+    let name = 'Manual', wa = raw;
+    if(raw.includes('|')) { [name, wa] = raw.split('|').map(s=>s.trim()); }
+    wa = wa.replace(/\D/g,'');
+    if(!wa) { alert('Nomor WA tidak valid'); return; }
+    if(recipients.find(r=>r.wa===wa)) { showToast('Nomor sudah ada di daftar', 'warn'); return; }
+    recipients.push({ id:'manual-'+Date.now(), name, wa, odpName:'Manual',
+        status:'Active', sendResult:null, checked:true });
+    document.getElementById('manual-wa').value = '';
+    renderRecipientTable();
+    showToast(`✓ ${name} ditambahkan`);
+}
+
+// Tutup dropdown jika klik di luar
+document.addEventListener('click', e => {
+    if(!e.target.closest('.autocomplete-wrap')) {
+        document.getElementById('manual-ac-drop')?.classList.remove('open');
+    }
+});
+
+// ============================================================
+// FILTER TABEL PENERIMA
+// ============================================================
+function filterTable(val) {
+    _tableFilter = val.trim().toLowerCase();
+    renderRecipientTable();
+}
+
+// ============================================================
+// TOAST NOTIFICATION
+// ============================================================
+function showToast(msg, type='ok') {
+    let toast = document.getElementById('wa-toast');
+    if(!toast) {
+        toast = document.createElement('div');
+        toast.id = 'wa-toast';
+        toast.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;transition:all .3s;opacity:0;transform:translateY(8px);pointer-events:none';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.background = type==='warn'?'#f59e0b':'#16a34a';
+    toast.style.color = 'white';
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>{ toast.style.opacity='0'; toast.style.transform='translateY(8px)'; }, 2500);
+}
+
+function insertVar(v) {
+    const ta = document.getElementById('msg-body');
+    const s = ta.selectionStart, e = ta.selectionEnd;
+    ta.value = ta.value.substring(0,s)+v+ta.value.substring(e);
+    ta.setSelectionRange(s+v.length, s+v.length);
+    ta.focus();
+    document.getElementById('char-count').textContent = ta.value.length;
+}
+
+function previewMsg() {
+    const msg   = document.getElementById('msg-body').value;
+    const wrap  = document.getElementById('msg-preview-wrap');
+    const first = recipients.find(r=>r.checked) || { name:'Pelanggan', odpName:'ODP-01' };
+    const preview = msg
+        .replace(/\{nama\}/gi, first.name)
+        .replace(/\{odp\}/gi, first.odpName)
+        .replace(/\{no\}/gi, '1');
+    document.getElementById('msg-preview-text').textContent = preview;
+    wrap.classList.toggle('hidden');
+    lucide.createIcons();
+}
+
+function clearAll() {
+    if(!confirm('Hapus semua penerima dan reset form?'))return;
+    recipients=[];
+    document.getElementById('msg-body').value='';
+    document.getElementById('char-count').textContent='0';
+    document.getElementById('msg-preview-wrap').classList.add('hidden');
+    document.getElementById('blast-progress-wrap').classList.add('hidden');
+    cntOk=cntFail=0;
+    renderRecipientTable();
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+</script>
+</body>
+</html>
