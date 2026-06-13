@@ -1,178 +1,429 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Form Pendaftaran Layanan Internet</title>
+  <title>Pendaftaran Internet — PT. Jaringan Teknologi Sejahtera</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; margin: 0; padding: 16px; }
-    .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 24px; padding: 24px 20px 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    h1 { font-size: 22px; text-align: center; margin: 0 0 4px; font-weight: 700; }
-    .subtitle { text-align: center; font-size: 13px; color: #6b7280; margin-bottom: 20px; }
-    .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #111827; }
-    input[type="text"], input[type="file"] { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #d1d5db; font-size: 14px; box-sizing: border-box; transition: border 0.2s; }
-    input:focus { outline: none; border-color: #16a34a; }
-    
-    /* Layout Simetris untuk Kecamatan & Desa */
-    .row { display: flex; gap: 8px; margin-bottom: 14px; }
-    .row .combo-wrapper { flex: 1; margin-bottom: 0; width: 50%; }
-    
-    /* DESAIN PAKET PREMIUM */
-    .package-grid { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr); 
-      gap: 10px; 
-      margin-bottom: 18px; 
+    :root{
+      --primary: #16a34a;
+      --primary-dark: #15803d;
+      --primary-light: #dcfce7;
+      --teal: #0d9488;
+      --ai: #6366f1;
+      --bg-from: #ecfdf5;
+      --bg-to: #eff6ff;
+      --card: #ffffff;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 22px;
+      --radius-sm: 14px;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
     }
-    .package-option { position: relative; cursor: pointer; }
-    .package-option input { position: absolute; opacity: 0; width: 0; height: 0; }
-    
-    /* Membuat item ke-5 (Gold) memenuhi lebar baris agar simetris */
-    .package-option:nth-child(5) {
-      grid-column: span 2;
+    *{ box-sizing: border-box; }
+    body{
+      margin:0; font-family: var(--font-body); color: var(--text);
+      background: linear-gradient(180deg, var(--bg-from) 0%, var(--bg-to) 100%);
+      padding: 18px; min-height:100vh;
     }
+    .page{ max-width: 440px; margin: 0 auto; }
+    .hidden{ display:none !important; }
 
-    .package-card { 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 10px;
-      background: #fff;
-      border: 2px solid #e5e7eb;
-      border-radius: 16px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-align: center;
+    /* ===== Hero / Header ===== */
+    .hero{
+      position:relative; overflow:hidden; isolation:isolate;
+      background: linear-gradient(135deg, #0b1e36 0%, #15324f 55%, #0d4a45 100%);
+      border-radius: 28px; padding: 30px 22px; text-align:center; color:#fff;
+      margin-bottom: 18px; box-shadow: 0 16px 36px -16px rgba(11,30,54,.5);
     }
-    .package-icon { font-size: 20px; margin-bottom: 4px; }
-    .package-name { font-size: 14px; font-weight: 700; color: #374151; }
-    
-    /* Efek Saat Dipilih */
-    .package-option input:checked + .package-card { 
-      border-color: #16a34a; 
-      background: #f0fdf4; 
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+    .hero::before{
+      content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+      background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.16) 1px, transparent 0);
+      background-size: 20px 20px;
     }
-    .package-option input:checked + .package-card .package-name { color: #16a34a; }
+    .hero::after{
+      content:''; position:absolute; right:-40px; top:-40px; width:160px; height:160px; z-index:0;
+      background: radial-gradient(circle, rgba(45,212,191,.25) 0%, transparent 70%); pointer-events:none;
+    }
+    .hero-content{ position:relative; z-index:1; }
+    .hero-icon{
+      width:58px; height:58px; border-radius:16px;
+      background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.18);
+      display:flex; align-items:center; justify-content:center; margin:0 auto 12px;
+    }
+    .hero h1{ font-family: var(--font-display); font-size:18px; font-weight:800; margin:0 0 5px; letter-spacing:-.005em; line-height:1.3; }
+    .hero p{ font-size:11.5px; color:#8fd9c9; margin:0; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 
-    /* Tombol & Status */
-    .btn-submit { width: 100%; margin-top: 10px; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 999px; border: none; background: #16a34a; color: #ffffff; cursor: pointer; transition: background 0.2s; }
-    .btn-submit:active { transform: scale(0.98); }
-    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
-    
-    .hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
-    .status-box { margin-top: 10px; font-size: 13px; border-radius: 12px; padding: 12px; border: 1px solid transparent; display: none; }
-    .status-success { background: #d1fae5; border-color: #6ee7b7; color: #065f46; white-space: pre-line; }
-    .status-error { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
-    
-    /* Terms */
-    .terms-title { margin-top: 20px; font-size: 13px; font-weight: 700; color: #111827; }
-    .terms-list { margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: #4b5563; line-height: 1.6; }
-    
+    /* ===== Stepper ===== */
+    .stepper{ display:flex; align-items:center; gap:8px; margin: 0 4px 16px; }
+    .step-item{ display:flex; align-items:center; gap:8px; }
+    .step-dot{
+      width:28px; height:28px; border-radius:50%; background:#fff; border:2px solid var(--border);
+      display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;
+      color: var(--text-muted); font-family: var(--font-display); flex-shrink:0; transition: all .2s;
+    }
+    .step-label{ font-size:12px; font-weight:700; color: var(--text-muted); font-family: var(--font-display); }
+    .step-item.active .step-dot{ background: var(--primary); border-color: var(--primary); color:#fff; }
+    .step-item.active .step-label{ color: var(--text); }
+    .step-item.done .step-dot{ background: var(--primary); border-color: var(--primary); color:#fff; }
+    .step-track{ flex:1; height:2px; background: var(--border); border-radius:2px; overflow:hidden; }
+    .step-track-fill{ height:100%; width:0%; background: var(--primary); transition: width .4s ease; }
+
+    /* ===== Card ===== */
+    .card{
+      background: var(--card); border-radius: var(--radius); padding: 22px 18px;
+      box-shadow: 0 10px 30px -14px rgba(17,24,39,.12); margin-bottom: 16px;
+    }
+    .card-header{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .card-header-icon{
+      width:34px; height:34px; border-radius:10px; background: var(--primary-light);
+      display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+    }
+    .card-header h2{ font-family: var(--font-display); font-size:15px; font-weight:800; margin:0; }
+    .card-header p{ font-size:11.5px; color: var(--text-muted); margin:2px 0 0; }
+
+    @keyframes fadeInUp{ from{ opacity:0; transform: translateY(14px); } to{ opacity:1; transform: translateY(0); } }
+    .reveal{ animation: fadeInUp .45s ease-out; }
+
+    /* ===== Upload zone ===== */
+    .upload-zone{ display:block; cursor:pointer; }
+    .upload-placeholder{
+      text-align:center; padding: 34px 18px; border:2px dashed #bbf7d0; border-radius: var(--radius-sm);
+      transition: border-color .15s, background .15s; background:#f8fffb;
+    }
+    .upload-zone:hover .upload-placeholder{ border-color: var(--primary); background: var(--primary-light); }
+    .upload-icon{ font-size:38px; margin-bottom:8px; }
+    .upload-text{ font-family: var(--font-display); font-weight:800; font-size:14.5px; color: var(--text); margin-bottom:4px; }
+    .upload-hint{ font-size:11.5px; color: var(--text-muted); line-height:1.5; }
+
+    .upload-result{
+      display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #bbf7d0;
+      border-radius: var(--radius-sm); background: var(--primary-light); transition: background .15s;
+    }
+    .upload-zone:hover .upload-result{ background:#bbf7d0; }
+    .upload-result canvas{ width:56px; height:56px; border-radius:12px; object-fit:cover; flex-shrink:0; background:#fff; }
+    .upload-result-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .upload-result-text strong{ font-family: var(--font-display); font-size:13px; color: var(--primary-dark); }
+    .upload-result-text span{ font-size:11px; color: var(--text-muted); }
+
+    /* ===== Loading / Alerts ===== */
+    .progress-card{ text-align:center; padding: 18px 0 4px; }
+    .spinner{
+      width:32px; height:32px; border:3px solid var(--primary-light); border-top-color: var(--primary);
+      border-radius:50%; animation: spin .8s linear infinite; margin:0 auto 10px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+    .progress-label{ font-size:12.5px; color: var(--text-muted); font-weight:600; }
+
+    .alert{
+      display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius: var(--radius-sm);
+      font-size:12.5px; line-height:1.55; margin-top:12px; white-space:pre-line;
+    }
+    .alert-error{ background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+    .alert-success{ background: var(--primary-light); color:#166534; border:1px solid #bbf7d0; }
+    .alert-info{ background:#eff6ff; color:#1e3a8a; border:1px solid #bfdbfe; }
+    .alert-icon{ font-size:16px; flex-shrink:0; line-height:1.4; }
+
+    /* ===== Form fields ===== */
+    .field-section{ margin-bottom: 20px; }
+    .field-section:last-of-type{ margin-bottom:0; }
+    .field-section-title{
+      font-family: var(--font-display); font-weight:800; font-size:13.5px; color: var(--text);
+      margin-bottom:12px; display:flex; align-items:center; gap:8px;
+    }
+    .field-section-title .icon-box{
+      width:26px; height:26px; border-radius:8px; background: var(--primary-light);
+      display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;
+    }
+    .field-group{ margin-bottom: 12px; }
+    .field-group:last-child{ margin-bottom:0; }
+    .field-group label{
+      display:flex; align-items:center; font-size:12.5px; font-weight:700; margin-bottom:7px; color: var(--text);
+    }
+    input[type="text"]{
+      width:100%; padding:13px 14px; border-radius: var(--radius-sm); border:1.5px solid var(--border);
+      font-size:14px; font-family: var(--font-body); background:#f9fafb; transition: all .15s; color: var(--text);
+    }
+    input[type="text"]:focus{
+      outline:none; border-color: var(--primary); background:#fff; box-shadow: 0 0 0 4px rgba(22,163,74,.09);
+    }
+    input[type="text"]:disabled{ opacity:.55; }
+    .hint{ font-size:11px; color: var(--text-muted); margin-top:5px; line-height:1.5; }
+
     /* Combobox */
-    .combo-wrapper { position: relative; margin-bottom: 14px; }
-    .combo-list { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #e5e7eb; max-height: 200px; overflow-y: auto; z-index: 50; display: none; border-radius: 0 0 12px 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    .combo-item { padding: 10px 14px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
-    .combo-item:last-child { border-bottom: none; }
-    .combo-item:hover { background: #f0fdf4; color: #16a34a; }
+    .combo-wrapper{ position:relative; }
+    .combo-list{
+      position:absolute; left:0; right:0; top:calc(100% + 4px); background:#fff; border:1px solid var(--border);
+      max-height:190px; overflow-y:auto; z-index:50; display:none; border-radius: var(--radius-sm);
+      box-shadow: 0 14px 28px -8px rgba(17,24,39,.18);
+    }
+    .combo-item{ padding:11px 14px; font-size:13.5px; cursor:pointer; }
+    .combo-item:not(:last-child){ border-bottom:1px solid #f3f4f6; }
+    .combo-item:hover{ background: var(--primary-light); color: var(--primary-dark); }
+    .combo-wrapper.needs-review input{ border-color:#f59e0b; background:#fffbeb; }
+
+    .row2{ display:flex; gap:10px; }
+    .row2 > .combo-wrapper, .row2 > .field-group{ flex:1; margin-bottom:0; min-width:0; }
+
+    /* ===== Package grid ===== */
+    .package-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+    .package-option{ position:relative; cursor:pointer; }
+    .package-option input{ position:absolute; opacity:0; width:0; height:0; }
+    .package-option:nth-child(5){ grid-column: span 2; }
+    .package-card{
+      position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:6px; padding:16px 10px; background:#f9fafb; border:2px solid var(--border); border-radius: var(--radius-sm);
+      transition: all .2s cubic-bezier(.4,0,.2,1); text-align:center;
+    }
+    .package-icon-wrap{
+      width:38px; height:38px; border-radius:11px; background:#fff; border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center; font-size:18px; transition: all .2s;
+    }
+    .package-name{ font-family: var(--font-display); font-size:13.5px; font-weight:800; color: var(--text); }
+    .package-check{
+      position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:50%;
+      background: var(--primary); color:#fff; font-size:11px; font-weight:800; display:flex;
+      align-items:center; justify-content:center; opacity:0; transform: scale(.5); transition: all .2s;
+    }
+    .package-option input:checked + .package-card{
+      border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px);
+      box-shadow: 0 8px 18px -8px rgba(22,163,74,.35);
+    }
+    .package-option input:checked + .package-card .package-icon-wrap{ background: var(--primary); border-color: var(--primary); }
+    .package-option input:checked + .package-card .package-name{ color: var(--primary-dark); }
+    .package-option input:checked + .package-card .package-check{ opacity:1; transform: scale(1); }
+
+    /* ===== Buttons ===== */
+    .btn-primary{
+      width:100%; padding:16px; font-size:15px; font-weight:800; border:none; border-radius:999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; cursor:pointer;
+      font-family: var(--font-display); box-shadow: 0 10px 22px -8px rgba(22,163,74,.5);
+      transition: transform .1s, box-shadow .1s; margin-top: 18px;
+    }
+    .btn-primary:active{ transform: scale(.98); }
+    .btn-primary:disabled{ background:#d1d5db; box-shadow:none; cursor:not-allowed; }
+    .btn-outline{
+      width:100%; padding:13px; font-size:13.5px; font-weight:800; border-radius:999px; margin-top:10px;
+      border:1.5px solid var(--border); background:#fff; color: var(--text); cursor:pointer; font-family: var(--font-display);
+      transition: border-color .15s, color .15s;
+    }
+    .btn-outline:hover{ border-color: var(--primary); color: var(--primary-dark); }
+
+    /* ===== Terms ===== */
+    .terms-title{ margin-top:18px; font-size:12.5px; font-weight:800; color: var(--text); font-family: var(--font-display); }
+    .terms-list{ margin:8px 0 0; padding-left:18px; font-size:11.5px; color: var(--text-muted); line-height:1.7; }
+
+    /* ===== Success card ===== */
+    .success-card{ text-align:center; padding: 10px 4px; }
+    .success-icon{
+      width:64px; height:64px; border-radius:50%; background: var(--primary-light); color: var(--primary);
+      display:flex; align-items:center; justify-content:center; font-size:30px; margin:0 auto 14px;
+    }
+    .success-title{ font-family: var(--font-display); font-size:18px; font-weight:800; margin:0 0 6px; }
+    .success-text{ font-size:13px; color: var(--text-muted); line-height:1.6; margin:0 0 4px; }
+
+    .footer-note{ text-align:center; font-size:11px; color:#9ca3af; margin-top: 6px; line-height:1.6; }
   </style>
 </head>
 <body>
+<div class="page">
 
-<div class="card">
-  <h1>Form Pendaftaran Layanan Internet</h1>
-  <div class="subtitle">PT. Jaringan Teknologi Sejahtra</div>
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="2"/>
+          <circle cx="5" cy="19" r="2"/>
+          <circle cx="19" cy="19" r="2"/>
+          <path d="M12 7v3.5M12 10.5L6.3 17.3M12 10.5l5.7 6.8"/>
+        </svg>
+      </div>
+      <h1>Form Pendaftaran Layanan Internet</h1>
+      <p>PT. Jaringan Teknologi Sejahtera</p>
+    </div>
+  </div>
 
-  <form id="formPelanggan">
-    <div class="form-group">
-      <label for="nik">NIK</label>
-      <input type="text" id="nik" name="nik" maxlength="16" placeholder="Masukkan NIK 16 digit" inputmode="numeric" required />
+  <div class="stepper">
+    <div class="step-item active" id="stepItem1">
+      <div class="step-dot" id="stepDot1">1</div>
+      <span class="step-label">Pindai KTP</span>
+    </div>
+    <div class="step-track"><div class="step-track-fill" id="stepFill"></div></div>
+    <div class="step-item" id="stepItem2">
+      <div class="step-dot" id="stepDot2">2</div>
+      <span class="step-label">Lengkapi &amp; Daftar</span>
+    </div>
+  </div>
+
+  <!-- ===================== LANGKAH 1: PINDAI KTP ===================== -->
+  <div class="card" id="cardScan">
+    <div class="card-header">
+      <div class="card-header-icon">📷</div>
+      <div>
+        <h2>Foto KTP</h2>
+        <p>Data Anda akan terisi otomatis</p>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="nama">Nama Lengkap</label>
-      <input type="text" id="nama" name="nama" placeholder="Nama sesuai KTP" required />
+    <label class="upload-zone" id="uploadZone" for="fotoKtp">
+      <div class="upload-placeholder" id="uploadPlaceholder">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">Tap untuk Ambil Foto KTP</div>
+        <div class="upload-hint">Gunakan kamera belakang &mdash; pastikan KTP rata, jelas &amp; cukup cahaya</div>
+      </div>
+      <div class="upload-result hidden" id="uploadResult">
+        <canvas id="previewCanvas"></canvas>
+        <div class="upload-result-text">
+          <strong>✓ KTP berhasil dipindai</strong>
+          <span>Tap untuk ganti foto</span>
+        </div>
+      </div>
+    </label>
+    <input type="file" id="fotoKtp" accept="image/*" capture="environment" style="display:none" />
+
+    <div class="progress-card hidden" id="progressWrap">
+      <div class="spinner"></div>
+      <div class="progress-label" id="progressLabel">Membaca data KTP...</div>
     </div>
 
-    <div class="form-group">
-      <label for="wa">Nomor WhatsApp</label>
-      <input type="text" id="wa" name="wa" placeholder="08xxxxxxxxxx" inputmode="numeric" required />
+    <div class="alert alert-error hidden" id="scanError">
+      <span class="alert-icon">⚠️</span>
+      <span id="scanErrorText"></span>
+    </div>
+    <button type="button" class="btn-outline hidden" id="btnRetry">🔄 Coba Pindai Lagi</button>
+  </div>
+
+  <!-- ===================== LANGKAH 2: LENGKAPI PENDAFTARAN ===================== -->
+  <form class="card hidden" id="formPelanggan">
+    <div class="alert alert-success" style="margin-top:0;">
+      <span class="alert-icon">✅</span>
+      <span>Data KTP terbaca otomatis. Periksa sekali lagi sebelum lanjut.</span>
     </div>
 
-    <!-- Pilihan Paket Grid Premium -->
-    <div class="form-group">
-      <label>Pilih Paket Berlangganan</label>
+    <div class="field-section">
+      <div class="field-section-title"><span class="icon-box">🪪</span> Data Diri</div>
+
+      <div class="field-group">
+        <label for="nik">NIK</label>
+        <input type="text" id="nik" name="nik" maxlength="16" placeholder="16 digit NIK" inputmode="numeric" required />
+      </div>
+
+      <div class="field-group">
+        <label for="nama">Nama Lengkap</label>
+        <input type="text" id="nama" name="nama" placeholder="Nama sesuai KTP" required />
+      </div>
+    </div>
+
+    <div class="field-section">
+      <div class="field-section-title"><span class="icon-box">📱</span> Kontak</div>
+      <div class="field-group">
+        <label for="wa">Nomor WhatsApp</label>
+        <input type="text" id="wa" name="wa" placeholder="08xxxxxxxxxx" inputmode="numeric" required />
+      </div>
+    </div>
+
+    <div class="field-section">
+      <div class="field-section-title"><span class="icon-box">📍</span> Alamat &amp; Wilayah</div>
+
+      <div class="field-group">
+        <label for="alamatDetail">Alamat (Dusun/Jalan, RT/RW)</label>
+        <input type="text" id="alamatDetail" name="alamatDetail" placeholder="Mis: Dusun VI, RT 025/RW 006" />
+      </div>
+
+      <div class="field-group">
+        <label>Provinsi</label>
+        <div class="combo-wrapper" data-level="provinsi">
+          <input type="text" id="provinsi_input" class="combo-input" placeholder="Ketik Provinsi..." autocomplete="off" required />
+          <div class="combo-list"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Kota/Kabupaten</label>
+        <div class="combo-wrapper" data-level="kabupaten">
+          <input type="text" id="kota_input" class="combo-input" placeholder="Kota/Kabupaten" autocomplete="off" disabled required />
+          <div class="combo-list"></div>
+        </div>
+      </div>
+
+      <div class="row2" style="margin-bottom:0;">
+        <div class="field-group">
+          <label>Kecamatan</label>
+          <div class="combo-wrapper" data-level="kecamatan">
+            <input type="text" id="kecamatan_input" class="combo-input" placeholder="Kecamatan" autocomplete="off" disabled required />
+            <div class="combo-list"></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Desa/Kelurahan</label>
+          <div class="combo-wrapper" data-level="kelurahan">
+            <input type="text" id="desa_input" class="combo-input" placeholder="Desa/Kelurahan" autocomplete="off" disabled required />
+            <div class="combo-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info hidden" id="regionHint">
+        <span class="alert-icon">ℹ️</span>
+        <span id="regionHintText"></span>
+      </div>
+    </div>
+
+    <div class="field-section">
+      <div class="field-section-title"><span class="icon-box">📶</span> Pilih Paket Berlangganan</div>
       <div class="package-grid">
         <label class="package-option">
           <input type="radio" name="paket" value="Basic" required />
           <div class="package-card">
-            <span class="package-icon">🌱</span>
+            <div class="package-check">✓</div>
+            <div class="package-icon-wrap">🌱</div>
             <span class="package-name">Basic</span>
           </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Clasic" />
           <div class="package-card">
-            <span class="package-icon">🏠</span>
+            <div class="package-check">✓</div>
+            <div class="package-icon-wrap">🏠</div>
             <span class="package-name">Clasic</span>
           </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Bronze" />
           <div class="package-card">
-            <span class="package-icon">🥉</span>
+            <div class="package-check">✓</div>
+            <div class="package-icon-wrap">🥉</div>
             <span class="package-name">Bronze</span>
           </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Silver" />
           <div class="package-card">
-            <span class="package-icon">🥈</span>
+            <div class="package-check">✓</div>
+            <div class="package-icon-wrap">🥈</div>
             <span class="package-name">Silver</span>
           </div>
         </label>
         <label class="package-option">
           <input type="radio" name="paket" value="Gold" />
           <div class="package-card">
-            <span class="package-icon">🥇</span>
+            <div class="package-check">✓</div>
+            <div class="package-icon-wrap">🥇</div>
             <span class="package-name">Gold Premium</span>
           </div>
         </label>
       </div>
     </div>
 
-    <label>Wilayah Domisili</label>
-    <div class="combo-wrapper" data-level="provinsi">
-      <input type="text" id="provinsi_input" class="combo-input" placeholder="Ketik Provinsi..." autocomplete="off" required />
-      <div class="combo-list"></div>
-    </div>
-
-    <div class="combo-wrapper" data-level="kabupaten">
-      <input type="text" id="kota_input" class="combo-input" placeholder="Kota/Kabupaten" autocomplete="off" disabled required />
-      <div class="combo-list"></div>
-    </div>
-
-    <div class="row">
-      <div class="combo-wrapper" data-level="kecamatan">
-        <input type="text" id="kecamatan_input" class="combo-input" placeholder="Kecamatan" autocomplete="off" disabled required />
-        <div class="combo-list"></div>
-      </div>
-      <div class="combo-wrapper" data-level="kelurahan">
-        <input type="text" id="desa_input" class="combo-input" placeholder="Desa/Kelurahan" autocomplete="off" disabled required />
-        <div class="combo-list"></div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="foto">Upload Foto KTP</label>
-      <input type="file" id="foto" name="foto" accept="image/*" capture="environment" required />
-      <div class="hint">Gunakan kamera belakang untuk hasil maksimal.</div>
-    </div>
-
-    <button type="submit" class="btn-submit" id="btnKirim">Daftar Sekarang</button>
-    <div id="statusBox" class="status-box"></div>
+    <button type="submit" class="btn-primary" id="btnKirim">Daftar Sekarang</button>
+    <div class="alert hidden" id="statusBox"><span class="alert-icon" id="statusIcon">⏳</span><span id="statusText"></span></div>
 
     <div class="terms-title">Catatan untuk Calon Pelanggan:</div>
     <ul class="terms-list">
@@ -182,14 +433,65 @@
       <li>Penanganan kendala dilakukan pada jam kerja (08.00–16.00 WIB).</li>
     </ul>
   </form>
+
+  <!-- ===================== SUKSES ===================== -->
+  <div class="card hidden" id="successCard">
+    <div class="success-card">
+      <div class="success-icon">✅</div>
+      <h2 class="success-title">Pendaftaran Berhasil!</h2>
+      <p class="success-text">Terima kasih, data Anda sudah kami terima dan akan segera ditindaklanjuti oleh tim kami.</p>
+      <p class="success-text">Konfirmasi juga telah dikirim ke WhatsApp Anda.</p>
+      <button type="button" class="btn-outline" id="btnDaftarLagi">Daftar Lagi</button>
+    </div>
+  </div>
+
+  <div class="footer-note">🔒 Foto KTP digunakan hanya untuk proses pendaftaran &amp; verifikasi data.</div>
 </div>
 
 <script>
+  /* ============================================================
+     KONFIGURASI BACKEND & AI
+     Catatan: API key Gemini di-embed langsung karena halaman ini
+     hanya untuk pemakaian pribadi/internal (tidak dipublikasikan).
+  ============================================================ */
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8FoI2tREEqWNaTKBx7XodOGmexTw750fpJB2vWuBxKsXHgcaCpjoXPDTQIO7QNI9V/exec";
   const BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+  const FONNTE_TOKEN = "AiK7CYb8t8Musw5HMBG1";
+
+  const GEMINI_API_KEY = "AIzaSyC6zNxr2kYF2k8aHLKWr-XGDl8dOnhdXbQ";
+  const GEMINI_MODEL = "gemini-2.5-flash"; // bisa diganti "gemini-2.5-pro" untuk akurasi lebih tinggi
+
   const state = { provinsi: null, kabupaten: null, kecamatan: null, kelurahan: null };
   const cache = { provinsi: [], kabupaten: new Map(), kecamatan: new Map(), kelurahan: new Map() };
 
+  /* ============================================================
+     DOM REFS
+  ============================================================ */
+  const fotoInput        = document.getElementById('fotoKtp');
+  const uploadPlaceholder= document.getElementById('uploadPlaceholder');
+  const uploadResult     = document.getElementById('uploadResult');
+  const previewCanvas    = document.getElementById('previewCanvas');
+  const progressWrap     = document.getElementById('progressWrap');
+  const progressLabel    = document.getElementById('progressLabel');
+  const scanError        = document.getElementById('scanError');
+  const scanErrorText    = document.getElementById('scanErrorText');
+  const btnRetry         = document.getElementById('btnRetry');
+  const formPelanggan    = document.getElementById('formPelanggan');
+  const regionHint       = document.getElementById('regionHint');
+  const regionHintText   = document.getElementById('regionHintText');
+  const successCard      = document.getElementById('successCard');
+  const cardScan         = document.getElementById('cardScan');
+
+  const stepItem1 = document.getElementById('stepItem1');
+  const stepItem2 = document.getElementById('stepItem2');
+  const stepDot1  = document.getElementById('stepDot1');
+  const stepFill  = document.getElementById('stepFill');
+
+  let ktpPhotoDataUrl = null; // foto KTP (hasil resize) -> dipakai utk scan & dikirim ke backend
+
+  /* ============================================================
+     WILAYAH (emsifa API) — combobox provinsi/kabupaten/kecamatan/desa
+  ============================================================ */
   async function fetchJson(url) {
     try {
       const r = await fetch(url);
@@ -215,6 +517,7 @@
     const level = wrapper.dataset.level;
     const listEl = wrapper.querySelector(".combo-list");
     const keyword = e.target.value.toLowerCase();
+    wrapper.classList.remove('needs-review');
 
     let source = [];
     if (level === "provinsi") source = cache.provinsi;
@@ -240,6 +543,7 @@
     const name = e.target.textContent;
 
     wrapper.querySelector('.combo-input').value = name;
+    wrapper.classList.remove('needs-review');
     state[level] = { id, name };
     wrapper.querySelector(".combo-list").style.display = "none";
 
@@ -249,86 +553,431 @@
       enableLevel("kabupaten", true);
       enableLevel("kecamatan", false);
       enableLevel("kelurahan", false);
+      state.kabupaten = null; state.kecamatan = null; state.kelurahan = null;
     } else if (level === "kabupaten") {
       const data = await fetchJson(`${BASE}/districts/${id}.json`);
       cache.kecamatan.set(id, data);
       enableLevel("kecamatan", true);
       enableLevel("kelurahan", false);
+      state.kecamatan = null; state.kelurahan = null;
     } else if (level === "kecamatan") {
       const data = await fetchJson(`${BASE}/villages/${id}.json`);
       cache.kelurahan.set(id, data);
       enableLevel("kelurahan", true);
+      state.kelurahan = null;
     }
   });
 
-  const form = document.getElementById("formPelanggan");
-  const btnKirim = document.getElementById("btnKirim");
-  const statusBox = document.getElementById("statusBox");
+  /* ============================================================
+     1) AMBIL FOTO KTP -> tampilkan preview -> langsung pindai
+  ============================================================ */
+  fotoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    loadImageToCanvas(file).then(() => {
+      formPelanggan.classList.add('hidden');
+      btnRetry.classList.add('hidden');
+      hideError();
+      scanKTP();
+    });
+  });
 
-  form.addEventListener("submit", function (e) {
+  function loadImageToCanvas(file){
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          const maxDim = 1568;
+          if (Math.max(width, height) > maxDim) {
+            const scale = maxDim / Math.max(width, height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          previewCanvas.width = width;
+          previewCanvas.height = height;
+          const ctx = previewCanvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          uploadPlaceholder.classList.add('hidden');
+          uploadResult.classList.remove('hidden');
+
+          ktpPhotoDataUrl = previewCanvas.toDataURL('image/jpeg', 0.9);
+          resolve();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ============================================================
+     2) PINDAI KTP DENGAN GEMINI AI
+  ============================================================ */
+  const KTP_SCHEMA = {
+    type: "OBJECT",
+    properties: {
+      nik:       { type: "STRING" },
+      nama:      { type: "STRING" },
+      alamat:    { type: "STRING" },
+      rt:        { type: "STRING" },
+      rw:        { type: "STRING" },
+      kelDesa:   { type: "STRING" },
+      kecamatan: { type: "STRING" },
+      kotaKab:   { type: "STRING" },
+      provinsi:  { type: "STRING" }
+    },
+    propertyOrdering: ["nik","nama","alamat","rt","rw","kelDesa","kecamatan","kotaKab","provinsi"]
+  };
+
+  const PROMPT = `Anda adalah sistem OCR untuk KTP (Kartu Tanda Penduduk) Indonesia.
+Baca gambar KTP ini dengan sangat teliti, terutama setiap digit pada NIK, lalu ekstrak data berikut sesuai schema JSON.
+
+Aturan:
+- Tulis semua nilai dengan HURUF KAPITAL sesuai yang tertulis di KTP.
+- "nik": tepat 16 digit angka tanpa spasi/karakter lain. Periksa ulang setiap digit (hindari salah baca 0/O, 1/I, 8/B, 5/S).
+- "rt" dan "rw": masing-masing 3 digit angka, contoh "025" dan "006". Jika tertulis "025/006", pisahkan menjadi rt="025", rw="006".
+- "alamat": hanya baris alamat utama (nama dusun/jalan), tanpa RT/RW/Kelurahan/Kecamatan.
+- "provinsi": nama provinsi saja, tanpa kata "PROVINSI" (contoh: "LAMPUNG").
+- "kotaKab": nama kota/kabupaten saja, tanpa kata "KOTA"/"KABUPATEN" (contoh: "LAMPUNG TENGAH").
+- "kecamatan" dan "kelDesa": nama wilayah saja, tanpa kata "KECAMATAN"/"KELURAHAN"/"DESA".
+- Jika sebuah field tidak ada/tidak terbaca di gambar, isi dengan string kosong "".
+- Jangan mengarang data yang tidak terlihat di gambar.
+- Kembalikan HANYA JSON sesuai schema, tanpa teks atau penjelasan lain.`;
+
+  async function callGemini(apiKey, model, base64Image, mimeType){
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const body = {
+      contents: [{
+        parts: [
+          { text: PROMPT },
+          { inline_data: { mime_type: mimeType, data: base64Image } }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0,
+        responseMimeType: "application/json",
+        responseSchema: KTP_SCHEMA
+      }
+    };
+
+    let res, json;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      json = await res.json();
+    } catch (e){
+      return { error: 'Tidak bisa terhubung ke Gemini API. Periksa koneksi internet Anda.' };
+    }
+
+    if (!res.ok){
+      const msg = json?.error?.message || `HTTP ${res.status}`;
+      let friendly = msg;
+      if (res.status === 400 && /API key/i.test(msg)) friendly = 'API key Gemini tidak valid.';
+      else if (res.status === 403) friendly = 'Akses Gemini API ditolak (403). Periksa API key.';
+      else if (res.status === 404) friendly = `Model "${model}" tidak tersedia untuk key ini.`;
+      else if (res.status === 429) friendly = 'Kuota Gemini API tercapai (429). Coba beberapa saat lagi.';
+      return { error: friendly };
+    }
+
+    const candidate = json?.candidates?.[0];
+    if (!candidate) return { error: 'Gemini tidak mengembalikan hasil. Coba foto ulang dengan pencahayaan lebih baik.' };
+    if (candidate.finishReason === 'SAFETY') return { error: 'Permintaan diblokir oleh filter keamanan Gemini.' };
+
+    const text = candidate?.content?.parts?.map(p => p.text || '').join('') || '';
+    try {
+      return { data: JSON.parse(text) };
+    } catch (e){
+      return { error: 'Gagal membaca respons dari Gemini. Coba lagi.' };
+    }
+  }
+
+  btnRetry.addEventListener('click', scanKTP);
+
+  async function scanKTP(){
+    if (!ktpPhotoDataUrl) return;
+
+    hideError();
+    btnRetry.classList.add('hidden');
+    progressWrap.classList.remove('hidden');
+    progressLabel.textContent = 'Membaca data KTP...';
+
+    const base64 = ktpPhotoDataUrl.split(',')[1];
+    const result = await callGemini(GEMINI_API_KEY, GEMINI_MODEL, base64, 'image/jpeg');
+
+    if (result.error){
+      progressWrap.classList.add('hidden');
+      showError('⚠ ' + result.error);
+      btnRetry.classList.remove('hidden');
+      return;
+    }
+
+    const data = normalizeData(result.data);
+
+    // Isi field dasar
+    document.getElementById('nik').value = data.nik;
+    document.getElementById('nama').value = data.nama;
+    document.getElementById('alamatDetail').value = buildAlamatDetail(data);
+
+    // Cocokkan wilayah ke daftar provinsi/kabupaten/kecamatan/desa
+    progressLabel.textContent = 'Mencocokkan data wilayah...';
+    const matched = await autoSelectRegion(data);
+    progressWrap.classList.add('hidden');
+
+    showRegionHint(matched, data);
+    goToStep2();
+  }
+
+  function showError(msg){
+    scanErrorText.textContent = msg;
+    scanError.classList.remove('hidden');
+  }
+  function hideError(){
+    scanError.classList.add('hidden');
+    scanErrorText.textContent = '';
+  }
+
+  function goToStep2(){
+    stepItem1.classList.remove('active');
+    stepItem1.classList.add('done');
+    stepDot1.textContent = '✓';
+    stepItem2.classList.add('active');
+    stepFill.style.width = '100%';
+
+    formPelanggan.classList.remove('hidden');
+    formPelanggan.classList.add('reveal');
+    formPelanggan.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function normalizeData(d){
+    const keys = ['nik','nama','alamat','rt','rw','kelDesa','kecamatan','kotaKab','provinsi'];
+    const data = {};
+    keys.forEach(k => { data[k] = (d && d[k] != null) ? String(d[k]).trim() : ''; });
+    data.nik = data.nik.replace(/\D/g, '');
+    if (/^\d{1,3}$/.test(data.rt)) data.rt = data.rt.padStart(3,'0');
+    if (/^\d{1,3}$/.test(data.rw)) data.rw = data.rw.padStart(3,'0');
+    return data;
+  }
+
+  function buildAlamatDetail(d){
+    const parts = [];
+    if (d.alamat) parts.push(d.alamat);
+    if (d.rt || d.rw) parts.push(`RT ${d.rt || '-'}/RW ${d.rw || '-'}`);
+    return parts.join(', ');
+  }
+
+  /* ============================================================
+     3) COCOKKAN HASIL AI KE DAFTAR WILAYAH (emsifa)
+  ============================================================ */
+  function normalizeRegionName(name){
+    return (name || '')
+      .toUpperCase()
+      .replace(/^(PROVINSI|KABUPATEN|KOTA(?:\s+ADM\.?)?|KECAMATAN|KELURAHAN|DESA)\s+/, '')
+      .trim();
+  }
+
+  function findBestMatch(list, target){
+    const t = normalizeRegionName(target);
+    if (!t || !list || !list.length) return null;
+    let found = list.find(i => normalizeRegionName(i.name) === t);
+    if (found) return found;
+    found = list.find(i => {
+      const n = normalizeRegionName(i.name);
+      return n.includes(t) || t.includes(n);
+    });
+    return found || null;
+  }
+
+  function selectComboItem(level, item){
+    const wrapper = document.querySelector(`[data-level="${level}"]`);
+    wrapper.querySelector('.combo-input').value = item.name;
+    wrapper.classList.remove('needs-review');
+    state[level] = { id: item.id, name: item.name };
+  }
+
+  async function autoSelectRegion(data){
+    const matched = { provinsi:false, kabupaten:false, kecamatan:false, kelurahan:false };
+
+    if (!cache.provinsi.length){
+      cache.provinsi = await fetchJson(`${BASE}/provinces.json`);
+    }
+
+    const prov = findBestMatch(cache.provinsi, data.provinsi);
+    if (!prov) return matched;
+    selectComboItem('provinsi', prov);
+    matched.provinsi = true;
+
+    const regList = await fetchJson(`${BASE}/regencies/${prov.id}.json`);
+    cache.kabupaten.set(prov.id, regList);
+    enableLevel('kabupaten', true);
+
+    const kab = findBestMatch(regList, data.kotaKab);
+    if (!kab) return matched;
+    selectComboItem('kabupaten', kab);
+    matched.kabupaten = true;
+
+    const distList = await fetchJson(`${BASE}/districts/${kab.id}.json`);
+    cache.kecamatan.set(kab.id, distList);
+    enableLevel('kecamatan', true);
+
+    const kec = findBestMatch(distList, data.kecamatan);
+    if (!kec) return matched;
+    selectComboItem('kecamatan', kec);
+    matched.kecamatan = true;
+
+    const villList = await fetchJson(`${BASE}/villages/${kec.id}.json`);
+    cache.kelurahan.set(kec.id, villList);
+    enableLevel('kelurahan', true);
+
+    const kel = findBestMatch(villList, data.kelDesa);
+    if (!kel) return matched;
+    selectComboItem('kelurahan', kel);
+    matched.kelurahan = true;
+
+    return matched;
+  }
+
+  function showRegionHint(matched, data){
+    const levels = [
+      { key:'provinsi',  label:'Provinsi',       dataKey:'provinsi' },
+      { key:'kabupaten', label:'Kota/Kabupaten', dataKey:'kotaKab' },
+      { key:'kecamatan', label:'Kecamatan',      dataKey:'kecamatan' },
+      { key:'kelurahan', label:'Desa/Kelurahan', dataKey:'kelDesa' },
+    ];
+    const failedFrom = levels.find(l => !matched[l.key]);
+
+    if (!failedFrom){
+      regionHint.className = 'alert alert-success';
+      regionHintText.textContent = '✓ Wilayah terdeteksi otomatis. Tetap periksa sebelum mengirim.';
+      regionHint.querySelector('.alert-icon').textContent = '✅';
+      regionHint.classList.remove('hidden');
+      return;
+    }
+
+    const order = ['provinsi','kabupaten','kecamatan','kelurahan'];
+    const startIdx = order.indexOf(failedFrom.key);
+    for (let i = startIdx; i < order.length; i++){
+      document.querySelector(`[data-level="${order[i]}"]`).classList.add('needs-review');
+    }
+
+    regionHint.className = 'alert alert-info';
+    regionHint.querySelector('.alert-icon').textContent = 'ℹ️';
+    regionHintText.textContent =
+      `${failedFrom.label} & wilayah di bawahnya tidak terdeteksi otomatis (terbaca: "${data[failedFrom.dataKey] || '-'}"). ` +
+      `Silakan ketik/pilih manual pada kolom yang ditandai kuning.`;
+    regionHint.classList.remove('hidden');
+  }
+
+  /* ============================================================
+     4) SUBMIT FORM -> Google Sheets (Apps Script) + WhatsApp (Fonnte)
+  ============================================================ */
+  const btnKirim   = document.getElementById("btnKirim");
+  const statusBox  = document.getElementById("statusBox");
+  const statusIcon = document.getElementById("statusIcon");
+  const statusText = document.getElementById("statusText");
+
+  formPelanggan.addEventListener("submit", function (e) {
     e.preventDefault();
-    if (!state.kelurahan) { alert("Harap lengkapi pilihan wilayah!"); return; }
+    if (!state.kelurahan) { alert("Harap lengkapi pilihan wilayah (Provinsi/Kabupaten/Kecamatan/Desa)!"); return; }
+    if (!ktpPhotoDataUrl) { alert("Foto KTP belum terbaca, silakan ulangi langkah pertama."); return; }
 
     btnKirim.disabled = true;
-    statusBox.style.display = "block";
-    statusBox.className = "status-box";
-    statusBox.textContent = "Sedang memproses data...";
+    statusBox.className = "alert alert-info";
+    statusIcon.textContent = "⏳";
+    statusText.textContent = "Sedang memproses data...";
+    statusBox.classList.remove('hidden');
 
-    const file = document.getElementById("foto").files[0];
-    const reader = new FileReader();
+    const payload = {
+      nik: document.getElementById("nik").value,
+      nama: document.getElementById("nama").value,
+      wa: document.getElementById("wa").value,
+      alamatDetail: document.getElementById("alamatDetail").value,
+      paket: document.querySelector('input[name="paket"]:checked').value,
+      provinsi: state.provinsi.name,
+      kabupaten: state.kabupaten.name,
+      kecamatan: state.kecamatan.name,
+      kelurahan: state.kelurahan.name,
+      fotoDataUrl: ktpPhotoDataUrl
+    };
 
-    reader.onload = function (ev) {
-      const payload = {
-        nik: document.getElementById("nik").value,
-        nama: document.getElementById("nama").value,
-        wa: document.getElementById("wa").value,
-        paket: document.querySelector('input[name="paket"]:checked').value,
-        provinsi: state.provinsi.name,
-        kabupaten: state.kabupaten.name,
-        kecamatan: state.kecamatan.name,
-        kelurahan: state.kelurahan.name,
-        fotoDataUrl: ev.target.result
-      };
-
-      fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+    fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
       .then(() => { kirimKeFonnte(payload); })
       .catch(err => {
-        statusBox.className = "status-box status-error";
-        statusBox.textContent = "Koneksi Gagal: " + err.message;
+        statusBox.className = "alert alert-error";
+        statusIcon.textContent = "⚠️";
+        statusText.textContent = "Koneksi Gagal: " + err.message;
         btnKirim.disabled = false;
       });
-    };
-    reader.readAsDataURL(file);
   });
 
   async function kirimKeFonnte(payload) {
-    const messageAdmin = `*PENDAFTARAN BARU *\n\nNIK: ${payload.nik}\nNama: ${payload.nama}\nWA: ${payload.wa}\nPaket: ${payload.paket}\nAlamat: ${payload.kelurahan}, ${payload.kecamatan}, ${payload.kabupaten}, ${payload.provinsi}`;
+    const alamatLengkap = [payload.alamatDetail, payload.kelurahan, payload.kecamatan, payload.kabupaten, payload.provinsi]
+      .filter(Boolean).join(', ');
+
+    const messageAdmin = `*PENDAFTARAN BARU*\n\nNIK: ${payload.nik}\nNama: ${payload.nama}\nWA: ${payload.wa}\nPaket: ${payload.paket}\nAlamat: ${alamatLengkap}`;
     const messageUser = `Yth. *${payload.nama}*,\n\nTerima kasih telah memilih PT. JTS sebagai partner layanan internet Anda.\nData pendaftaran Anda telah kami terima dan akan segera ditindaklanjuti oleh tim kami.`;
 
     try {
       await fetch("https://api.fonnte.com/send", {
         method: "POST",
-        headers: { "Authorization": "AiK7CYb8t8Musw5HMBG1" },
+        headers: { "Authorization": FONNTE_TOKEN },
         body: new URLSearchParams({ target: "120363401341090123@g.us", message: messageAdmin })
       });
 
       await fetch("https://api.fonnte.com/send", {
         method: "POST",
-        headers: { "Authorization": "AiK7CYb8t8Musw5HMBG1" },
+        headers: { "Authorization": FONNTE_TOKEN },
         body: new URLSearchParams({ target: payload.wa, message: messageUser })
       });
 
-      statusBox.className = "status-box status-success";
-      statusBox.textContent = "Pendaftaran Berhasil Terkirim!";
-      form.reset();
-      Object.keys(state).forEach(key => state[key] = null);
-      ["kabupaten", "kecamatan", "kelurahan"].forEach(l => enableLevel(l, false));
+      showSuccess();
     } catch (e) {
-      statusBox.className = "status-box status-success";
-      statusBox.textContent = "Data terinput, namun notifikasi WA gagal.";
+      showSuccess('Data terinput, namun notifikasi WA gagal.');
     }
     btnKirim.disabled = false;
   }
+
+  function showSuccess(note){
+    cardScan.classList.add('hidden');
+    formPelanggan.classList.add('hidden');
+    document.querySelector('.stepper').classList.add('hidden');
+    if (note){
+      successCard.querySelector('.success-text').textContent = note;
+    }
+    successCard.classList.remove('hidden');
+    successCard.classList.add('reveal');
+    successCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('btnDaftarLagi').addEventListener('click', () => {
+    formPelanggan.reset();
+    formPelanggan.classList.add('hidden');
+    successCard.classList.add('hidden');
+    cardScan.classList.remove('hidden');
+    document.querySelector('.stepper').classList.remove('hidden');
+
+    uploadPlaceholder.classList.remove('hidden');
+    uploadResult.classList.add('hidden');
+    ktpPhotoDataUrl = null;
+    fotoInput.value = '';
+
+    Object.keys(state).forEach(key => state[key] = null);
+    ["kabupaten", "kecamatan", "kelurahan"].forEach(l => enableLevel(l, false));
+    document.querySelectorAll('.combo-wrapper').forEach(w => w.classList.remove('needs-review'));
+    regionHint.classList.add('hidden');
+    statusBox.classList.add('hidden');
+
+    stepItem1.classList.remove('done'); stepItem1.classList.add('active');
+    stepItem2.classList.remove('active');
+    stepDot1.textContent = '1';
+    stepFill.style.width = '0%';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 </script>
 
 </body>
